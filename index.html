@@ -1,70 +1,101 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ppGames</title>
+    <title>🎮 ppGames — Browser Arcade Collection</title>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e1e2f, #252540);
-            color: white;
+            background: #1b1b2f;
+            color: #e0e0e0;
             text-align: center;
         }
-
+        header {
+            padding: 40px;
+        }
         h1 {
-            margin-top: 60px;
             font-size: 3rem;
+            margin: 0;
         }
-
-        .container {
-            margin-top: 60px;
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 8px;
+            color: #bbdefb;
         }
-
+        .games {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            padding: 40px;
+        }
         .game-card {
-            display: inline-block;
-            margin: 20px;
-            padding: 30px;
-            width: 250px;
-            background: #2f2f4f;
+            background: #2a2a4c;
             border-radius: 15px;
-            transition: 0.3s;
-            text-decoration: none;
-            color: white;
+            width: 280px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
-
         .game-card:hover {
             transform: scale(1.05);
-            background: #3a3a6a;
         }
-
+        .game-card h2 {
+            margin-top: 0;
+            color: #ffeb3b;
+        }
+        .game-card p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .play-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 14px;
+            background: #ff5252;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
         footer {
-            margin-top: 80px;
-            opacity: 0.6;
+            margin-top: 60px;
+            padding: 20px;
             font-size: 0.9rem;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
 
+<header>
     <h1>🎮 ppGames</h1>
-    <p>Pure HTML5 Browser Games</p>
+    <div class="subtitle">A small arcade collection built with HTML5 & JavaScript</div>
+</header>
 
-    <div class="container">
-        <a class="game-card" href="ppMinePlanet.html">
-            <h2>🌍 ppMinePlanet</h2>
-            <p>Space exploration arcade game</p>
-        </a>
+<div class="games">
 
-        <a class="game-card" href="ppPacSmile.html">
-            <h2>😄 ppPacSmile</h2>
-            <p>Retro maze arcade game</p>
-        </a>
+    <div class="game-card">
+        <h2>🌍 ppMinePlanet</h2>
+        <p>An arcade space exploration game where you navigate a planet surface, avoid hidden mines, and collect points.</p>
+        <p><strong>Controls:</strong> Arrow keys to move • Avoid obstacles • Collect bonuses</p>
+        <a class="play-btn" href="ppMinePlanet.html">Play Now</a>
     </div>
 
-    <footer>
-        © 2026 ppGames – Built with HTML5 & JavaScript
-    </footer>
+    <div class="game-card">
+        <h2>😄 ppPacSmile</h2>
+        <p>A maze arcade game inspired by classic retro titles — collect items, avoid enemies, and survive as long as you can.</p>
+        <p><strong>Controls:</strong> Arrow keys or WASD • Navigate maze • Dodge foes and score points</p>
+        <a class="play-btn" href="ppPacSmile.html">Play Now</a>
+    </div>
+
+</div>
+
+<footer>
+    © 2026 PISTINO DEVELOPMENT – Built with HTML5 & JavaScript<br>
+    Hosted via GitHub Pages
+</footer>
 
 </body>
 </html>
