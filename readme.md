@@ -56,8 +56,7 @@ License
 
 📜 SOFTWARE LICENSE AGREEMENT 📜
 
-Copyright (c) 2026 [Your Name]
-All Rights Reserved.
+Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.
 
 1. License Grant
 The author grants a limited, revocable, non-exclusive license
