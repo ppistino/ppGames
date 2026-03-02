@@ -130,8 +130,57 @@ body.light .screen{background:rgba(220,245,230,.97);}
 .screen p{font-size:10px;color:var(--text-mid);letter-spacing:2px;}
 .screen .sub{font-size:8px;color:var(--text-mid);letter-spacing:1px;}
 
+/* START SCREEN */
+#start-screen{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px 16px 40px;overflow-y:auto;background:var(--bg);}
+#start-screen.hidden{display:none!important;}
+.start-logo{font-family:'Courier New',monospace;font-size:clamp(1.6rem,8vw,3rem);font-weight:700;letter-spacing:4px;color:var(--glow);text-shadow:0 0 30px var(--glow),0 0 60px rgba(0,255,136,.3);animation:flicker 9s infinite;text-align:center;}
+.start-tagline{font-size:10px;letter-spacing:4px;color:var(--text-mid);text-align:center;margin-top:-8px;}
+.start-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;width:100%;max-width:400px;}
+.start-label{font-size:9px;font-weight:700;letter-spacing:3px;color:var(--glow);text-shadow:0 0 8px var(--glow);margin-bottom:8px;display:block;}
+.start-input{width:100%;background:rgba(0,255,136,.05);border:2px solid rgba(0,255,136,.3);border-radius:5px;padding:10px 14px;color:var(--glow);font-family:'Courier New',monospace;font-size:13px;font-weight:700;outline:none;transition:border-color .2s;margin-bottom:16px;letter-spacing:1px;}
+.start-input:focus{border-color:var(--glow);box-shadow:0 0 16px rgba(0,255,136,.25);}
+.start-input::placeholder{color:rgba(0,255,136,.3);font-size:10px;}
+body.light .start-input{background:rgba(0,120,60,.04);border-color:rgba(0,120,60,.3);color:var(--glow);}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.avbtn{background:rgba(0,255,136,.04);border:1.5px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-mid);font-family:'Courier New',monospace;font-size:8px;}
+.avbtn .ae{font-size:1.6rem;line-height:1;}
+.avbtn .al{font-size:8px;color:var(--text-dim);text-align:center;}
+.avbtn:hover{border-color:var(--glow);background:rgba(0,255,136,.10);}
+.avbtn.active{border-color:var(--glow);background:rgba(0,255,136,.18);box-shadow:0 0 14px rgba(0,255,136,.2);}
+.start-playbtn{background:linear-gradient(135deg,var(--glow),#008844);color:#000;border:none;border-radius:50px;padding:14px 44px;font-family:'Courier New',monospace;font-size:13px;letter-spacing:3px;cursor:pointer;box-shadow:0 5px 28px rgba(0,255,136,.4);transition:all .2s;width:100%;max-width:300px;font-weight:700;}
+.start-playbtn:hover{transform:translateY(-2px);box-shadow:0 9px 38px rgba(0,255,136,.6);}
+.start-secbtn{background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:50px;padding:10px 28px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:300px;}
+.start-secbtn:hover{border-color:var(--glow);color:var(--glow);}
+.start-avatar-display{font-size:1.6rem;line-height:1;}
+
 @keyframes flicker{0%,93%,96%,100%{opacity:1;}94%{opacity:.7;}95%{opacity:1;}97%{opacity:.6;}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+/* HISTORY OVERLAY (full-screen, usable from anywhere) */
+#history-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;transition:opacity .25s;}
+body.light #history-overlay{background:rgba(210,235,220,.96);}
+#history-overlay.hidden{display:none!important;}
+#history-overlay-box{width:100%;max-width:640px;flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#history-overlay-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--border);}
+#history-overlay-title{font-size:13px;color:var(--glow);letter-spacing:3px;text-shadow:0 0 8px var(--glow);}
+#history-overlay-close{font-family:'Courier New',monospace;font-size:10px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:5px 10px;transition:all .15s;}
+#history-overlay-close:hover{color:var(--glow);border-color:var(--glow);}
+#history-overlay-body{flex:1;overflow-y:auto;padding:10px 18px 14px;}
+#history-overlay-body::-webkit-scrollbar{width:4px;}
+#history-overlay-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+#history-overlay-table{width:100%;border-collapse:collapse;font-size:9px;}
+#history-overlay-table th{color:var(--text-dim);padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
+#history-overlay-table td{color:var(--text-mid);padding:5px 6px;border-bottom:1px solid rgba(0,255,136,.06);}
+#history-overlay-table tr:last-child td{border-bottom:none;}
+#history-overlay-table td.score-cell{color:var(--cyan);text-shadow:0 0 6px var(--cyan);}
+#history-overlay-table td.name-cell{color:var(--glow);}
+#history-overlay-empty{font-size:10px;color:var(--text-dim);text-align:center;padding:28px;letter-spacing:1px;}
+#history-overlay-footer{padding:10px 18px 14px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* START SCREEN FOOTER */
+#start-footer{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:8px;color:var(--text-dim);letter-spacing:1px;padding:5px 0 6px;pointer-events:none;}
+#start-footer span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 4px;}
+#start-footer span:hover{color:var(--glow);text-shadow:0 0 8px var(--glow);}
 </style>
 </head>
 <body>
@@ -143,11 +192,54 @@ body.light .screen{background:rgba(220,245,230,.97);}
 <canvas id="pc"></canvas>
 <canvas id="gc"></canvas>
 
+<!-- START SCREEN -->
+<div id="start-screen">
+  <div style="text-align:center;margin-bottom:4px;">
+    <div class="start-logo">🌍 MINE PLANET 🌍</div>
+    <div class="start-tagline">HEX-GRID EXPLORATION · MINESWEEPER ADVENTURE ✦</div>
+  </div>
+  <div class="start-card">
+    <span class="start-label">YOUR NAME</span>
+    <input id="start-name" class="start-input" type="text" placeholder="Enter your name..." maxlength="14" autocomplete="off">
+    <span class="start-label">CHOOSE YOUR AVATAR</span>
+    <div class="avatar-grid" id="avatar-grid"></div>
+  </div>
+  <button class="start-playbtn" id="start-play-btn">🚀 PLAY!</button>
+  <button class="start-secbtn" id="start-hist-btn">📜 GAME HISTORY</button>
+  <button class="start-secbtn" id="start-help-btn">❓ HOW TO PLAY</button>
+  <div id="start-footer">
+    <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.02 — click for info &amp; license</span>
+  </div>
+</div>
+
+<!-- HISTORY OVERLAY (full-screen, from anywhere) -->
+<div id="history-overlay" class="hidden">
+  <div id="history-overlay-box">
+    <div id="history-overlay-header">
+      <span id="history-overlay-title">📜 GAMES HISTORY</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn red" style="font-size:8px;padding:4px 8px;min-width:auto;" onclick="doClearHistoryOverlay()">🗑 CLEAR</button>
+        <button id="history-overlay-close" onclick="closeHistoryOverlay()">✕ CLOSE</button>
+      </div>
+    </div>
+    <div id="history-overlay-body">
+      <div id="history-overlay-empty">No games recorded yet.</div>
+      <table id="history-overlay-table" style="display:none;">
+        <thead><tr><th>#</th><th>DATE</th><th>PLAYER</th><th>SCORE</th><th>LVL</th><th>RESULT</th></tr></thead>
+        <tbody id="history-overlay-body-rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <div id="topbar">
   <div id="game-title">🌍<U>MINE PLANET</U>🌍</div>
   <div id="player-block">
     <span id="player-label">PLAYER</span>
-    <input id="player-name" type="text" maxlength="14" placeholder="Your name..." oninput="playerName=this.value.trim()||'UNKNOWN'">
+    <div style="display:flex;align-items:center;gap:5px;">
+      <span id="player-avatar-hud" style="font-size:1.4rem;line-height:1;"></span>
+      <span id="player-name-hud" style="font-family:'Courier New',monospace;font-size:13px;color:var(--glow);text-shadow:0 0 6px var(--glow);letter-spacing:1px;"></span>
+    </div>
   </div>
   <div class="top-stat">
     <span class="top-label">HP</span>
@@ -189,9 +281,10 @@ body.light .screen{background:rgba(220,245,230,.97);}
     <button class="zbtn" onclick="zoom(1.15)">🔍＋</button>
     <button class="zbtn" onclick="resetView()">⊙ RESET</button>
     <button class="zbtn" onclick="zoom(0.87)">🔍－</button>
-    <button class="btn purple" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="toggleHistory()">📜 HISTORY</button>
+    <button class="btn purple" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="openHistoryOverlay()">📜 HISTORY</button>
     <button class="btn cyan" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="openPopup('popup-help')">❓ HELP</button>
     <button class="btn red" id="b-quit" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="onQuitOrStart()">🏳 QUIT</button>
+    <button class="btn amber" id="b-menu" style="font-size:8px;padding:7px 10px;min-width:auto;display:none;" onclick="backToStart()">🏠 MENU</button>
   </div>
 </div>
 
@@ -215,7 +308,7 @@ body.light .screen{background:rgba(220,245,230,.97);}
 
 <!-- COPYRIGHT BAR -->
 <div id="copyright-bar">
-  <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.01 — click for info &amp; license</span>
+  <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.02 — click for info &amp; license</span>
 </div>
 
 <!-- WIN SCREEN -->
@@ -227,14 +320,18 @@ body.light .screen{background:rgba(220,245,230,.97);}
   <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;">
     <button class="btn green" onclick="nextLevel()">▶ NEXT LEVEL</button>
     <button class="btn red" onclick="endGameFromWin()">🏁 END GAME</button>
+    <button class="btn amber" onclick="backToStart()">🏠 MAIN MENU</button>
   </div>
 </div>
 <!-- GAME OVER SCREEN -->
 <div class="screen" id="sc-over">
   <h1 class="red">💀 GAME OVER</h1>
   <div class="big" id="go-score"></div>
-  <p>HP DEPLETED</p>
-  <button class="btn red" onclick="restartGame()" style="margin-top:8px">↺ RESTART</button>
+  <p>HP DEPLETED — board revealed to show your mistakes</p>
+  <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn green" onclick="restartGame()">↺ RESTART</button>
+    <button class="btn amber" onclick="backToStart()">🏠 MAIN MENU</button>
+  </div>
 </div>
 
 <!-- CUSTOM POPUP: quit confirm -->
@@ -269,7 +366,7 @@ body.light .screen{background:rgba(220,245,230,.97);}
   <div class="popup-box">
     <div class="popup-title">🌍 MINE PLANET 🌍</div>
     <div class="popup-body">
-      <p><strong>Version:</strong> 01.01 — February 2026</p>
+      <p><strong>Version:</strong> 01.02 — February 2026</p>
       <p><strong>Genre:</strong> Hex-grid exploration / minesweeper adventure</p>
       <p><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-body" href="mailto:pistino@libero.it">pistino@libero.it</a>)</p>
       <p><strong>Platform:</strong> Single-file HTML5 — runs in any modern browser</p>
@@ -361,6 +458,7 @@ let objective={};
 let camX=0,camY=0,camZ=1;
 let hexSize=32;
 let playerName='UNKNOWN';
+let playerAvatar='🌍';
 let matchHistory=[];
 let historyOpen=false;
 let gameAbandoned=false;
@@ -433,9 +531,11 @@ const ICFG={
 const NUM_COLORS=['#00ff88','#44ff55','#aaff44','#ffff33','#ffbb00','#ff7700','#ff2255','#ee00ff','#aaaaff'];
 const RES_ICONS={wood:'🌲',stone:'🪨',iron:'⚙️',crystal:'💎',fish:'🐠',gold:'🪙',coal:'🪵',herbs:'🌿',mushroom:'🍄',coral:'🪸',pearl:'🫧',crab:'🦀',octopus:'🐙'};
 const COLLECT_TYPES=['wood','stone','iron','crystal','fish','gold','coal','herbs','mushroom','coral','pearl','crab','octopus','portal'];
+// Special items that can be collected manually (not auto-activated on reveal)
+const SPECIAL_COLLECT=['medkit','bomb','map','potion','lantern'];
 const WATER_TYPES=['water','fish','waterMine','coral','pearl','crab','octopus'];
-// Special items that trigger on reveal (not collected manually)
-const SPECIAL_REVEAL=['medkit','bomb','map','potion','lantern'];
+// Special items trigger on COLLECT, not on reveal (kept for legacy reference)
+const SPECIAL_REVEAL=[];
 
 // ── BUILD PLANET — guarantees all required resources ──
 function buildPlanet(){
@@ -821,56 +921,20 @@ function doReveal(){
     flashFn('#ff1133','.3');spawnBurst(sp.x,sp.y,'#ff3355',20);spawnBurst(sp.x,sp.y,'#ff8800',8);
     toast(`💥 MINE! −${dmg} HP`);updateHpUI();updateMinesUI();if(hp<=0){gameOver();return;}
   } else if(sel.type==='medkit'){
-    const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);
-    spawnBurst(sp.x,sp.y,'#ff4444',12);spawnBurst(sp.x,sp.y,'#ffffff',8);
-    toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
+    spawnBurst(sp.x,sp.y,'#ff4444',8);
+    toast(`🩺 MEDKIT found! Press ⛏ COLLECT to use it`);
   } else if(sel.type==='bomb'){
-    // Bomb: reveals all adjacent cells automatically
-    spawnBurst(sp.x,sp.y,'#ff8800',22);flashFn('#ff8800','.2');
-    let revealed=0;
-    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
-      const nc=findCell(q,r);
-      if(nc&&!nc.revealed&&!nc.flagged){
-        nc.revealed=true;revealed++;
-        if(nc.type==='mine'||nc.type==='waterMine'){
-          bombsHit++;
-          const dmg=Math.max(1,Math.floor((3+Math.floor(level/3))/2));hp-=dmg;
-          toast(`💥 BOMB HIT MINE! −${dmg} HP`);updateHpUI();
-          if(hp<=0){gameOver();return;}
-        }
-      }
-    });
-    toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;
+    spawnBurst(sp.x,sp.y,'#ff8800',10);
+    toast(`💥 BOMB found! Press ⛏ COLLECT to detonate`);
   } else if(sel.type==='map'){
-    // Map: reveals a random area of unrevealed land cells
-    spawnBurst(sp.x,sp.y,'#44ffff',18);flashFn('#44ffff','.1');
-    const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');
-    const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);
-    toReveal.forEach(c=>c.revealed=true);
-    toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);
+    spawnBurst(sp.x,sp.y,'#44ffff',10);
+    toast(`🗺️ MAP found! Press ⛏ COLLECT to reveal terrain`);
   } else if(sel.type==='potion'){
-    // Potion: random effect (heal or damage)
-    const lucky=Math.random()<.6;
-    if(lucky){
-      const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);
-      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);
-      toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');
-    } else {
-      const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;
-      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);
-      toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;
-      if(hp<=0){updateHpUI();gameOver();return;}
-    }
-    updateHpUI();
+    spawnBurst(sp.x,sp.y,'#aa44ff',10);
+    toast(`🧪 POTION found! Press ⛏ COLLECT to drink`);
   } else if(sel.type==='lantern'){
-    // Lantern: reveals all adjacent cells safely (no mine damage)
-    spawnBurst(sp.x,sp.y,'#ffee44',16);flashFn('#ffee44','.08');
-    let revealed=0;
-    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
-      const nc=findCell(q,r);
-      if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}
-    });
-    toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);
+    spawnBurst(sp.x,sp.y,'#ffee44',10);
+    toast(`🔦 LANTERN found! Press ⛏ COLLECT to illuminate`);
   } else if(sel.type==='portal'){
     spawnBurst(sp.x,sp.y,'#aa44ff',18);toast('🌀 PORTAL FOUND! Collect resources then use COLLECT here');
   } else if(WATER_TYPES.includes(sel.type)){
@@ -898,7 +962,76 @@ function floodFill(q,r){
 
 function doCollect(){
   if(gameAbandoned||!sel||!sel.revealed)return;
-  if(!COLLECT_TYPES.includes(sel.type)){toast('⚠ NOTHING TO COLLECT');return;}
+  const isSpecial=SPECIAL_COLLECT.includes(sel.type);
+  if(!COLLECT_TYPES.includes(sel.type)&&!isSpecial){toast('⚠ NOTHING TO COLLECT');return;}
+
+  // ── SPECIAL ITEM EFFECTS (triggered by COLLECT) ──
+  if(sel.type==='medkit'){
+    const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);
+    const sp=worldToScreen(sel.px,sel.py);
+    spawnBurst(sp.x,sp.y,'#ff4444',12);spawnBurst(sp.x,sp.y,'#ffffff',8);
+    toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='bomb'){
+    const sp=worldToScreen(sel.px,sel.py);
+    spawnBurst(sp.x,sp.y,'#ff8800',22);flashFn('#ff8800','.2');
+    let revealed=0;
+    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
+      const nc=findCell(q,r);
+      if(nc&&!nc.revealed&&!nc.flagged){
+        nc.revealed=true;revealed++;
+        if(nc.type==='mine'||nc.type==='waterMine'){
+          bombsHit++;
+          const dmg=Math.max(1,Math.floor((3+Math.floor(level/3))/2));hp-=dmg;
+          toast(`💥 BOMB HIT MINE! −${dmg} HP`);updateHpUI();
+          if(hp<=0){sel.type='empty';gameOver();return;}
+        }
+      }
+    });
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();return;
+  }
+  if(sel.type==='map'){
+    const sp=worldToScreen(sel.px,sel.py);
+    spawnBurst(sp.x,sp.y,'#44ffff',18);flashFn('#44ffff','.1');
+    const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');
+    const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);
+    toReveal.forEach(c=>c.revealed=true);
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='potion'){
+    const sp=worldToScreen(sel.px,sel.py);
+    const lucky=Math.random()<.6;
+    if(lucky){
+      const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);
+      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);
+      toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');
+    } else {
+      const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;
+      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);
+      toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;
+    }
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    updateHpUI();if(hp<=0){gameOver();return;}
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='lantern'){
+    const sp=worldToScreen(sel.px,sel.py);
+    spawnBurst(sp.x,sp.y,'#ffee44',16);flashFn('#ffee44','.08');
+    let revealed=0;
+    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
+      const nc=findCell(q,r);
+      if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}
+    });
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
 
   // ── CASO SPECIALE: COLLECT sul portale = uscita livello ──
   if(sel.type==='portal'){
@@ -906,7 +1039,6 @@ function doCollect(){
     score+=200*level;updateScoreUI();
     const sp=worldToScreen(sel.px,sel.py);
     spawnBurst(sp.x,sp.y,'#aa44ff',28);flashFn('#aa44ff','.18');
-    <!-- saveToHistory('✅ LVL '+level+' COMPLETE'); -->
     setTimeout(()=>{
       document.getElementById('sc-level').classList.add('show');
       document.getElementById('sc-score').textContent='SCORE: '+score;
@@ -943,6 +1075,11 @@ function checkWin(){
 }
 function gameOver(){
   saveToHistory('💀 GAME OVER');
+  // Reveal all cells to show mistakes (like abandon)
+  cells.forEach(c=>{c.revealed=true;c.flagged=false;});
+  sel=null;gameAbandoned=true;
+  updateQuitBtn();updateActionBtns(null);
+  drawAll();
   document.getElementById('sc-over').classList.add('show');
   document.getElementById('go-score').textContent='SCORE: '+score;
 }
@@ -964,7 +1101,20 @@ function restartGame(){
   level=1;score=0;maxHp=12;hp=12;bombsHit=0;
   document.getElementById('lv-num').textContent=level;
   document.getElementById('sc-over').classList.remove('show');
+  document.getElementById('sc-level').classList.remove('show');
   buildPlanet();
+}
+function backToStart(){
+  document.getElementById('sc-over').classList.remove('show');
+  document.getElementById('sc-level').classList.remove('show');
+  // Hide game UI, show start screen
+  document.getElementById('start-screen').classList.remove('hidden');
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('left-panel').style.display='none';
+  document.getElementById('right-panel').style.display='none';
+  document.getElementById('bottombar').style.display='none';
+  document.getElementById('gc').style.display='none';
+  document.getElementById('pc').style.display='none';
 }
 
 // ── UI LABELS ──
@@ -988,10 +1138,11 @@ function updateCellInfo(c){
     if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine') t+=` [${c.adjacent} nearby mines]`;
     if(c.type==='portal'&&!objDone()) t+=' — collect resources first!';
     if(c.type==='portal'&&objDone()) t+=' — press ⛏ COLLECT to exit!';
-    if(c.type==='bomb') t+=' — reveals adjacent cells!';
-    if(c.type==='map') t+=' — reveals random terrain area!';
-    if(c.type==='potion') t+=' — random effect (60% lucky)!';
-    if(c.type==='lantern') t+=' — safely illuminates neighbors!';
+    if(c.type==='bomb') t+=' — press ⛏ COLLECT to detonate neighbors!';
+    if(c.type==='map') t+=' — press ⛏ COLLECT to reveal terrain!';
+    if(c.type==='potion') t+=' — press ⛏ COLLECT to drink (60% lucky)!';
+    if(c.type==='lantern') t+=' — press ⛏ COLLECT to illuminate safely!';
+    if(c.type==='medkit') t+=' — press ⛏ COLLECT to restore HP!';
   }
   if(c.flagged) t+=' 🚩';
   el.textContent=t;
@@ -1004,7 +1155,7 @@ function updateActionBtns(c){
     return;
   }
   document.getElementById('b-reveal').classList.toggle('off',!c||c.revealed||c.flagged);
-  document.getElementById('b-collect').classList.toggle('off',!c||!c.revealed||!COLLECT_TYPES.includes(c.type));
+  document.getElementById('b-collect').classList.toggle('off',!c||!c.revealed||(![...COLLECT_TYPES,...SPECIAL_COLLECT].includes(c.type)));
   document.getElementById('b-flag').classList.toggle('off',!c||c.revealed);
 }
 function updateHpUI(){document.getElementById('hp-num').textContent=hp;document.getElementById('hp-fill').style.width=(Math.max(0,hp)/maxHp*100)+'%';}
@@ -1030,10 +1181,13 @@ function updateUI(){updateHpUI();updateScoreUI();updateMinesUI();updateResUI();u
 // ── QUIT / START BUTTON ──
 function updateQuitBtn(){
   const btn=document.getElementById('b-quit');
+  const menuBtn=document.getElementById('b-menu');
   if(gameAbandoned){
     btn.textContent='▶ NEW GAME';btn.classList.remove('red');btn.classList.add('green');
+    if(menuBtn)menuBtn.style.display='';
   } else {
     btn.textContent='🏳 QUIT';btn.classList.remove('green');btn.classList.add('red');
+    if(menuBtn)menuBtn.style.display='none';
   }
 }
 function onQuitOrStart(){
@@ -1069,11 +1223,12 @@ function flashFn(col,op){const el=document.getElementById('flash');el.style.back
 function saveToHistory(result){
   const now=new Date();
   const dateStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const name=document.getElementById('player-name').value.trim()||'UNKNOWN';
-  matchHistory.unshift({date:dateStr,player:name,score,level,result});
+  const name=playerName||'UNKNOWN';
+  matchHistory.unshift({date:dateStr,player:name,avatar:playerAvatar,score,level,result});
   if(matchHistory.length>50)matchHistory.pop();
   try{window.storage&&window.storage.set('mineplanet-history',JSON.stringify(matchHistory));}catch(e){}
   renderHistory();
+  renderHistoryOverlay();
 }
 function renderHistory(){
   const empty=document.getElementById('history-empty');
@@ -1081,7 +1236,7 @@ function renderHistory(){
   const tbody=document.getElementById('history-body');
   if(!matchHistory.length){empty.style.display='block';table.style.display='none';return;}
   empty.style.display='none';table.style.display='table';
-  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
+  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.avatar||'🌍'} ${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
 }
 function toggleHistory(){
   historyOpen=!historyOpen;
@@ -1090,11 +1245,34 @@ function toggleHistory(){
   if(historyOpen){renderHistory();setTimeout(()=>{bb.style.bottom=document.getElementById('history-panel').offsetHeight+'px';},20);}
   else{bb.style.bottom='0';}
 }
+
+// ── HISTORY OVERLAY (full-screen, works from start screen and game) ──
+function openHistoryOverlay(){
+  renderHistoryOverlay();
+  document.getElementById('history-overlay').classList.remove('hidden');
+}
+function closeHistoryOverlay(){
+  document.getElementById('history-overlay').classList.add('hidden');
+}
+function renderHistoryOverlay(){
+  const empty=document.getElementById('history-overlay-empty');
+  const table=document.getElementById('history-overlay-table');
+  const tbody=document.getElementById('history-overlay-body-rows');
+  if(!matchHistory.length){
+    empty.style.display='block';table.style.display='none';return;
+  }
+  empty.style.display='none';table.style.display='table';
+  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.avatar||'🌍'} ${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
+}
+function doClearHistoryOverlay(){
+  openPopup('popup-clear');
+}
 function clearHistory(){openPopup('popup-clear');}
 function doClearHistory(){
   closePopup('popup-clear');matchHistory=[];
   try{window.storage&&window.storage.delete('mineplanet-history');}catch(e){}
   renderHistory();
+  renderHistoryOverlay();
 }
 async function loadHistory(){
   try{if(window.storage){const r=await window.storage.get('mineplanet-history');if(r&&r.value)matchHistory=JSON.parse(r.value);}}catch(e){}
@@ -1122,7 +1300,86 @@ function loop(t){
 
 // ── START ──
 loadHistory();
-buildPlanet();
+
+// ── AVATARS ──
+const AVATARS={
+  explorer: {i:'🧭',l:'Explorer'},
+  astronaut:{i:'🧑‍🚀',l:'Astronaut'},
+  robot:    {i:'🤖',l:'Robot'},
+  alien:    {i:'👽',l:'Alien'},
+  wizard:   {i:'🧙',l:'Wizard'},
+  pirate:   {i:'🏴‍☠️',l:'Pirate'},
+  ninja:    {i:'🥷',l:'Ninja'},
+  viking:   {i:'⚔️',l:'Viking'},
+  scientist:{i:'🔬',l:'Scientist'},
+  dragon:   {i:'🐲',l:'Dragon'},
+};
+
+// ── BUILD AVATAR GRID ──
+let selectedAvatarKey=null;
+(()=>{
+  const grid=document.getElementById('avatar-grid');
+  Object.entries(AVATARS).forEach(([key,av])=>{
+    const b=document.createElement('button');
+    b.className='avbtn';b.dataset.key=key;
+    b.innerHTML=`<span class="ae">${av.i}</span><span class="al">${av.l}</span>`;
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.avbtn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');selectedAvatarKey=key;
+    });
+    grid.appendChild(b);
+  });
+})();
+
+// ── SHOW/HIDE GAME UI ──
+function showGameUI(){
+  document.getElementById('topbar').style.display='';
+  document.getElementById('left-panel').style.display='';
+  document.getElementById('right-panel').style.display='';
+  document.getElementById('bottombar').style.display='';
+  document.getElementById('gc').style.display='';
+  document.getElementById('pc').style.display='';
+}
+function hideGameUI(){
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('left-panel').style.display='none';
+  document.getElementById('right-panel').style.display='none';
+  document.getElementById('bottombar').style.display='none';
+  document.getElementById('gc').style.display='none';
+  document.getElementById('pc').style.display='none';
+}
+
+// ── START SCREEN BUTTONS ──
+document.getElementById('start-play-btn').addEventListener('click',()=>{
+  const name=document.getElementById('start-name').value.trim();
+  if(!name){toast('✏️ Inserisci il tuo nome!');return;}
+  if(!selectedAvatarKey){toast('👆 Scegli il tuo avatar!');return;}
+  // Set player info
+  playerName=name;
+  playerAvatar=AVATARS[selectedAvatarKey].i;
+  // Update HUD
+  document.getElementById('player-name-hud').textContent=playerName;
+  document.getElementById('player-avatar-hud').textContent=playerAvatar;
+  // Hide start screen, show game
+  document.getElementById('start-screen').classList.add('hidden');
+  showGameUI();
+  // Reset and start
+  level=1;score=0;maxHp=12;hp=12;bombsHit=0;
+  document.getElementById('lv-num').textContent=level;
+  buildPlanet();
+});
+
+document.getElementById('start-hist-btn').addEventListener('click',()=>{
+  openHistoryOverlay();
+});
+
+document.getElementById('start-help-btn').addEventListener('click',()=>{
+  openPopup('popup-help');
+});
+
+// ── INITIALLY HIDE GAME UI ──
+hideGameUI();
+
 requestAnimationFrame(loop);
 </script>
 </body>

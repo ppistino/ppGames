@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -465,7 +465,7 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
 <div id="toast"></div>
 
 <!-- ══ THEME TOGGLE ══ -->
-<button id="theme-toggle" title="Cambia tema chiaro/scuro" aria-label="Cambia tema">
+<button id="theme-toggle" title="Toggle light/dark theme" aria-label="Toggle theme">
   <div id="theme-knob"><span id="theme-icon">☀️</span></div>
 </button>
 
@@ -473,39 +473,39 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
 <div id="ss" class="screen">
   <div style="text-align:center">
     <div class="logo">PacSMILE</div>
-    <div class="tagline">Il labirinto degli smiley ✨</div>
+    <div class="tagline">The Smiley Maze ✨</div>
   </div>
 
   <div class="card">
     <div style="font-family:'Boogaloo',cursive;font-size:1.1rem;color:var(--accent);
-      margin-bottom:14px;text-align:center;letter-spacing:1px">🎮 Configura il tuo Smile</div>
-    <label class="clbl" for="pn">Il tuo nome</label>
-    <input type="text" id="pn" class="cinp" placeholder="Es. Paolo…" maxlength="14" autocomplete="off"/>
-    <label class="clbl">Scegli il tuo PacSmile</label>
+      margin-bottom:14px;text-align:center;letter-spacing:1px">🎮 Set up your Smile</div>
+    <label class="clbl" for="pn">Your name</label>
+    <input type="text" id="pn" class="cinp" placeholder="e.g. Paolo…" maxlength="14" autocomplete="off"/>
+    <label class="clbl">Choose your PacSmile</label>
     <div class="grow" id="chars-grid"></div>
   </div>
 
-  <button class="playbtn" id="pbtn">🚀 GIOCA!</button>
+  <button class="playbtn" id="pbtn">🚀 PLAY!</button>
   <button class="playbtn" id="hist-btn"
     style="background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);box-shadow:none;font-size:1rem;padding:12px 40px">
-    🏆 Storico Partite
+    🏆 Game History
   </button>
   <button class="playbtn" id="help-ss-btn"
     style="background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);box-shadow:none;font-size:1rem;padding:12px 40px">
-    ❓ Come si gioca
+    ❓ How to Play
   </button>
-  <div class="hint">⌨️ Frecce/WASD · 📱 D-Pad touch · 👆 Swipe<br>
-  Raccogli 🍎 frutti e portali alla controparte!</div>
+  <div class="hint">⌨️ Arrows/WASD · 📱 D-Pad touch · 👆 Swipe<br>
+  Collect 🍎 fruits and bring them to your counterpart!</div>
 </div>
 
 <!-- ══ HISTORY SCREEN ══ -->
 <div id="hs-screen" class="screen hidden">
-  <div class="hs-title">🏆 Storico Partite</div>
-  <div class="hs-subtitle">Le tue avventure con PacSmile</div>
+  <div class="hs-title">🏆 Game History</div>
+  <div class="hs-subtitle">Your PacSmile adventures</div>
   <div id="hs-list"></div>
   <div class="hs-actions">
-    <button class="hs-btn hs-btn-back" id="hs-back">← Torna</button>
-    <button class="hs-btn hs-btn-del" id="hs-clear">🗑️ Cancella storico</button>
+    <button class="hs-btn hs-btn-back" id="hs-back">← Back</button>
+    <button class="hs-btn hs-btn-del" id="hs-clear">🗑️ Clear history</button>
   </div>
 </div>
 
@@ -513,11 +513,11 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
 <div id="conf-ov" class="hidden">
   <div class="conf-box">
     <div class="conf-icon" id="conf-icon">⚠️</div>
-    <div class="conf-title" id="conf-title">Sicuro?</div>
-    <div class="conf-text" id="conf-text">Testo</div>
+    <div class="conf-title" id="conf-title">Are you sure?</div>
+    <div class="conf-text" id="conf-text">Message</div>
     <div class="conf-btns">
-      <button class="conf-btn conf-no" id="conf-no">Annulla</button>
-      <button class="conf-btn conf-yes" id="conf-yes">Conferma</button>
+      <button class="conf-btn conf-no" id="conf-no">Cancel</button>
+      <button class="conf-btn conf-yes" id="conf-yes">Confirm</button>
     </div>
   </div>
 </div>
@@ -526,17 +526,17 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
 <div id="gs" class="screen hidden">
   <div id="hud">
     <div class="hs"><span id="hpi" style="font-size:1.1rem">😊</span>
-      <span class="hv" id="hn" style="font-size:.85rem;color:var(--blue)">Nome</span></div>
+      <span class="hv" id="hn" style="font-size:.85rem;color:var(--blue)">Name</span></div>
     <div class="hs"><span class="hl">LVL</span><span class="hv" id="hlvl">1</span></div>
-    <div class="hs"><span class="hl">PUNTI</span><span class="hv" id="hsc">0</span></div>
+    <div class="hs"><span class="hl">SCORE</span><span class="hv" id="hsc">0</span></div>
     <div class="hs"><span class="hl">🍎</span><span class="hv" id="hfr">0/3</span></div>
     <div class="hs"><span class="hl">❤️</span><div id="hpw"><div id="hpf"></div></div></div>
     <div class="hs"><span id="hliv">❤️❤️❤️</span></div>
     <div id="fxs"></div>
-    <button class="hud-iconbtn danger" id="quit-btn" title="Abbandona partita" style="margin-left:auto;margin-right:4px">🚪</button>
-    <button class="hud-iconbtn" id="pause-btn" title="Pausa" style="margin-right:4px">⏸</button>
-    <button class="hud-iconbtn" id="hist-hud-btn" title="Storico" style="margin-right:4px">🏆</button>
-    <button class="hud-iconbtn" id="help-btn" title="Guida" style="margin-right:52px">❓</button>
+    <button class="hud-iconbtn danger" id="quit-btn" title="Quit game" style="margin-left:auto;margin-right:4px">🚪</button>
+    <button class="hud-iconbtn" id="pause-btn" title="Pause" style="margin-right:4px">⏸</button>
+    <button class="hud-iconbtn" id="hist-hud-btn" title="History" style="margin-right:4px">🏆</button>
+    <button class="hud-iconbtn" id="help-btn" title="Help" style="margin-right:52px">❓</button>
   </div>
   <div id="cw"><canvas id="cv"></canvas></div>
 
@@ -546,9 +546,9 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
       <div class="db" id="bl">◀</div><div class="dc db"></div><div class="db" id="br">▶</div>
       <div></div><div class="db" id="bd">▼</div><div></div>
     </div>
-    <div id="ah">🍎 Porta frutti<br>alla controparte!<br><br>
+    <div id="ah">🍎 Bring fruits<br>to your counterpart!<br><br>
       <span style="font-size:.6rem;color:var(--text4)">
-        💊medikit 🗝️chiave 💡segreti<br>⭐turbo 💣bomba 🧊ghiaccio 🍬x2 🛡️scudo ❤️vita</span></div>
+        💊medikit 🗝️key 💡secrets<br>⭐turbo 💣bomb 🧊ice 🍬x2 🛡️shield ❤️life</span></div>
   </div>
 </div>
 
@@ -556,27 +556,27 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
 <div id="ov" class="hidden">
   <div class="ovb">
     <div class="oe" id="oe">🎉</div>
-    <div class="ot" id="ot">Titolo</div>
-    <div class="ox" id="ox">Testo</div>
+    <div class="ot" id="ot">Title</div>
+    <div class="ox" id="ox">Message</div>
     <button class="obtn" id="ob">OK</button>
   </div>
 </div>
 
 <!-- ══ COPYRIGHT BAR ══ -->
 <div id="copyright-bar">
-  <span id="copyright-span">© 2026 PISTINO DEVELOPMENT — PacSMILE v.01.01 — click per info &amp; licenza</span>
+  <span id="copyright-span">© 2026 PISTINO DEVELOPMENT — PacSMILE v.01.01 — click for info &amp; license</span>
 </div>
 
 <!-- ══ ABOUT POPUP ══ -->
 <div id="about-popup" class="hidden">
   <div class="about-box">
     <div class="about-title">😊 PacSMILE</div>
-    <div class="about-row"><strong>Versione:</strong> 01.01 — Febbraio 2026</div>
-    <div class="about-row"><strong>Genere:</strong> Labirinto / Arcade smile-style</div>
-    <div class="about-row"><strong>Autore:</strong> Paolo Pista.</div>
-    <div class="about-row"><strong>Piattaforma:</strong> Single-file HTML5 — funziona su qualsiasi browser moderno e smartphone</div>
+    <div class="about-row"><strong>Version:</strong> 01.01 — February 2026</div>
+    <div class="about-row"><strong>Genre:</strong> Maze / Arcade smile-style</div>
+    <div class="about-row"><strong>Author:</strong> Paolo Pista.</div>
+    <div class="about-row"><strong>Platform:</strong> Single-file HTML5 — works on any modern browser and smartphone</div>
     <div class="about-license">
-      <span class="lic-title">⚖ LICENZA SOFTWARE</span>
+      <span class="lic-title">⚖ SOFTWARE LICENSE</span>
         <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
         <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
         <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
@@ -585,34 +585,34 @@ body.light .gbtn.active{background:rgba(200,160,0,.15);}
         <p>By accessing or using this software, you agree to these terms.</p>
         <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
     </div>
-    <button class="about-close" id="about-close-btn">✕ Chiudi</button>
+    <button class="about-close" id="about-close-btn">✕ Close</button>
   </div>
 </div>
 
 <!-- ══ HELP POPUP ══ -->
 <div id="help-popup" class="hidden" style="position:fixed;inset:0;z-index:400;background:var(--overlay-bg);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
   <div class="about-box" style="max-width:420px;max-height:88vh;overflow-y:auto;">
-    <div class="about-title">❓ Guida a PacSMILE</div>
-    <div class="about-row"><strong>🎯 Obiettivo:</strong> Raccogli i frutti 🍎 nel labirinto e consegnali alla tua <strong>controparte</strong> (l'emoji abbinata). Consegna tutti i frutti richiesti per passare al livello successivo!</div>
-    <div class="about-row"><strong>🕹️ Controlli:</strong> ⌨️ Frecce / WASD — 📱 D-Pad touch — 👆 Swipe sullo schermo — ⏸ Spazio/Esc per pausa</div>
-    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent);font-weight:700">⚡ POWER-UP</span></div>
-    <div class="about-row">🔵 <strong>Pillola</strong> — Nemici spaventati per qualche secondi, puoi mangiarli!</div>
-    <div class="about-row">⭐ <strong>Turbo</strong> — Velocità raddoppiata temporaneamente</div>
-    <div class="about-row">🍬 <strong>Caramella</strong> — Punteggio x2 per qualche secondi</div>
-    <div class="about-row">🛡️ <strong>Scudo</strong> — Assorbe un colpo nemico</div>
-    <div class="about-row">💊 <strong>Medikit</strong> — Ripristina 38 HP</div>
-    <div class="about-row">❤️ <strong>Vita extra</strong> — Guadagni una vita aggiuntiva</div>
-    <div class="about-row">🗝️ <strong>Chiave</strong> — Sblocca un passaggio chiuso 🔒</div>
-    <div class="about-row">💡 <strong>Lampadina</strong> — Rivela i passaggi segreti <span style="color:var(--text3)">?</span></div>
-    <div class="about-row">💣 <strong>Bomba</strong> — Elimina tutti i nemici visibili</div>
-    <div class="about-row">🧊 <strong>Ghiaccio</strong> — Iberna tutti i nemici per qualche secondi</div>
-    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent2);font-weight:700">😠 NEMICI</span></div>
-    <div class="about-row">Al livello 1 ci sono <strong>2 nemici arrabbiati</strong>. Ogni livello ne aggiunge uno, fino a un massimo di 10. I nemici si muovono <strong>leggermente più lento</strong> del giocatore. Quando sono <strong>spaventati</strong> 😨 (dopo pillola) puoi mangiarli per bonus!</div>
-    <div class="about-row" style="margin-top:4px"><span style="color:var(--pink);font-weight:700">💨 DAL LIVELLO 7</span></div>
-    <div class="about-row">La <strong>controparte scappa</strong>! Si muove liberamente nel labirinto cercando di allontanarsi da te. Dovrai inseguirla per consegnare i frutti!</div>
-    <div class="about-row" style="margin-top:4px"><span style="color:var(--green);font-weight:700">💡 CONSIGLI</span></div>
-    <div class="about-row">• I nemici si nascondono per qualche secondi all'inizio e dopo ogni respawn — usali per orientarti!<br>• Usa la bomba 💣 quando sei circondato<br>• Usa il turbo ⭐ per sfuggire ai nemici o raggiungere la controparte 💨<br>• Il combo moltiplicatore sale mangiando nemici consecutivi!</div>
-    <button class="about-close" id="help-close-btn">✕ Chiudi</button>
+    <div class="about-title">❓ PacSMILE Guide</div>
+    <div class="about-row"><strong>🎯 Objective:</strong> Collect fruits 🍎 in the maze and deliver them to your <strong>counterpart</strong> (the matching emoji). Deliver all required fruits to advance to the next level!</div>
+    <div class="about-row"><strong>🕹️ Controls:</strong> ⌨️ Arrows / WASD — 📱 D-Pad touch — 👆 Swipe — ⏸ Space/Esc to pause</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent);font-weight:700">⚡ POWER-UPS</span></div>
+    <div class="about-row">🔵 <strong>Pill</strong> — Enemies frightened for a few seconds, you can eat them!</div>
+    <div class="about-row">⭐ <strong>Turbo</strong> — Speed doubled temporarily</div>
+    <div class="about-row">🍬 <strong>Candy</strong> — Score x2 for a few seconds</div>
+    <div class="about-row">🛡️ <strong>Shield</strong> — Absorbs one enemy hit</div>
+    <div class="about-row">💊 <strong>Medikit</strong> — Restores 38 HP</div>
+    <div class="about-row">❤️ <strong>Extra life</strong> — Gain an additional life</div>
+    <div class="about-row">🗝️ <strong>Key</strong> — Unlocks a locked passage 🔒</div>
+    <div class="about-row">💡 <strong>Bulb</strong> — Reveals secret passages <span style="color:var(--text3)">?</span></div>
+    <div class="about-row">💣 <strong>Bomb</strong> — Eliminates all visible enemies</div>
+    <div class="about-row">🧊 <strong>Ice</strong> — Freezes all enemies for a few seconds</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent2);font-weight:700">😠 ENEMIES</span></div>
+    <div class="about-row">Level 1 has <strong>2 angry enemies</strong>. Each level adds one, up to a maximum of 10. Enemies move <strong>slightly slower</strong> than the player. When <strong>frightened</strong> 😨 (after a pill) you can eat them for a bonus!</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--pink);font-weight:700">💨 FROM LEVEL 7</span></div>
+    <div class="about-row">The <strong>counterpart runs away</strong>! It moves freely through the maze trying to stay away from you. You'll have to chase it to deliver the fruits!</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--green);font-weight:700">💡 TIPS</span></div>
+    <div class="about-row">• Enemies hide for a few seconds at the start and after each respawn — use the time to get your bearings!<br>• Use the bomb 💣 when surrounded<br>• Use turbo ⭐ to escape enemies or reach the counterpart 💨<br>• The combo multiplier increases by eating enemies consecutively!</div>
+    <button class="about-close" id="help-close-btn">✕ Close</button>
   </div>
 </div>
 
@@ -657,15 +657,15 @@ applyTheme(isDark);
 const TILE = {WALL:0,EMPTY:1,DOT:2,PILL:3,FRUIT:4,MEDIKIT:5,KEY:6,BULB:7,TURBO:8,BOMB:9,CANDY:10,SHIELD:11,LOCKED:12,SECRET:13,EXTRALIFE:14,ICE:15};
 const COLS = 19, ROWS = 19;
 const CHARS = {
-  man:    {emoji:'👨', label:'Uomo',    color:'#6bcbff', cpEmoji:'👩', cpName:'Donna'},
-  woman:  {emoji:'👩', label:'Donna',   color:'#ffb3d9', cpEmoji:'👨', cpName:'Uomo'},
-  male:   {emoji:'😀', label:'Sole',    color:'#ffe566', cpEmoji:'😍', cpName:'Luna'},
-  female: {emoji:'😍', label:'Luna',    color:'#ffb3d9', cpEmoji:'😀', cpName:'Sole'},
-  monkey: {emoji:'🐵', label:'Scimmia', color:'#f4a460', cpEmoji:'🦊', cpName:'Volpe'},
-  devil:  {emoji:'😈', label:'Diavolo', color:'#ff6b6b', cpEmoji:'😇', cpName:'Angelo'},
-  cool:   {emoji:'😎', label:'Fico',    color:'#a8e6a3', cpEmoji:'🤓', cpName:'Nerd'},
-  alien:  {emoji:'👽', label:'Alieno',  color:'#c3b1e1', cpEmoji:'🤖', cpName:'Robot'},
-  robot:  {emoji:'🤖', label:'Robot',   color:'#88ddff', cpEmoji:'👽', cpName:'Alieno'},
+  man:    {emoji:'👨', label:'Man',     color:'#6bcbff', cpEmoji:'👩', cpName:'Woman'},
+  woman:  {emoji:'👩', label:'Woman',   color:'#ffb3d9', cpEmoji:'👨', cpName:'Man'},
+  male:   {emoji:'😀', label:'Sun',     color:'#ffe566', cpEmoji:'😍', cpName:'Moon'},
+  female: {emoji:'😍', label:'Moon',    color:'#ffb3d9', cpEmoji:'😀', cpName:'Sun'},
+  monkey: {emoji:'🐵', label:'Monkey',  color:'#f4a460', cpEmoji:'🦊', cpName:'Fox'},
+  devil:  {emoji:'😈', label:'Devil',   color:'#ff6b6b', cpEmoji:'😇', cpName:'Angel'},
+  cool:   {emoji:'😎', label:'Cool',    color:'#a8e6a3', cpEmoji:'🤓', cpName:'Nerd'},
+  alien:  {emoji:'👽', label:'Alien',   color:'#c3b1e1', cpEmoji:'🤖', cpName:'Robot'},
+  robot:  {emoji:'🤖', label:'Robot',   color:'#88ddff', cpEmoji:'👽', cpName:'Alien'},
 };
 const FRUITS = ['🍎','🍊','🍇','🍓','🍑','🫐','🍋','🍒'];
 const IEMOJI  = {[TILE.PILL]:'🔵',[TILE.MEDIKIT]:'💊',[TILE.KEY]:'🗝️',
@@ -673,7 +673,7 @@ const IEMOJI  = {[TILE.PILL]:'🔵',[TILE.MEDIKIT]:'💊',[TILE.KEY]:'🗝️',
 const HISTORY_KEY = 'pacsmile_history';
 
 /* ══ STATE ══ */
-// (spostato all'inizio dello script per evitare ReferenceError nel tema)
+// (moved to top of script to avoid ReferenceError in theme)
 
 /* ══ THEME-AWARE CANVAS COLORS ══ */
 function tc(dark, light) { return isDark ? dark : light; }
@@ -693,7 +693,7 @@ function addHistoryEntry(result) {
   h.unshift({
     name:G.name, gender:G.gender, emoji:G.char.emoji,
     score:G.score, level:G.level, result,
-    date: new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
     duration:`${mm}:${ss}`, fruitsTotal:G.fruitsDelivered,
   });
   if (h.length > 50) h.length = 50;
@@ -714,14 +714,14 @@ function renderHistoryList() {
   const h = loadHistory();
   const el = document.getElementById('hs-list');
   if (!h.length) {
-    el.innerHTML = '<div class="hs-empty">😴 Nessuna partita ancora registrata…<br>Gioca la tua prima partita!</div>';
+    el.innerHTML = '<div class="hs-empty">😴 No games recorded yet…<br>Play your first game!</div>';
     return;
   }
   const medals = ['🥇','🥈','🥉'];
   el.innerHTML = h.map((e, i) => {
     const badge = e.result === 'gameover'
       ? '<span class="hs-badge badge-go">💀 Game Over</span>'
-      : '<span class="hs-badge badge-ab">🚪 Abbandonato</span>';
+      : '<span class="hs-badge badge-ab">🚪 Abandoned</span>';
     const rank = medals[i] || `<span style="color:var(--text3);font-size:1rem">${i+1}</span>`;
     return `<div class="hs-item ${e.result==='gameover'?'gameover':'abandon'}">
       <div class="hs-rank">${rank}</div>
@@ -730,8 +730,8 @@ function renderHistoryList() {
         <div class="hs-detail">Lv.${e.level} · 🍎 ${e.fruitsTotal} · ⏱ ${e.duration} · ${e.date}</div>
         <div>${badge}</div>
       </div>
-      <div class="hs-score">${e.score.toLocaleString('it-IT')}<br>
-        <span style="font-size:.65rem;color:var(--text3)">punti</span></div>
+      <div class="hs-score">${e.score.toLocaleString('en')}<br>
+        <span style="font-size:.65rem;color:var(--text3)">pts</span></div>
     </div>`;
   }).join('');
 }
@@ -739,9 +739,9 @@ function renderHistoryList() {
 document.getElementById('hs-back').addEventListener('click', ()=>{});
 document.getElementById('hist-btn').addEventListener('click', () => showHistoryScreen('ss'));
 document.getElementById('hs-clear').addEventListener('click', () => {
-  confirm2('🗑️','Cancella storico',
-    "Vuoi davvero eliminare tutto lo storico? L'azione è irreversibile.",
-    'Elimina tutto', () => { saveHistory([]); renderHistoryList(); toast('🗑️ Storico cancellato!'); });
+  confirm2('🗑️','Clear history',
+    "Are you sure you want to delete all history? This action cannot be undone.",
+    'Delete all', () => { saveHistory([]); renderHistoryList(); toast('🗑️ History cleared!'); });
 });
 
 /* ══ CONFIRM DIALOG ══ */
@@ -778,8 +778,8 @@ function confirm2(icon, title, text, yesTxt, cb) {
 })();
 document.getElementById('pbtn').addEventListener('click', () => {
   pName = document.getElementById('pn').value.trim();
-  if (!pName)   { toast('✏️ Inserisci il tuo nome!'); return; }
-  if (!pGender) { toast('👆 Scegli il tuo PacSmile!'); return; }
+  if (!pName)   { toast('✏️ Enter your name!'); return; }
+  if (!pGender) { toast('👆 Choose your PacSmile!'); return; }
   startGame();
 });
 
@@ -787,14 +787,14 @@ document.getElementById('pbtn').addEventListener('click', () => {
 document.getElementById('quit-btn').addEventListener('click', () => {
   if (G.over || !G.player) return;
   G.paused = true;
-  confirm2('🚪','Abbandona partita',
-    'Vuoi davvero abbandonare? La partita verrà registrata come "Abbandonata" nello storico.',
-    'Abbandona', () => {
+  confirm2('🚪','Quit game',
+    'Are you sure you want to quit? The game will be saved as "Abandoned" in history.',
+    'Quit', () => {
       addHistoryEntry('abandon');
       cancelAnimationFrame(animID);
       hideAll();
       document.getElementById('ss').classList.remove('hidden');
-      toast('🚪 Partita abbandonata e salvata!');
+      toast('🚪 Game abandoned and saved!');
       G = {};
     });
 });
@@ -823,11 +823,11 @@ document.getElementById('pause-btn').addEventListener('click', () => {
   const btn = document.getElementById('pause-btn');
   if (G.paused) {
     btn.textContent = '▶';
-    btn.title = 'Riprendi';
-    toast('⏸ Pausa');
+    btn.title = 'Resume';
+    toast('⏸ Paused');
   } else {
     btn.textContent = '⏸';
-    btn.title = 'Pausa';
+    btn.title = 'Pause';
     lastTs = 0; tickAcc = 0;
     loop();
   }
@@ -904,7 +904,7 @@ function initLevel() {
   if (G.level>=4) { plN(pool,TILE.BULB,1); addSecret(3); }
   if (G.level>=3) plN(pool, TILE.BOMB, 1);
   if (G.level>=2) plN(pool, TILE.ICE, 1);
-  // Vita extra: 1 per livello, compare solo se ne hai persa almeno 1 (oppure sempre dal liv 2, ma rara)
+  // Extra life: 1 per level, appears only if at least 1 lost (or always from level 2, but rare)
   if (G.level>=2 && Math.random()<0.6) plN(pool, TILE.EXTRALIFE, 1);
 
   spawnPlayer(); spawnCP(); spawnEnemies(Math.min(1+G.level, 10));
@@ -957,7 +957,7 @@ function respawnCollectedFruits() {
   if (!col.length) return;
   const pool = shuf(emptyCells());
   col.forEach(it => { it.col=false; const pos=pool.pop()||freeCell([G.player,G.cp]); it.x=pos.x; it.y=pos.y; });
-  toast('🔄 Frutti rimessi in campo!');
+  toast('🔄 Fruits put back on the field!');
 }
 
 /* ══ CANVAS ══ */
@@ -1021,7 +1021,7 @@ function movePlayer(){
 }
 function dist(x1,y1,x2,y2){return Math.abs(x1-x2)+Math.abs(y1-y2);}
 function moveEnemies(){
-  if(G.enemyHideT>0) return; // nemici fermi mentre nascosti
+  if(G.enemyHideT>0) return; // enemies stay still while hidden
   G.enemies.forEach(e=>{
     if(e.dead){if(--e.respawnT<=0){e.dead=false;const p=freeCell([G.player,G.cp]);e.x=p.x;e.y=p.y;}return;}
     if(e.frozen){if(--e.frozenT<=0)e.frozen=false;return;}
@@ -1039,26 +1039,26 @@ function moveEnemies(){
   });
 }
 
-/* ══ CP MOVEMENT (dal livello 7 la controparte si muove) ══ */
+/* ══ CP MOVEMENT (from level 7 the counterpart moves) ══ */
 let cpTickAcc=0;
 function moveCP(){
   if(G.level<7) return;
   const cp=G.cp, p=G.player;
-  // Si muove a velocità player/3 — ogni 3 tick player
+  // Moves at player/3 speed — every 3 player ticks
   cpTickAcc++;
   if(cpTickAcc<3) return;
   cpTickAcc=0;
-  // Preferisce direzione opposta al player
+  // Prefers direction away from player
   const awayX = cp.x - p.x, awayY = cp.y - p.y;
-  // Costruisce direzioni ordinate: prima quelle che allontanano
+  // Build directions sorted: first those that move away
   const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
   dirs.sort((a,b)=>{
-    const da = -(a[0]*awayX + a[1]*awayY); // negativo = allontana
+    const da = -(a[0]*awayX + a[1]*awayY); // negative = moves away
     const db = -(b[0]*awayX + b[1]*awayY);
     return da-db + (Math.random()-.5)*1.5;
   });
   const ok=dirs.filter(([dx,dy])=>passable(cp.x+dx,cp.y+dy));
-  // Evita tornare indietro se possibile
+  // Avoid going back if possible
   const nr=ok.filter(([dx,dy])=>!(dx===-cp.dx&&dy===-cp.dy));
   const ch=(nr.length?nr:ok)[0];
   if(ch){cp.x+=ch[0];cp.y+=ch[1];cp.dx=ch[0];cp.dy=ch[1];}
@@ -1070,7 +1070,7 @@ function checkPickups(){
   if(G.fruitsHeld>0&&p.x===G.cp.x&&p.y===G.cp.y){
     G.fruitsDelivered+=G.fruitsHeld;
     G.score+=50*G.level*G.fruitsHeld*(G.candyT>0?2:1);
-    toast(`💝 Consegnati ${G.fruitsHeld} frutti! (${G.fruitsDelivered}/${G.fruitsGoal})`);
+    toast(`💝 Delivered ${G.fruitsHeld} fruits! (${G.fruitsDelivered}/${G.fruitsGoal})`);
     G.fruitsHeld=0;
     if(G.fruitsDelivered>=G.fruitsGoal)setTimeout(levelUp,600);
   }
@@ -1079,20 +1079,20 @@ function collectItem(t){
   switch(t){
     case TILE.PILL:
       G.powerT=28;G.enemies.forEach(e=>{if(!e.dead){e.scared=true;e.scaredT=28;}});
-      G.comboK=0;toast('😱 Nemici spaventati!');G.score+=20;break;
+      G.comboK=0;toast('😱 Enemies frightened!');G.score+=20;break;
     case TILE.FRUIT:
-      G.fruitsHeld++;toast(`🍎 +1 frutto (${G.fruitsHeld} tenuti) → vai dalla controparte!`);G.score+=10;break;
+      G.fruitsHeld++;toast(`🍎 +1 fruit (${G.fruitsHeld} held) → go to your counterpart!`);G.score+=10;break;
     case TILE.MEDIKIT: G.hp=Math.min(100,G.hp+38);toast('💊 +38 HP!');G.score+=15;break;
     case TILE.KEY:
       G.keys++;
       outer:for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)
         if(G.grid[y][x]===TILE.LOCKED){G.grid[y][x]=TILE.DOT;break outer;}
-      toast('🗝️ Passaggio sbloccato!');G.score+=30;break;
+      toast('🗝️ Passage unlocked!');G.score+=30;break;
     case TILE.BULB:
       G.bulbOn=true;
       for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)
         if(G.grid[y][x]===TILE.SECRET)G.grid[y][x]=TILE.DOT;
-      toast('💡 Passaggi segreti rivelati!');G.score+=40;break;
+      toast('💡 Secret passages revealed!');G.score+=40;break;
     case TILE.TURBO: G.turboT=22;toast('⭐ TURBO!');G.score+=20;break;
     case TILE.BOMB:
       G.explosions = G.explosions||[];
@@ -1102,24 +1102,24 @@ function collectItem(t){
           e.dead=true; e.scared=false; e.frozen=false; e.respawnT=40;
         }
       });
-      toast('💣 BOOM! Tutti eliminati!');G.score+=80;break;
+      toast('💣 BOOM! All eliminated!');G.score+=80;break;
     case TILE.ICE:
       G.enemies.forEach(e=>{if(!e.dead){e.frozen=true;e.frozenT=30;e.scared=false;}});
-      toast('🧊 Nemici ibernati!');G.score+=40;break;
-    case TILE.CANDY: G.candyT=28;toast('🍬 Punteggio x2!');G.score+=10;break;
-    case TILE.SHIELD:G.shieldT=32;toast('🛡️ Scudo!');G.score+=25;break;
+      toast('🧊 Enemies frozen!');G.score+=40;break;
+    case TILE.CANDY: G.candyT=28;toast('🍬 Score x2!');G.score+=10;break;
+    case TILE.SHIELD:G.shieldT=32;toast('🛡️ Shield!');G.score+=25;break;
     case TILE.EXTRALIFE:
       G.lives=Math.min(G.lives+1,5);
-      toast('❤️ Vita extra guadagnata!');
+      toast('❤️ Extra life gained!');
       G.score+=100;
       updateHUD();
       break;
   }
 }
 function checkCollisions(){
-  if(G.enemyHideT>0) return; // no collisioni mentre nascosti
+  if(G.enemyHideT>0) return; // no collisions while enemies are hidden
   const p=G.player;
-  if(G.hitCooldown>0)return; // immunità temporanea dopo un colpo
+  if(G.hitCooldown>0)return; // temporary immunity after a hit
   G.enemies.forEach(e=>{
     if(e.dead||e.frozen)return;
     if(e.x===p.x&&e.y===p.y){
@@ -1127,15 +1127,15 @@ function checkCollisions(){
         e.dead=true;e.scared=false;e.scaredT=0;e.respawnT=24;
         G.comboK++;
         const pts=200*G.comboK*(G.candyT>0?2:1);
-        G.score+=pts;toast(`😋 Mangiato! +${pts} pts!`);
+        G.score+=pts;toast(`😋 Eaten! +${pts} pts!`);
       }else{
-        if(G.shieldT>0){G.shieldT=0;toast('🛡️ Scudo assorbito!');G.hitCooldown=20;return;}
-        G.hp=Math.max(0,G.hp-28);toast('😱 Colpito! -28 HP');
+        if(G.shieldT>0){G.shieldT=0;toast('🛡️ Shield absorbed!');G.hitCooldown=20;return;}
+        G.hp=Math.max(0,G.hp-28);toast('😱 Hit! -28 HP');
         G.hitCooldown=20;
         if(G.hp<=0){
           G.lives--;
           if(G.lives<=0){G.hp=0;gameOver();}
-          else{G.hp=100;G.fruitsHeld=0;G.hitCooldown=31;G.respawnT=31;G.enemyHideT=35;respawnCollectedFruits();toast('💀 Vita persa! 5s di immunità!');spawnPlayer();}
+          else{G.hp=100;G.fruitsHeld=0;G.hitCooldown=31;G.respawnT=31;G.enemyHideT=35;respawnCollectedFruits();toast('💀 Life lost! 5s immunity!');spawnPlayer();}
         }
       }
     }
@@ -1153,18 +1153,18 @@ function tickTimers(){
 /* ══ LEVEL / GAME OVER ══ */
 function levelUp(){
   G.level++;G.paused=true;
-  showOv('🎉',`Livello ${G.level}!`,
-    `Obiettivo: ${2+G.level} frutti. ${Math.min(1+G.level,10)} nemici!`+
-    (G.level>=3?' 🗝️ Porte chiuse!':'')+(G.level>=4?' 💡 Passaggi segreti!':'')+(G.level>=7?' 💨 La controparte scappa!':''),
-    '▶ Vai!',()=>{G.paused=false;initLevel();updateHUD();});
+  showOv('🎉',`Level ${G.level}!`,
+    `Goal: ${2+G.level} fruits. ${Math.min(1+G.level,10)} enemies!`+
+    (G.level>=3?' 🗝️ Locked doors!':'')+(G.level>=4?' 💡 Secret passages!':'')+(G.level>=7?' 💨 The counterpart runs away!':''),
+    '▶ Go!',()=>{G.paused=false;initLevel();updateHUD();});
 }
 function gameOver(){
   G.over=true;G.paused=true;
   cancelAnimationFrame(animID);
   addHistoryEntry('gameover');
   showOv('💀','GAME OVER',
-    `${G.name} ha totalizzato ${G.score} punti al livello ${G.level}! Salvato nello storico.`,
-    '🔄 Riprova',()=>{hideAll();document.getElementById('ss').classList.remove('hidden');G={};});
+    `${G.name} scored ${G.score} points at level ${G.level}! Saved to history.`,
+    '🔄 Try again',()=>{hideAll();document.getElementById('ss').classList.remove('hidden');G={};});
 }
 
 /* ══ HUD ══ */
@@ -1212,7 +1212,7 @@ function showOv(emoji,title,text,btn,cb){
 /* ══ MAIN LOOP ══ */
 let lastTs=0, tickAcc=0, enemyTickAcc=0;
 const BASE_TICK=160;
-const ENEMY_TICK_EXTRA=40; // nemici più lenti di ~25%
+const ENEMY_TICK_EXTRA=40; // enemies ~25% slower than player
 function loop(ts=0){
   animID=requestAnimationFrame(loop);
   if(G.over||G.paused)return;
@@ -1296,7 +1296,7 @@ function drawEmoji(ctx,em,x,y,size){
 
 function drawPlayer(ctx,C){
   const p=G.player, px=p.x*C+C/2, py=p.y*C+C/2, r=C*.42;
-  // Lampeggio durante immunità respawn
+  // Blink during respawn immunity
   if(G.respawnT>0 && G.frame%4<2) return;
   ctx.save(); ctx.translate(px,py);
   if(G.shieldT>0){
@@ -1307,8 +1307,8 @@ function drawPlayer(ctx,C){
   }
   if(G.turboT>0){ctx.shadowBlur=18;ctx.shadowColor='#ffcc00';}
   if(G.candyT>0){ctx.shadowBlur=16;ctx.shadowColor='#ff69b4';}
-  // Nessuna rotazione: player sempre dritto
-  // Leggera pulsazione per dare vita
+  // No rotation: player always faces forward
+  // Slight pulse to give life
   const sc = 1 + 0.06 * Math.sin(G.frame * 0.35);
   ctx.scale(sc, sc);
   ctx.font = `${C*1.05}px serif`;
@@ -1355,7 +1355,7 @@ function drawCP(ctx,C){
 
 function drawEnemy(ctx,e,C){
   if(e.dead)return;
-  // Nemici nascosti all'inizio/dopo respawn player — lampeggio finale
+  // Enemies hidden at start/after player respawn — final blink warning
   if(G.enemyHideT>0){
     if(G.enemyHideT>8) return;
     if(G.frame%6<3) return; // lampeggio avviso
@@ -1364,7 +1364,7 @@ function drawEnemy(ctx,e,C){
   ctx.save(); ctx.translate(e.x*C+C/2,e.y*C+C/2+bob);
   if(e.frozen){
     drawEmoji(ctx,'🥶',0,0,C*.92);
-    // barra countdown ibernazione
+    // freeze countdown bar
     ctx.fillStyle='rgba(100,200,255,.5)';
     ctx.fillRect(-C*.38,C*.5,C*.76*(e.frozenT/30),3);
   }
