@@ -1,0 +1,1127 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌍 ppMinePlanet 🌍</title>
+<!-- <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> -->
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080c;--surface:rgba(4,12,8,.93);--border:rgba(0,255,136,.18);
+  --glow:#00ff88;--cyan:#00e5ff;--amber:#ffaa00;--red:#ff3355;--purple:#bb66ff;
+  --text-dim:#2a5040;--text-mid:#3a7050;--scanline:rgba(0,255,100,.022);
+  --vignette:rgba(0,0,0,.88);
+  --fs: 1.5;
+}
+body.light{
+  --bg:#e8f4ec;--surface:rgba(240,255,245,.95);--border:rgba(0,150,80,.25);
+  --glow:#008844;--cyan:#007799;--amber:#bb6600;--red:#cc1133;--purple:#663399;
+  --text-dim:#5a8060;--text-mid:#336644;--scanline:rgba(0,80,40,.012);
+  --vignette:rgba(200,230,210,.6);
+}
+body{background:var(--bg);overflow:hidden;width:100vw;height:100vh;font-family:'Courier New',monospace;font-weight: bold;touch-action:none;transition:background .3s;}
+#bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;transition:opacity .4s;}
+body.light #bg-layer{opacity:0;pointer-events:none;}
+#light-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 30% 20%,rgba(180,240,200,.6) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(160,220,255,.4) 0%,transparent 50%),#e8f4ec;transition:opacity .4s;}
+body.light #light-bg{opacity:1;}
+#crt{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,var(--scanline) 0,transparent 1px,transparent 4px);}
+#vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,var(--vignette) 100%);}
+#gc{position:fixed;inset:0;z-index:5;display:block;cursor:crosshair;}
+#pc{position:fixed;inset:0;z-index:6;pointer-events:none;}
+#flash{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0;transition:opacity .12s;}
+#toast{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:90;font-size:11px;color:var(--amber);text-shadow:0 0 10px var(--amber);opacity:0;pointer-events:none;letter-spacing:2px;white-space:nowrap;transition:opacity .2s;}
+
+/* TOP BAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:5px 10px;gap:6px 10px;background:linear-gradient(180deg,rgba(0,0,0,.88) 0%,transparent 100%);border-bottom:1px solid var(--border);}
+body.light #topbar{background:linear-gradient(180deg,rgba(220,245,230,.95) 0%,transparent 100%);}
+#game-title{font-size:18px;color:var(--glow);text-shadow:0 0 12px var(--glow);letter-spacing:2px;animation:flicker 9s infinite;white-space:nowrap;}
+#player-block{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+#player-label{font-size:10px;color:var(--glow);text-shadow:0 0 8px var(--glow);letter-spacing:1px;}
+#player-name{font-family:'Courier New',monospace;font-size:13px;padding:3px 6px;background:rgba(0,255,136,.08);color:var(--glow);border:2px solid var(--glow);border-radius:3px;width:90px;outline:none;letter-spacing:1px;text-shadow:0 0 6px var(--glow);box-shadow:0 0 10px rgba(0,255,136,.2);}
+#player-name::placeholder{color:rgba(0,255,136,.4);font-size:8px;}
+#player-name:focus{border-color:var(--glow);box-shadow:0 0 16px rgba(0,255,136,.45);}
+.top-stat{font-size:10px;display:flex;flex-direction:column;gap:2px;align-items:center;}
+.top-label{color:var(--glow);letter-spacing:1px;font-size:10px;}
+.top-val{font-size:18px;color:var(--cyan);text-shadow:0 0 8px var(--cyan);}
+.top-val.amber{color:var(--amber);text-shadow:0 0 8px var(--amber);}
+.top-val.red{color:var(--red);text-shadow:0 0 8px var(--red);}
+#hp-wrap{width:55px;height:5px;background:rgba(255,0,0,.12);border:1px solid rgba(255,51,85,.3);border-radius:2px;}
+#hp-fill{height:100%;background:var(--red);box-shadow:0 0 6px var(--red);border-radius:2px;transition:width .3s;}
+#theme-btn{font-family:'Courier New',monospace;font-size:10px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;}
+#theme-btn:hover{color:var(--glow);border-color:var(--glow);}
+
+/* SIDE PANELS */
+#left-panel{position:fixed;left:8px;top:72px;z-index:80;display:flex;flex-direction:column;gap:6px;}
+#right-panel{position:fixed;right:8px;top:72px;z-index:80;display:flex;flex-direction:column;gap:6px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:7px 10px;min-width:80px;}
+.card-title{font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:5px;}
+.card-val{font-size:14px;color:var(--glow);text-shadow:0 0 8px var(--glow);}
+.card-val.red{color:var(--red);text-shadow:0 0 8px var(--red);}
+.res-row{display:flex;justify-content:space-between;font-size:11px;margin:3px 0;color:var(--text-mid);}
+.res-row.done{color:var(--amber);text-shadow:0 0 6px var(--amber);}
+.res-num{color:var(--glow);}
+.res-row.done .res-num{color:var(--amber);}
+
+/* BOTTOM BAR */
+#bottombar{position:fixed;bottom:0;left:0;right:0;z-index:80;display:flex;flex-direction:column;align-items:center;gap:7px;padding:8px 10px 10px;background:linear-gradient(0deg,rgba(0,0,0,.88) 0%,transparent 100%);border-top:1px solid var(--border);transition:bottom .35s cubic-bezier(.4,0,.2,1);}
+body.light #bottombar{background:linear-gradient(0deg,rgba(220,245,230,.95) 0%,transparent 100%);}
+#cell-info{font-size:10px;color:var(--cyan);letter-spacing:1px;text-shadow:0 0 8px var(--cyan);height:16px;text-align:center;}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.btn{font-family:'Courier New',monospace;font-size:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .08s;letter-spacing:1px;min-width:84px;text-align:center;-webkit-tap-highlight-color:transparent;}
+.btn.green{color:var(--glow);border-color:rgba(0,255,136,.3);}
+.btn.green:not(.off):hover,.btn.green:not(.off):active{background:rgba(0,255,136,.12);border-color:var(--glow);box-shadow:0 0 14px rgba(0,255,136,.3);}
+.btn.cyan{color:var(--cyan);border-color:rgba(0,229,255,.3);}
+.btn.cyan:not(.off):hover,.btn.cyan:not(.off):active{background:rgba(0,229,255,.1);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,229,255,.3);}
+.btn.amber{color:var(--amber);border-color:rgba(255,170,0,.3);}
+.btn.amber:not(.off):hover,.btn.amber:not(.off):active{background:rgba(255,170,0,.1);border-color:var(--amber);box-shadow:0 0 14px rgba(255,170,0,.3);}
+.btn.red{color:var(--red);border-color:rgba(255,51,85,.3);}
+.btn.red:not(.off):hover,.btn.red:not(.off):active{background:rgba(255,51,85,.1);border-color:var(--red);box-shadow:0 0 14px rgba(255,51,85,.3);}
+.btn.purple{color:var(--purple);border-color:rgba(187,102,255,.3);}
+.btn.purple:not(.off):hover,.btn.purple:not(.off):active{background:rgba(187,102,255,.1);border-color:var(--purple);box-shadow:0 0 14px rgba(187,102,255,.3);}
+.btn.off{opacity:.22;pointer-events:none;}
+.zbtn{font-family:'Courier New',monospace;font-size:11px;padding:7px 11px;background:var(--surface);color:var(--text-dim);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .08s;-webkit-tap-highlight-color:transparent;}
+.zbtn:hover,.zbtn:active{color:var(--glow);border-color:var(--glow);}
+
+/* HISTORY PANEL */
+#history-panel{position:fixed;bottom:0;left:0;right:0;z-index:75;background:rgba(2,8,6,.97);border-top:2px solid var(--border);transition:transform .35s cubic-bezier(.4,0,.2,1);transform:translateY(100%);}
+#history-panel.open{transform:translateY(0);}
+body.light #history-panel{background:rgba(230,248,235,.98);}
+#history-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border);}
+#history-title{font-size:10px;color:var(--glow);letter-spacing:2px;}
+#history-close{font-family:'Courier New',monospace;font-size:10px;color:var(--text-dim);background:none;border:none;cursor:pointer;padding:4px 8px;}
+#history-close:hover{color:var(--glow);}
+#history-table-wrap{max-height:150px;overflow-y:auto;padding:5px 14px 8px;}
+#history-table{width:100%;border-collapse:collapse;font-size:8px;}
+#history-table th{color:var(--text-dim);padding:3px 6px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
+#history-table td{color:var(--text-mid);padding:4px 6px;border-bottom:1px solid rgba(0,255,136,.06);}
+#history-table tr:last-child td{border-bottom:none;}
+#history-table td.score-cell{color:var(--cyan);text-shadow:0 0 6px var(--cyan);}
+#history-table td.name-cell{color:var(--glow);}
+#history-empty{font-size:10px;color:var(--text-dim);text-align:center;padding:14px;letter-spacing:1px;}
+#history-table-wrap::-webkit-scrollbar{width:4px;}
+#history-table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* COPYRIGHT BAR */
+#copyright-bar{position:fixed;bottom:2px;left:0;right:0;z-index:201;text-align:center;font-size:8px;color:var(--text-dim);letter-spacing:1px;pointer-events:none;}
+#copyright-bar span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 4px;}
+#copyright-bar span:hover{color:var(--glow);text-shadow:0 0 8px var(--glow);}
+
+/* CUSTOM POPUP OVERLAY */
+.popup-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+body.light .popup-overlay{background:rgba(180,220,190,.7);}
+.popup-overlay.show{opacity:1;pointer-events:all;}
+.popup-box{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:22px 26px;max-width:480px;width:92%;box-shadow:0 0 40px rgba(0,255,136,.12);display:flex;flex-direction:column;gap:14px;}
+.popup-title{font-size:13px;color:var(--glow);text-shadow:0 0 12px var(--glow);letter-spacing:2px;text-align:center;}
+.popup-body{font-size:10px;color:var(--text-mid);line-height:2.3;letter-spacing:1px;}
+.popup-body p{margin-bottom:6px;}
+.popup-body .license{font-size:10px;color:var(--text-dim);border:1px solid var(--border);border-radius:3px;padding:10px;line-height:2.3;margin-top:6px;}
+.popup-body strong{color:var(--glow);}
+.popup-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;opacity:0;pointer-events:none;transition:opacity .35s;}
+body.light .screen{background:rgba(220,245,230,.97);}
+.screen.show{opacity:1;pointer-events:all;}
+.screen h1{font-size:18px;animation:pulse 1.2s infinite;}
+.screen h1.green{color:var(--glow);text-shadow:0 0 20px var(--glow);}
+.screen h1.red{color:var(--red);text-shadow:0 0 20px var(--red);}
+.screen .big{font-size:14px;color:var(--amber);text-shadow:0 0 12px var(--amber);}
+.screen p{font-size:10px;color:var(--text-mid);letter-spacing:2px;}
+.screen .sub{font-size:8px;color:var(--text-mid);letter-spacing:1px;}
+
+@keyframes flicker{0%,93%,96%,100%{opacity:1;}94%{opacity:.7;}95%{opacity:1;}97%{opacity:.6;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+</style>
+</head>
+<body>
+
+<div id="bg-layer"><canvas id="stars"></canvas></div>
+<div id="light-bg"></div>
+<div id="crt"></div><div id="vignette"></div>
+<div id="flash"></div>
+<canvas id="pc"></canvas>
+<canvas id="gc"></canvas>
+
+<div id="topbar">
+  <div id="game-title">🌍<U>MINE PLANET</U>🌍</div>
+  <div id="player-block">
+    <span id="player-label">PLAYER</span>
+    <input id="player-name" type="text" maxlength="14" placeholder="Your name..." oninput="playerName=this.value.trim()||'UNKNOWN'">
+  </div>
+  <div class="top-stat">
+    <span class="top-label">HP</span>
+    <div id="hp-wrap"><div id="hp-fill"></div></div>
+    <span class="top-val red" id="hp-num">12</span>
+  </div>
+  <div class="top-stat">
+    <span class="top-label">LVL</span>
+    <span class="top-val amber" id="lv-num">1</span>
+  </div>
+  <div class="top-stat">
+    <span class="top-label">SCORE</span>
+    <span class="top-val" id="score-num">0</span>
+  </div>
+  <button id="theme-btn" onclick="toggleTheme()">🌗</button>
+</div>
+
+<div id="left-panel">
+  <div class="card"><div class="card-title">MINES</div><div class="card-val red" id="mines-val">?</div><div style="font-size:14px;margin-top:3px;color:var(--amber)" id="flags-val"></div><div style="font-size:14px;margin-top:2px;color:var(--red)" id="bombs-hit-val"></div></div>
+  <div class="card"><div class="card-title">SAFE</div><div class="card-val" id="safe-val">?</div></div>
+</div>
+<div id="right-panel">
+  <div class="card">
+    <div class="card-title">OBJECTIVE</div>
+    <div id="res-list"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="bottombar">
+  <div id="cell-info">— tap a cell —</div>
+  <div class="btn-row">
+    <button class="btn cyan off" id="b-reveal"  onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
+    <button class="btn amber off" id="b-collect" onclick="doCollect()">⛏ <u>C</u>OLLECT</button>
+    <button class="btn red off"  id="b-flag"    onclick="doFlag()">🚩 <u>F</u>LAG</button>
+  </div>
+  <div class="btn-row">
+    <button class="zbtn" onclick="zoom(1.15)">🔍＋</button>
+    <button class="zbtn" onclick="resetView()">⊙ RESET</button>
+    <button class="zbtn" onclick="zoom(0.87)">🔍－</button>
+    <button class="btn purple" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="toggleHistory()">📜 HISTORY</button>
+    <button class="btn cyan" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="openPopup('popup-help')">❓ HELP</button>
+    <button class="btn red" id="b-quit" style="font-size:8px;padding:7px 10px;min-width:auto;" onclick="onQuitOrStart()">🏳 QUIT</button>
+  </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div id="history-panel">
+  <div id="history-header">
+    <span id="history-title">📜 GAMES HISTORY</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn red" style="font-size:8px;padding:4px 8px;min-width:auto;" onclick="clearHistory()">🗑 CLEAR</button>
+      <button id="history-close" onclick="toggleHistory()">✕ CLOSE</button>
+    </div>
+  </div>
+  <div id="history-table-wrap">
+    <div id="history-empty">No abandoned games recorded yet.</div>
+    <table id="history-table" style="display:none;">
+      <thead><tr><th>#</th><th>DATE</th><th>PLAYER</th><th>SCORE</th><th>LVL</th><th>RESULT</th></tr></thead>
+      <tbody id="history-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- COPYRIGHT BAR -->
+<div id="copyright-bar">
+  <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.01 — click for info &amp; license</span>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen" id="sc-level">
+  <h1 class="green">🌍 PLANET SOLVED!</h1>
+  <div class="big" id="sc-score"></div>
+  <p id="sc-next"></p>
+  <div class="sub" id="sc-diff"></div>
+  <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn green" onclick="nextLevel()">▶ NEXT LEVEL</button>
+    <button class="btn red" onclick="endGameFromWin()">🏁 END GAME</button>
+  </div>
+</div>
+<!-- GAME OVER SCREEN -->
+<div class="screen" id="sc-over">
+  <h1 class="red">💀 GAME OVER</h1>
+  <div class="big" id="go-score"></div>
+  <p>HP DEPLETED</p>
+  <button class="btn red" onclick="restartGame()" style="margin-top:8px">↺ RESTART</button>
+</div>
+
+<!-- CUSTOM POPUP: quit confirm -->
+<div class="popup-overlay" id="popup-quit">
+  <div class="popup-box">
+    <div class="popup-title">🏳 ABANDON GAME?</div>
+    <div class="popup-body">
+      <p>All cells will be revealed, exposing mines, fish, portals and all hidden elements.</p>
+      <p>This match will be saved to the history log.</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn amber" onclick="doAbandon()">✓ YES, ABANDON</button>
+      <button class="btn" style="color:var(--text-mid);" onclick="closePopup('popup-quit')">✕ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM POPUP: clear history confirm -->
+<div class="popup-overlay" id="popup-clear">
+  <div class="popup-box">
+    <div class="popup-title">🗑 CLEAR HISTORY?</div>
+    <div class="popup-body"><p>All match records will be permanently deleted.</p></div>
+    <div class="popup-actions">
+      <button class="btn red" onclick="doClearHistory()">✓ YES, CLEAR</button>
+      <button class="btn" style="color:var(--text-mid);" onclick="closePopup('popup-clear')">✕ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT POPUP -->
+<div class="popup-overlay" id="popup-about">
+  <div class="popup-box">
+    <div class="popup-title">🌍 MINE PLANET 🌍</div>
+    <div class="popup-body">
+      <p><strong>Version:</strong> 01.01 — February 2026</p>
+      <p><strong>Genre:</strong> Hex-grid exploration / minesweeper adventure</p>
+      <p><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-body" href="mailto:pistino@libero.it">pistino@libero.it</a>)</p>
+      <p><strong>Platform:</strong> Single-file HTML5 — runs in any modern browser</p>
+      <div class="license">
+        <p style="color:var(--amber);margin-bottom:6px;letter-spacing:2px;">⚖ SOFTWARE LICENSE</p>
+        <p>This application is provided FREE OF CHARGE for personal, non-commercial use only.</p>
+        <p>The software is provided "as is", without warranty of any kind — use at your own risk.</p>
+        <p>Modification of this software, in whole or in part, is NOT permitted without explicit written authorization from the author.</p>
+        <p>Sale, sublicensing, redistribution or any commercial exploitation of this software is strictly NOT permitted, except by the original author.</p>
+        <p style="margin-top:8px;color:var(--text-dim);">© 2026 PISTINO DEVELOPMENT. All rights reserved.</p>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn green" onclick="closePopup('popup-about')">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- HELP POPUP -->
+<div class="popup-overlay" id="popup-help">
+  <div class="popup-box" style="max-width:520px;max-height:88vh;overflow-y:auto;">
+    <div class="popup-title">❓ HOW TO PLAY</div>
+    <div class="popup-body">
+      <p><strong>🎯 OBJECTIVE</strong></p>
+      <p>Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level.</p>
+      <p style="margin-top:8px;"><strong>🖱 CONTROLS</strong></p>
+      <p>Tap/click a cell to select it. Use the buttons at the bottom to act:</p>
+      <p>• 🔍 <strong style="color:var(--cyan);">REVEAL</strong> — uncovers the selected cell. If it's a mine, you lose HP!</p>
+      <p>• ⛏ <strong style="color:var(--amber);">COLLECT</strong> — gathers a resource from a revealed cell into your inventory.</p>
+      <p>• 🚩 <strong style="color:var(--red);">FLAG</strong> — marks a suspected mine. Flagged cells cannot be revealed.</p>
+      <p style="margin-top:8px;"><strong>⚠ MINES</strong></p>
+      <p>Revealing a 💣 MINE costs HP. Each cell shows a number: adjacent mine count. Use it to deduce safe cells. Water hides 💣 WATER MINES too!</p>
+      <p style="margin-top:8px;"><strong>✨ SPECIAL ITEMS</strong></p>
+      <p>• 💥 BOMB — reveals all neighbors (may hit mines for half damage)</p>
+      <p>• 🗺️ MAP — reveals several random safe terrain cells</p>
+      <p>• 🧪 POTION — 60% chance to heal, 40% chance to damage</p>
+      <p>• 🔦 LANTERN — safely illuminates all adjacent cells (no mine damage)</p>
+      <p>• 🩺 MEDKIT — restores HP when revealed</p>
+      <p style="margin-top:8px;"><strong>📊 PANELS</strong></p>
+      <p>Left panel shows <strong style="color:var(--red);">MINES</strong> present on the map, flags placed, and mines accidentally hit. Right panel shows the <strong style="color:var(--glow);">OBJECTIVE</strong>: collected / needed (available on map).</p>
+      <p style="margin-top:8px;"><strong>🏆 SCORING</strong></p>
+      <p>+5 per revealed cell, +20×level per collected resource, +200×level for completing a level. Each level increases difficulty!</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn green" onclick="closePopup('popup-help')">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── THEME ──
+let isDark=true;
+function toggleTheme(){isDark=!isDark;document.body.classList.toggle('light',!isDark);}
+
+// ── STARS ──
+(()=>{
+  const c=document.getElementById('stars');c.width=innerWidth;c.height=innerHeight;
+  const x=c.getContext('2d');
+  for(let i=0;i<380;i++){x.beginPath();x.arc(Math.random()*c.width,Math.random()*c.height,Math.random()*1.5,0,Math.PI*2);x.fillStyle=`rgba(255,255,255,${.1+Math.random()*.8})`;x.fill();}
+  for(let i=0;i<6;i++){const g=x.createRadialGradient(Math.random()*c.width,Math.random()*c.height,0,Math.random()*c.width,Math.random()*c.height,300+Math.random()*400);g.addColorStop(0,`hsla(${Math.random()*360},80%,50%,.05)`);g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);}
+})();
+
+// ── PARTICLES ──
+const pc=document.getElementById('pc');pc.width=innerWidth;pc.height=innerHeight;
+const pctx=pc.getContext('2d');let parts=[];
+function spawnBurst(sx,sy,color,n=14){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=50+Math.random()*110;parts.push({x:sx,y:sy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-30,color,sz:3+Math.random()*5,life:.5+Math.random()*.4,t:0});}}
+function tickParts(dt){pctx.clearRect(0,0,pc.width,pc.height);parts=parts.filter(p=>{p.t+=dt;if(p.t>=p.life)return false;const pct=p.t/p.life;pctx.globalAlpha=(1-pct)*.9;pctx.fillStyle=p.color;const s=p.sz*(1-pct*.5);pctx.fillRect(p.x+p.vx*p.t-s/2,p.y+p.vy*p.t+60*p.t*p.t-s/2,s,s);return true;});pctx.globalAlpha=1;}
+
+// ── CANVAS ──
+const canvas=document.getElementById('gc');const ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;pc.width=innerWidth;pc.height=innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();drawAll();});
+
+// ── HEX MATH (pointy-top axial) ──
+function hexToPixel(q,r,sz){return{x:sz*(Math.sqrt(3)*q+Math.sqrt(3)/2*r),y:sz*(1.5*r)};}
+function pixelToHex(px,py,sz){const q=(Math.sqrt(3)/3*px-1/3*py)/sz;const r=(2/3*py)/sz;return axialRound(q,r);}
+function axialRound(fq,fr){const fs=-fq-fr;let rq=Math.round(fq),rr=Math.round(fr),rs=Math.round(fs);const dq=Math.abs(rq-fq),dr=Math.abs(rr-fr),ds=Math.abs(rs-fs);if(dq>dr&&dq>ds)rq=-rr-rs;else if(dr>ds)rr=-rq-rs;return{q:rq,r:rr};}
+function hexDisk(R){const l=[];for(let q=-R;q<=R;q++){const r1=Math.max(-R,-q-R),r2=Math.min(R,-q+R);for(let r=r1;r<=r2;r++)l.push({q,r});}return l;}
+function hexNeighbors(q,r){return[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]].map(([dq,dr])=>({q:q+dq,r:r+dr}));}
+function hexDist(q,r){return Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));}
+
+// ── GAME STATE ──
+let level=1,score=0,maxHp=12,hp=12;
+let cells=[],sel=null;
+let inventory={wood:0,stone:0,iron:0,crystal:0,fish:0};
+let objective={};
+let camX=0,camY=0,camZ=1;
+let hexSize=32;
+let playerName='UNKNOWN';
+let matchHistory=[];
+let historyOpen=false;
+let gameAbandoned=false;
+let bombsHit=0;
+
+function lvlCfg(lv){
+  return{
+    radius:      Math.min(5+Math.floor(lv/2),11),
+    mineRatio:   Math.min(0.06+lv*.022,.22),
+    waterRatio:  Math.max(.28-lv*.01,.15),
+    woodNeed:    Math.min(1+Math.floor(lv/2),5),
+    stoneNeed:   Math.min(1+Math.floor(lv/2),5),
+    ironNeed:    Math.min(1+Math.floor(lv/2),4),
+    crystalNeed: lv>=4?Math.min(Math.floor((lv-3)/2)+1,3):0,
+    fishNeed:    Math.min(1+Math.floor(lv/2),5),
+    goldNeed:    lv>=3?Math.min(Math.floor((lv-2)/2)+1,3):0,
+    coalNeed:    lv>=2?Math.min(Math.floor((lv-1)/2)+1,3):0,
+    herbsNeed:   lv>=5?Math.min(Math.floor((lv-4)/2)+1,2):0,
+    mushroomNeed:lv>=6?Math.min(Math.floor((lv-5)/2)+1,2):0,
+    coralNeed:   lv>=3?Math.min(Math.floor((lv-2)/2)+1,3):0,
+    pearlNeed:   lv>=5?Math.min(Math.floor((lv-4)/2)+1,2):0,
+    crabNeed:    lv>=2?Math.min(Math.floor((lv-1)/2)+1,3):0,
+    octopusNeed: lv>=7?Math.min(Math.floor((lv-6)/2)+1,2):0,
+  };
+}
+
+// ── COLORS ──
+const DARK={
+  landHidden:'#0e2018',landHiddenBorder:'#1c3828',
+  waterHidden:'#061828',waterHiddenBorder:'#0d3060',
+  revealedLandBorder:'#00ff88',revealedWaterBorder:'#00aaff',
+};
+const LIGHT={
+  landHidden:'#b8d8c0',landHiddenBorder:'#7aaa88',
+  waterHidden:'#8ab8d8',waterHiddenBorder:'#4488bb',
+  revealedLandBorder:'#008844',revealedWaterBorder:'#0066aa',
+};
+function TC(){return isDark?DARK:LIGHT;}
+
+// Icon config: icon, scale, shadowColor
+const ICFG={
+  empty:    {i:'',     s:.60, g:null},
+  mine:     {i:'💣',   s:.58, g:'#ff3355'},
+  wood:     {i:'🌲',   s:.62, g:null},
+  stone:    {i:'🪨',   s:.62, g:null},
+  iron:     {i:'⚙️',   s:.60, g:'#66aaff'},
+  crystal:  {i:'💎',   s:.60, g:'#aa88ff'},
+  portal:   {i:'🌀',   s:.60, g:'#bb44ff'},
+  fish:     {i:'🐠',   s:.72, g:'#00ddff'},
+  medkit:   {i:'🩺',   s:.58, g:'#ff4466'},
+  water:    {i:'',     s:.55, g:null},
+  waterMine:{i:'💣',   s:.58, g:'#ff3355'},
+  // ── NEW LAND RESOURCES ──
+  gold:     {i:'🪙',   s:.62, g:'#ffdd00'},
+  coal:     {i:'🪵',   s:.60, g:'#886644'},
+  herbs:    {i:'🌿',   s:.62, g:'#44ff88'},
+  mushroom: {i:'🍄',   s:.62, g:'#ff8844'},
+  // ── NEW WATER RESOURCES ──
+  coral:    {i:'🪸',   s:.62, g:'#ff6688'},
+  pearl:    {i:'🫧',   s:.58, g:'#aaddff'},
+  crab:     {i:'🦀',   s:.64, g:'#ff5522'},
+  octopus:  {i:'🐙',   s:.64, g:'#cc44ff'},
+  // ── SPECIAL ITEMS (effect on reveal) ──
+  bomb:     {i:'💥',   s:.62, g:'#ff8800'},
+  map:      {i:'🗺️',  s:.58, g:'#44ffff'},
+  potion:   {i:'🧪',   s:.60, g:'#aa44ff'},
+  lantern:  {i:'🔦',   s:.58, g:'#ffee44'},
+};
+
+const NUM_COLORS=['#00ff88','#44ff55','#aaff44','#ffff33','#ffbb00','#ff7700','#ff2255','#ee00ff','#aaaaff'];
+const RES_ICONS={wood:'🌲',stone:'🪨',iron:'⚙️',crystal:'💎',fish:'🐠',gold:'🪙',coal:'🪵',herbs:'🌿',mushroom:'🍄',coral:'🪸',pearl:'🫧',crab:'🦀',octopus:'🐙'};
+const COLLECT_TYPES=['wood','stone','iron','crystal','fish','gold','coal','herbs','mushroom','coral','pearl','crab','octopus','portal'];
+const WATER_TYPES=['water','fish','waterMine','coral','pearl','crab','octopus'];
+// Special items that trigger on reveal (not collected manually)
+const SPECIAL_REVEAL=['medkit','bomb','map','potion','lantern'];
+
+// ── BUILD PLANET — guarantees all required resources ──
+function buildPlanet(){
+  gameAbandoned=false;
+  bombsHit=0;
+  updateQuitBtn();
+  const cfg=lvlCfg(level);
+  const R=cfg.radius;
+  hexSize=Math.max(22,Math.min(42,Math.floor(210/(R+1))));
+  cells=[];
+
+  hexDisk(R).forEach(({q,r})=>{
+    const d=hexDist(q,r);
+    const rng=Math.random();
+    const ef=d/R;
+    const wc=cfg.waterRatio*(0.5+ef)+(Math.abs(r)>R*.6?.5:0)+(d===R?.4:0);
+    let type='empty';
+    if(rng<Math.min(wc,.9))           type='water';
+    else if(rng<wc+cfg.mineRatio)     type='mine';
+    else if(rng<wc+cfg.mineRatio+.09) type='wood';
+    else if(rng<wc+cfg.mineRatio+.16) type='stone';
+    else if(rng<wc+cfg.mineRatio+.21) type='iron';
+    else if(rng<wc+cfg.mineRatio+.25) type='coal';
+    else if(cfg.goldNeed>0&&rng<wc+cfg.mineRatio+.28) type='gold';
+    else if(cfg.crystalNeed>0&&rng<wc+cfg.mineRatio+.31) type='crystal';
+    else if(cfg.herbsNeed>0&&rng<wc+cfg.mineRatio+.33) type='herbs';
+    else if(cfg.mushroomNeed>0&&rng<wc+cfg.mineRatio+.35) type='mushroom';
+    const p=hexToPixel(q,r,hexSize);
+    cells.push({q,r,type,revealed:false,flagged:false,adjacent:0,px:p.x,py:p.y,dist:d});
+  });
+
+  // Water resources: fish, coral, pearl, crab, octopus
+  cells.filter(c=>c.type==='water').forEach(c=>{
+    const rw=Math.random();
+    if(rw<.30) c.type='fish';
+    else if(rw<.42&&cfg.coralNeed>0) c.type='coral';
+    else if(rw<.50&&cfg.crabNeed>0)  c.type='crab';
+    else if(rw<.55&&cfg.pearlNeed>0) c.type='pearl';
+    else if(rw<.58&&cfg.octopusNeed>0) c.type='octopus';
+  });
+
+  // Water-mines: ~15% of water cells
+  cells.filter(c=>WATER_TYPES.includes(c.type)).forEach(c=>{if(Math.random()<.15)c.type='waterMine';});
+
+  // ── GUARANTEE REQUIRED RESOURCE COUNTS ──
+  const landNeeds=[
+    {key:'wood',need:cfg.woodNeed},
+    {key:'stone',need:cfg.stoneNeed},
+    {key:'iron',need:cfg.ironNeed},
+    {key:'coal',need:cfg.coalNeed},
+    ...(cfg.goldNeed>0?[{key:'gold',need:cfg.goldNeed}]:[]),
+    ...(cfg.crystalNeed>0?[{key:'crystal',need:cfg.crystalNeed}]:[]),
+    ...(cfg.herbsNeed>0?[{key:'herbs',need:cfg.herbsNeed}]:[]),
+    ...(cfg.mushroomNeed>0?[{key:'mushroom',need:cfg.mushroomNeed}]:[]),
+  ];
+  landNeeds.forEach(({key,need})=>{
+    if(!need)return;
+    const have=cells.filter(c=>c.type===key).length;
+    if(have<need){
+      let pool=cells.filter(c=>c.type==='empty'&&c.dist<R-1);
+      for(let i=have;i<need&&pool.length;i++){
+        const idx=Math.floor(Math.random()*pool.length);
+        pool[idx].type=key;pool.splice(idx,1);
+      }
+    }
+  });
+
+  // Guarantee water resources
+  const waterNeeds=[
+    {key:'fish',need:cfg.fishNeed},
+    ...(cfg.coralNeed>0?[{key:'coral',need:cfg.coralNeed}]:[]),
+    ...(cfg.crabNeed>0?[{key:'crab',need:cfg.crabNeed}]:[]),
+    ...(cfg.pearlNeed>0?[{key:'pearl',need:cfg.pearlNeed}]:[]),
+    ...(cfg.octopusNeed>0?[{key:'octopus',need:cfg.octopusNeed}]:[]),
+  ];
+  waterNeeds.forEach(({key,need})=>{
+    if(!need)return;
+    const have=cells.filter(c=>c.type===key).length;
+    if(have<need){
+      let pool=cells.filter(c=>c.type==='water');
+      for(let i=have;i<need&&pool.length;i++){
+        const idx=Math.floor(Math.random()*pool.length);
+        pool[idx].type=key;pool.splice(idx,1);
+      }
+    }
+  });
+
+  // Medkits: 0–3 randomly on land
+  const numMedkits=Math.floor(Math.random()*4);
+  let mkPool=cells.filter(c=>!WATER_TYPES.includes(c.type)&&c.type!=='mine'&&c.dist<R-1);
+  for(let i=0;i<numMedkits&&mkPool.length;i++){
+    const idx=Math.floor(Math.random()*mkPool.length);
+    mkPool[idx].type='medkit';mkPool.splice(idx,1);
+  }
+
+  // Special items on land: bomb, map, potion, lantern (1 each max, from level 2+)
+  if(level>=2){
+    const specials=['bomb','map','potion','lantern'];
+    specials.forEach(sp=>{
+      if(Math.random()<.4){
+        let pool=cells.filter(c=>!WATER_TYPES.includes(c.type)&&c.type==='empty'&&c.dist<R-1);
+        if(pool.length){const idx=Math.floor(Math.random()*pool.length);pool[idx].type=sp;}
+      }
+    });
+  }
+
+  // Portal: inner land cell (exclude all special/resource types)
+  const NON_PORTAL=['mine','waterMine','medkit','bomb','map','potion','lantern'];
+  const landPool=cells.filter(c=>!WATER_TYPES.includes(c.type)&&!NON_PORTAL.includes(c.type)&&c.dist<R-1);
+  if(landPool.length){
+    landPool.sort((a,b)=>a.dist-b.dist);
+    landPool[Math.floor(Math.random()*Math.min(6,landPool.length))].type='portal';
+  }
+
+  // ── FINAL GUARANTEE: ensure all required resources still present after specials/portal placement ──
+  const ALL_LAND_TYPES=['mine','waterMine','medkit','bomb','map','potion','lantern','portal'];
+  const ALL_WATER_TYPES_EXT=[...WATER_TYPES,'waterMine'];
+  const finalLandNeeds=[
+    {key:'wood',need:cfg.woodNeed},{key:'stone',need:cfg.stoneNeed},
+    {key:'iron',need:cfg.ironNeed},{key:'coal',need:cfg.coalNeed},
+    ...(cfg.goldNeed>0?[{key:'gold',need:cfg.goldNeed}]:[]),
+    ...(cfg.crystalNeed>0?[{key:'crystal',need:cfg.crystalNeed}]:[]),
+    ...(cfg.herbsNeed>0?[{key:'herbs',need:cfg.herbsNeed}]:[]),
+    ...(cfg.mushroomNeed>0?[{key:'mushroom',need:cfg.mushroomNeed}]:[]),
+  ];
+  finalLandNeeds.forEach(({key,need})=>{
+    if(!need)return;
+    const have=cells.filter(c=>c.type===key).length;
+    if(have<need){
+      let pool=cells.filter(c=>c.type==='empty'&&c.dist<R-1);
+      if(!pool.length) pool=cells.filter(c=>!ALL_WATER_TYPES_EXT.includes(c.type)&&!ALL_LAND_TYPES.includes(c.type)&&c.type!==key&&c.dist<R-1);
+      for(let i=have;i<need&&pool.length;i++){
+        const idx=Math.floor(Math.random()*pool.length);
+        pool[idx].type=key;pool.splice(idx,1);
+      }
+    }
+  });
+  const finalWaterNeeds=[
+    {key:'fish',need:cfg.fishNeed},
+    ...(cfg.coralNeed>0?[{key:'coral',need:cfg.coralNeed}]:[]),
+    ...(cfg.crabNeed>0?[{key:'crab',need:cfg.crabNeed}]:[]),
+    ...(cfg.pearlNeed>0?[{key:'pearl',need:cfg.pearlNeed}]:[]),
+    ...(cfg.octopusNeed>0?[{key:'octopus',need:cfg.octopusNeed}]:[]),
+  ];
+  finalWaterNeeds.forEach(({key,need})=>{
+    if(!need)return;
+    const have=cells.filter(c=>c.type===key).length;
+    if(have<need){
+      let pool=cells.filter(c=>c.type==='water');
+      for(let i=have;i<need&&pool.length;i++){
+        const idx=Math.floor(Math.random()*pool.length);
+        pool[idx].type=key;pool.splice(idx,1);
+      }
+    }
+  });
+
+  // Adjacency: count both land mines and water mines
+  cells.forEach(c=>{
+    c.adjacent=hexNeighbors(c.q,c.r).map(n=>findCell(n.q,n.r))
+      .filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+  });
+
+  // Objective
+  const c2=lvlCfg(level);
+  objective={wood:c2.woodNeed,stone:c2.stoneNeed,iron:c2.ironNeed,fish:c2.fishNeed};
+  if(c2.coalNeed>0)    objective.coal=c2.coalNeed;
+  if(c2.goldNeed>0)    objective.gold=c2.goldNeed;
+  if(c2.crystalNeed>0) objective.crystal=c2.crystalNeed;
+  if(c2.herbsNeed>0)   objective.herbs=c2.herbsNeed;
+  if(c2.mushroomNeed>0)objective.mushroom=c2.mushroomNeed;
+  if(c2.coralNeed>0)   objective.coral=c2.coralNeed;
+  if(c2.pearlNeed>0)   objective.pearl=c2.pearlNeed;
+  if(c2.crabNeed>0)    objective.crab=c2.crabNeed;
+  if(c2.octopusNeed>0) objective.octopus=c2.octopusNeed;
+  inventory={wood:0,stone:0,iron:0,crystal:0,fish:0,gold:0,coal:0,herbs:0,mushroom:0,coral:0,pearl:0,crab:0,octopus:0};
+
+  sel=null;camX=0;camY=0;camZ=1;
+  updateUI();updateActionBtns(null);drawAll();
+}
+
+function findCell(q,r){return cells.find(c=>c.q===q&&c.r===r);}
+
+// ── DRAWING ──
+let portalPhase=0;
+function worldToScreen(wx,wy){return{x:canvas.width/2+(wx+camX)*camZ,y:canvas.height/2+(wy+camY)*camZ};}
+function screenToWorld(sx,sy){return{x:(sx-canvas.width/2)/camZ-camX,y:(sy-canvas.height/2)/camZ-camY};}
+
+function hexPath(cx,cy,sz,gap=3){
+  const s=sz-gap;
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a=(i*60-30)*Math.PI/180; // pointy-top
+    const px=cx+s*Math.cos(a),py=cy+s*Math.sin(a);
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.closePath();
+}
+
+function lighten(hex,f){
+  let n=parseInt(hex.replace('#',''),16);
+  const cl=v=>Math.min(255,Math.max(0,v));
+  return`#${cl(((n>>16)&255)+Math.round(f*255)).toString(16).padStart(2,'0')}${cl(((n>>8)&255)+Math.round(f*200)).toString(16).padStart(2,'0')}${cl((n&255)+Math.round(f*180)).toString(16).padStart(2,'0')}`;
+}
+
+function drawAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();ctx.strokeStyle=isDark?'rgba(0,255,100,.02)':'rgba(0,80,40,.04)';ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+  ctx.restore();
+  [...cells].sort((a,b)=>a.py-b.py).forEach(c=>{
+    const sp=worldToScreen(c.px,c.py);const sz=hexSize*camZ;
+    if(sp.x<-sz*3||sp.x>canvas.width+sz*3||sp.y<-sz*3||sp.y>canvas.height+sz*3)return;
+    drawCell(c,sp.x,sp.y,sz);
+  });
+}
+
+function drawCell(c,sx,sy,sz){
+  const isSel=c===sel;
+  const tc=TC();
+  const isWater=WATER_TYPES.includes(c.type);
+  // Draw cells at 82% of grid slot → uniform gap visible on all sides
+  sz = sz * 0.82;
+  const GAP=0;
+
+  // Fill: always use original background color (land or water), don't change on reveal
+  const fillH=isWater?tc.waterHidden:tc.landHidden;
+
+  // Border: change only the border color when revealed
+  let borderH;
+  if(c.revealed){
+    borderH=isSel?(isWater?(isDark?'#00e5ff':'#0066aa'):(isDark?'#00ff88':'#008844')):
+                  (isWater?tc.revealedWaterBorder:tc.revealedLandBorder);
+  } else {
+    borderH=isSel?(isWater?(isDark?'#00e5ff':'#0066aa'):(isDark?'#00ff88':'#008844')):
+                  (isWater?tc.waterHiddenBorder:tc.landHiddenBorder);
+  }
+
+  // Fill — for revealed water invert gradient (bright center, dark edges)
+  if(isWater&&c.revealed){
+    const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,sz);
+    grad.addColorStop(0,lighten(fillH,.30));grad.addColorStop(1,fillH);
+    hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();
+  } else {
+    const grad=ctx.createRadialGradient(sx,sy-sz*.1,0,sx,sy,sz);
+    grad.addColorStop(0,lighten(fillH,.14));grad.addColorStop(1,fillH);
+    hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();
+  }
+
+  // Water shimmer — only when NOT revealed
+  if(isWater&&!c.revealed){
+    hexPath(sx,sy,sz,GAP);
+    ctx.fillStyle=`rgba(20,80,200,${.06+.05*Math.sin(portalPhase*1.5+c.q*.8+c.r*.5)})`;ctx.fill();
+  }
+
+  // Border — revealed = bright & thick, hidden = dim & thin
+  hexPath(sx,sy,sz,GAP);
+  ctx.strokeStyle=borderH;
+  ctx.lineWidth=isSel?3.5:(c.revealed?3.0:1.2);
+  ctx.stroke();
+
+  // Revealed outer glow ring
+  if(c.revealed&&!isSel){
+    hexPath(sx,sy,sz*1.05,GAP);
+    ctx.strokeStyle=isWater?'rgba(0,160,255,.40)':'rgba(0,255,136,.32)';
+    ctx.lineWidth=5;ctx.stroke();
+  }
+
+  // Selection outer glow
+  if(isSel){
+    hexPath(sx,sy,sz*1.08,GAP);
+    ctx.strokeStyle=isWater?(isDark?'rgba(0,229,255,.55)':'rgba(0,100,180,.5)'):(isDark?'rgba(0,255,136,.55)':'rgba(0,120,60,.5)');
+    ctx.lineWidth=9;ctx.stroke();
+  }
+
+  // Portal pulse
+  //if(c.type==='portal'&&c.revealed){
+  //  const p=Math.sin(portalPhase)*.5+.5;
+  //  hexPath(sx,sy,sz,GAP);ctx.strokeStyle=`rgba(180,80,255,${.4+.5*p})`;ctx.lineWidth=2.5;ctx.stroke();
+  //  hexPath(sx,sy,sz,GAP);ctx.fillStyle='rgba(100,20,200,.12)';ctx.fill();
+  //}
+  // Portal pulse
+  if(c.type==='portal'&&c.revealed){
+    const p=Math.sin(portalPhase)*.5+.5;
+    const p2=Math.sin(portalPhase*1.7+1)*.5+.5;
+    hexPath(sx,sy,sz,GAP);
+    ctx.fillStyle=`rgba(120,20,220,${.18+.22*p})`;ctx.fill();
+    hexPath(sx,sy,sz*1.18,GAP);
+    ctx.strokeStyle=`rgba(200,80,255,${.15+.35*p2})`;
+    ctx.lineWidth=6+4*p2;ctx.stroke();
+    hexPath(sx,sy,sz,GAP);
+    ctx.strokeStyle=`rgba(220,100,255,${.6+.4*p})`;
+    ctx.lineWidth=3.5;ctx.stroke();
+    const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,sz*.5);
+    grad.addColorStop(0,`rgba(200,100,255,${.25*p})`);
+    grad.addColorStop(1,'rgba(100,20,200,0)');
+    hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();
+    ctx.shadowColor='#cc44ff';ctx.shadowBlur=20+18*p;
+  }
+
+  // Hidden land dot texture
+  if(!c.revealed&&!isWater){
+    for(let dd=-1;dd<=1;dd++)for(let dr=-1;dr<=1;dr++){
+      if(!dd&&!dr)continue;
+      ctx.beginPath();ctx.arc(sx+dd*sz*.27,sy+dr*sz*.19,1.2,0,Math.PI*2);
+      ctx.fillStyle=isDark?'rgba(0,255,100,.055)':'rgba(0,80,40,.07)';ctx.fill();
+    }
+  }
+
+  // ── REVEALED CONTENT ──
+  if(c.revealed){
+    const cfg=ICFG[c.type]||ICFG.empty;
+    if(cfg.i){
+      const fs=Math.max(14,sz*cfg.s);
+      ctx.font=`${fs}px sans-serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      if(cfg.g){ctx.shadowColor=cfg.g;ctx.shadowBlur=18;}
+      ctx.fillText(cfg.i,sx,sy+sz*.02);
+      ctx.shadowBlur=0;
+    }
+
+    // Adjacency badge — shown on all cell types (land + water)
+    if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine'){
+      const col=NUM_COLORS[c.adjacent-1]||'#fff';
+      const fs=Math.max(8,Math.min(sz*.28,17));
+      ctx.font=`bold ${fs}px "Georgia"`;
+      const ns=String(c.adjacent),tw=ctx.measureText(ns).width;
+      const bx=sx+(cfg.i?sz*.3:0),by=sy-(cfg.i?sz*.28:0);
+      ctx.fillStyle='rgba(0,0,0,.85)';
+      roundRect(bx-tw/2-5,by-fs/2-3,tw+10,fs+6,3);ctx.fill();
+      ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(ns,bx,by);ctx.shadowBlur=0;
+    }
+  }
+
+  // Flag — visible with glow outline, no background change
+  if(c.flagged){
+    const fsize=Math.max(13,sz*.52);
+    ctx.font=`${fsize}px sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    // Bright outline ring for visibility
+    ctx.shadowColor='#ff3355';ctx.shadowBlur=14;
+    ctx.fillStyle='rgba(255,30,60,.9)';ctx.fillText('🚩',sx,sy);
+    ctx.shadowBlur=0;
+    // Small indicator dot bottom-right corner
+    //ctx.beginPath();ctx.arc(sx+sz*.35,sy+sz*.32,Math.max(3,sz*.1),0,Math.PI*2);
+    //ctx.fillStyle='rgba(255,30,60,.9)';ctx.fill();
+    //ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1;ctx.stroke();
+  }
+}
+
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+
+// ── INPUT ──
+let ptrs={},pinchDist=null,panStart=null,panCam=null,tapPt=null,moved=false;
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);ptrs[e.pointerId]={x:e.clientX,y:e.clientY};tapPt={x:e.clientX,y:e.clientY};moved=false;if(Object.keys(ptrs).length===1){panStart={x:e.clientX,y:e.clientY};panCam={x:camX,y:camY};}});
+canvas.addEventListener('pointermove',e=>{if(!ptrs[e.pointerId])return;ptrs[e.pointerId]={x:e.clientX,y:e.clientY};const arr=Object.values(ptrs);if(arr.length===2){const dx=arr[0].x-arr[1].x,dy=arr[0].y-arr[1].y,d=Math.sqrt(dx*dx+dy*dy);if(pinchDist)camZ=Math.max(.25,Math.min(4,camZ*(d/pinchDist)));pinchDist=d;moved=true;}else if(arr.length===1&&panStart){const dx=e.clientX-panStart.x,dy=e.clientY-panStart.y;if(Math.abs(dx)+Math.abs(dy)>8)moved=true;if(moved){camX=panCam.x+dx/camZ;camY=panCam.y+dy/camZ;}}});
+canvas.addEventListener('pointerup',e=>{if(!moved&&tapPt){const dx=e.clientX-tapPt.x,dy=e.clientY-tapPt.y;if(Math.abs(dx)+Math.abs(dy)<12)handleTap(e.clientX,e.clientY);}delete ptrs[e.pointerId];if(Object.keys(ptrs).length<2)pinchDist=null;if(!Object.keys(ptrs).length)panStart=null;});
+canvas.addEventListener('wheel',e=>{camZ=Math.max(.25,Math.min(4,camZ*(e.deltaY<0?1.12:.89)));e.preventDefault();},{passive:false});
+
+function handleTap(sx,sy){
+  if(gameAbandoned)return;
+  const w=screenToWorld(sx,sy);
+  const {q,r}=pixelToHex(w.x,w.y,hexSize);
+  const c=findCell(q,r);if(!c)return;
+  sel=c;updateCellInfo(c);updateActionBtns(c);drawAll();
+}
+
+// ── ZOOM ──
+function zoom(f){camZ=Math.max(.25,Math.min(4,camZ*f));}
+function resetView(){camX=0;camY=0;camZ=1;}
+
+// ── ACTIONS ──
+function doReveal(){
+  if(gameAbandoned||!sel||sel.revealed||sel.flagged)return;
+  sel.revealed=true;
+  const sp=worldToScreen(sel.px,sel.py);
+  if(sel.type==='mine'||sel.type==='waterMine'){
+    const dmg=Math.max(2,3+Math.floor(level/3));hp-=dmg;shakeT=450;bombsHit++;
+    flashFn('#ff1133','.3');spawnBurst(sp.x,sp.y,'#ff3355',20);spawnBurst(sp.x,sp.y,'#ff8800',8);
+    toast(`💥 MINE! −${dmg} HP`);updateHpUI();updateMinesUI();if(hp<=0){gameOver();return;}
+  } else if(sel.type==='medkit'){
+    const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);
+    spawnBurst(sp.x,sp.y,'#ff4444',12);spawnBurst(sp.x,sp.y,'#ffffff',8);
+    toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
+  } else if(sel.type==='bomb'){
+    // Bomb: reveals all adjacent cells automatically
+    spawnBurst(sp.x,sp.y,'#ff8800',22);flashFn('#ff8800','.2');
+    let revealed=0;
+    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
+      const nc=findCell(q,r);
+      if(nc&&!nc.revealed&&!nc.flagged){
+        nc.revealed=true;revealed++;
+        if(nc.type==='mine'||nc.type==='waterMine'){
+          bombsHit++;
+          const dmg=Math.max(1,Math.floor((3+Math.floor(level/3))/2));hp-=dmg;
+          toast(`💥 BOMB HIT MINE! −${dmg} HP`);updateHpUI();
+          if(hp<=0){gameOver();return;}
+        }
+      }
+    });
+    toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;
+  } else if(sel.type==='map'){
+    // Map: reveals a random area of unrevealed land cells
+    spawnBurst(sp.x,sp.y,'#44ffff',18);flashFn('#44ffff','.1');
+    const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');
+    const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);
+    toReveal.forEach(c=>c.revealed=true);
+    toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);
+  } else if(sel.type==='potion'){
+    // Potion: random effect (heal or damage)
+    const lucky=Math.random()<.6;
+    if(lucky){
+      const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);
+      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);
+      toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');
+    } else {
+      const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;
+      spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);
+      toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;
+      if(hp<=0){updateHpUI();gameOver();return;}
+    }
+    updateHpUI();
+  } else if(sel.type==='lantern'){
+    // Lantern: reveals all adjacent cells safely (no mine damage)
+    spawnBurst(sp.x,sp.y,'#ffee44',16);flashFn('#ffee44','.08');
+    let revealed=0;
+    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
+      const nc=findCell(q,r);
+      if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}
+    });
+    toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);
+  } else if(sel.type==='portal'){
+    spawnBurst(sp.x,sp.y,'#aa44ff',18);toast('🌀 PORTAL FOUND! Collect resources then use COLLECT here');
+  } else if(WATER_TYPES.includes(sel.type)){
+    spawnBurst(sp.x,sp.y,'#0088ff',8);
+    if(sel.adjacent===0)floodFill(sel.q,sel.r);
+  } else {
+    spawnBurst(sp.x,sp.y,isDark?'#00ff88':'#008844',8);
+    if(sel.adjacent===0)floodFill(sel.q,sel.r);
+  }
+  score+=5;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
+}
+
+function floodFill(q,r){
+  const queue=[{q,r}],seen=new Set([`${q},${r}`]);
+  while(queue.length){
+    const {q:cq,r:cr}=queue.shift();
+    hexNeighbors(cq,cr).forEach(({q:nq,r:nr})=>{
+      const k=`${nq},${nr}`;if(seen.has(k))return;seen.add(k);
+      const nc=findCell(nq,nr);
+      if(!nc||nc.revealed||nc.flagged||nc.type==='mine'||nc.type==='waterMine')return;
+      nc.revealed=true;if(nc.adjacent===0)queue.push({q:nq,r:nr});
+    });
+  }
+}
+
+function doCollect(){
+  if(gameAbandoned||!sel||!sel.revealed)return;
+  if(!COLLECT_TYPES.includes(sel.type)){toast('⚠ NOTHING TO COLLECT');return;}
+
+  // ── CASO SPECIALE: COLLECT sul portale = uscita livello ──
+  if(sel.type==='portal'){
+    if(!objDone()){toast('⚠ COLLECT ALL RESOURCES FIRST!');return;}
+    score+=200*level;updateScoreUI();
+    const sp=worldToScreen(sel.px,sel.py);
+    spawnBurst(sp.x,sp.y,'#aa44ff',28);flashFn('#aa44ff','.18');
+    <!-- saveToHistory('✅ LVL '+level+' COMPLETE'); -->
+    setTimeout(()=>{
+      document.getElementById('sc-level').classList.add('show');
+      document.getElementById('sc-score').textContent='SCORE: '+score;
+      document.getElementById('sc-next').textContent='NEXT: LVL '+(level+1);
+      const cfg=lvlCfg(level+1);
+      document.getElementById('sc-diff').textContent=`MINES: ${Math.round(cfg.mineRatio*100)}%  GRID: R${cfg.radius}`;
+    },800);
+    return;
+  }
+
+  // ── RACCOLTA NORMALE ──
+  inventory[sel.type]=(inventory[sel.type]||0)+1;
+  const sp=worldToScreen(sel.px,sel.py);
+  const cols={wood:'#44ff44',stone:'#aaaaaa',iron:'#4488ff',crystal:'#aa44ff',fish:'#44ccff',
+              gold:'#ffdd00',coal:'#886644',herbs:'#44ff88',mushroom:'#ff8844',
+              coral:'#ff6688',pearl:'#aaddff',crab:'#ff5522',octopus:'#cc44ff'};
+  spawnBurst(sp.x,sp.y,cols[sel.type]||'#ffaa00',14);
+  flashFn(isDark?'#ffaa00':'#bb6600','.07');
+  toast(`✓ +1 ${sel.type.toUpperCase()}`);score+=20*level;
+  sel.type=WATER_TYPES.includes(sel.type)?'water':'empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+  updateScoreUI();updateResUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();
+}
+
+function doFlag(){
+  if(gameAbandoned||!sel||sel.revealed)return;
+  sel.flagged=!sel.flagged;
+  toast(sel.flagged?'🚩 FLAGGED':'🚩 REMOVED');
+  updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
+}
+
+// ── WIN / LOSE ──
+function checkWin(){
+  // Victory is now triggered only by COLLECT on the portal
+}
+function gameOver(){
+  saveToHistory('💀 GAME OVER');
+  document.getElementById('sc-over').classList.add('show');
+  document.getElementById('go-score').textContent='SCORE: '+score;
+}
+function endGameFromWin(){
+  // Player chose to stop after completing a level
+  saveToHistory('🏁 GAME ENDED @ LVL '+level);
+  document.getElementById('sc-level').classList.remove('show');
+  gameAbandoned=true;
+  updateQuitBtn();updateActionBtns(null);
+  toast('🏁 GAME ENDED — score saved to history');
+}
+function nextLevel(){
+  document.getElementById('sc-level').classList.remove('show');
+  level++;maxHp=Math.min(maxHp+2,28);hp=maxHp;
+  document.getElementById('lv-num').textContent=level;
+  updateHpUI();buildPlanet();
+}
+function restartGame(){
+  level=1;score=0;maxHp=12;hp=12;bombsHit=0;
+  document.getElementById('lv-num').textContent=level;
+  document.getElementById('sc-over').classList.remove('show');
+  buildPlanet();
+}
+
+// ── UI LABELS ──
+const REVEALED_LABEL={
+  empty:'EMPTY FIELD',mine:'💣 MINE',wood:'🌲 FOREST',stone:'🪨 ROCK',
+  iron:'⚙️ IRON',crystal:'💎 CRYSTAL',portal:'🌀 PORTAL',fish:'🐠 FISH',
+  medkit:'🩺 MEDKIT',water:'🌊 WATER',waterMine:'💣 MINE',
+  gold:'🪙 GOLD',coal:'🪵 COAL',herbs:'🌿 HERBS',mushroom:'🍄 MUSHROOM',
+  coral:'🪸 CORAL',pearl:'🫧 PEARL',crab:'🦀 CRAB',octopus:'🐙 OCTOPUS',
+  bomb:'💥 BOMB',map:'🗺️ MAP',potion:'🧪 POTION',lantern:'🔦 LANTERN'
+};
+function updateCellInfo(c){
+  const el=document.getElementById('cell-info');
+  if(!c){el.textContent='— tap a cell —';return;}
+  let t;
+  if(!c.revealed){
+    if(WATER_TYPES.includes(c.type)) t='UNEXPLORED WATER — press 🔍';
+    else t='UNEXPLORED TERRAIN — press 🔍';
+  } else {
+    t=REVEALED_LABEL[c.type]||'?';
+    if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine') t+=` [${c.adjacent} nearby mines]`;
+    if(c.type==='portal'&&!objDone()) t+=' — collect resources first!';
+    if(c.type==='portal'&&objDone()) t+=' — press ⛏ COLLECT to exit!';
+    if(c.type==='bomb') t+=' — reveals adjacent cells!';
+    if(c.type==='map') t+=' — reveals random terrain area!';
+    if(c.type==='potion') t+=' — random effect (60% lucky)!';
+    if(c.type==='lantern') t+=' — safely illuminates neighbors!';
+  }
+  if(c.flagged) t+=' 🚩';
+  el.textContent=t;
+}
+function objDone(){return Object.keys(objective).every(k=>(inventory[k]||0)>=(objective[k]||0));}
+
+function updateActionBtns(c){
+  if(gameAbandoned){
+    ['b-reveal','b-collect','b-flag'].forEach(id=>document.getElementById(id).classList.add('off'));
+    return;
+  }
+  document.getElementById('b-reveal').classList.toggle('off',!c||c.revealed||c.flagged);
+  document.getElementById('b-collect').classList.toggle('off',!c||!c.revealed||!COLLECT_TYPES.includes(c.type));
+  document.getElementById('b-flag').classList.toggle('off',!c||c.revealed);
+}
+function updateHpUI(){document.getElementById('hp-num').textContent=hp;document.getElementById('hp-fill').style.width=(Math.max(0,hp)/maxHp*100)+'%';}
+function updateScoreUI(){document.getElementById('score-num').textContent=score;}
+function updateMinesUI(){
+  const total=cells.filter(c=>c.type==='mine'||c.type==='waterMine').length;
+  const flagged=cells.filter(c=>c.flagged).length;
+  document.getElementById('mines-val').textContent=total;
+  document.getElementById('flags-val').textContent=`🚩 ${flagged}`;
+  document.getElementById('bombs-hit-val').textContent=`💥 ${bombsHit}`;
+  const safe=cells.filter(c=>!c.revealed&&!WATER_TYPES.includes(c.type)&&c.type!=='mine').length;
+  document.getElementById('safe-val').textContent=safe;
+}
+function updateResUI(){
+  document.getElementById('res-list').innerHTML=Object.entries(objective).map(([k,need])=>{
+    const have=inventory[k]||0,done=have>=need;
+    const onBoard=cells.filter(c=>c.type===k).length;
+    return`<div class="res-row${done?' done':''}"> <span>${RES_ICONS[k]||k} ${k}</span>&nbsp;&nbsp;<span class="res-num">${have}/${need} <span>(${onBoard})</span></span></div>`;
+  }).join('');
+}
+function updateUI(){updateHpUI();updateScoreUI();updateMinesUI();updateResUI();updateCellInfo(sel);}
+
+// ── QUIT / START BUTTON ──
+function updateQuitBtn(){
+  const btn=document.getElementById('b-quit');
+  if(gameAbandoned){
+    btn.textContent='▶ NEW GAME';btn.classList.remove('red');btn.classList.add('green');
+  } else {
+    btn.textContent='🏳 QUIT';btn.classList.remove('green');btn.classList.add('red');
+  }
+}
+function onQuitOrStart(){
+  if(gameAbandoned){
+    level=1;score=0;maxHp=12;hp=12;bombsHit=0;
+    document.getElementById('lv-num').textContent=level;
+    buildPlanet();
+  } else {
+    openPopup('popup-quit');
+  }
+}
+function doAbandon(){
+  closePopup('popup-quit');
+  cells.forEach(c=>{c.revealed=true;c.flagged=false;});
+  sel=null;gameAbandoned=true;
+  updateQuitBtn();updateActionBtns(null);
+  saveToHistory('🏳 GAME QUIT');
+  drawAll();
+  toast('🏳 GAME ABANDONED — all cells revealed');
+}
+
+// ── CUSTOM POPUPS ──
+function openPopup(id){document.getElementById(id).classList.add('show');}
+function closePopup(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.popup-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('show');});});
+
+// ── TOAST & FLASH ──
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.opacity='1';clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity='0',1900);}
+function flashFn(col,op){const el=document.getElementById('flash');el.style.background=col;el.style.opacity=op||'.2';setTimeout(()=>el.style.opacity='0',140);}
+
+// ── HISTORY (all game endings) ──
+function saveToHistory(result){
+  const now=new Date();
+  const dateStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const name=document.getElementById('player-name').value.trim()||'UNKNOWN';
+  matchHistory.unshift({date:dateStr,player:name,score,level,result});
+  if(matchHistory.length>50)matchHistory.pop();
+  try{window.storage&&window.storage.set('mineplanet-history',JSON.stringify(matchHistory));}catch(e){}
+  renderHistory();
+}
+function renderHistory(){
+  const empty=document.getElementById('history-empty');
+  const table=document.getElementById('history-table');
+  const tbody=document.getElementById('history-body');
+  if(!matchHistory.length){empty.style.display='block';table.style.display='none';return;}
+  empty.style.display='none';table.style.display='table';
+  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
+}
+function toggleHistory(){
+  historyOpen=!historyOpen;
+  document.getElementById('history-panel').classList.toggle('open',historyOpen);
+  const bb=document.getElementById('bottombar');
+  if(historyOpen){renderHistory();setTimeout(()=>{bb.style.bottom=document.getElementById('history-panel').offsetHeight+'px';},20);}
+  else{bb.style.bottom='0';}
+}
+function clearHistory(){openPopup('popup-clear');}
+function doClearHistory(){
+  closePopup('popup-clear');matchHistory=[];
+  try{window.storage&&window.storage.delete('mineplanet-history');}catch(e){}
+  renderHistory();
+}
+async function loadHistory(){
+  try{if(window.storage){const r=await window.storage.get('mineplanet-history');if(r&&r.value)matchHistory=JSON.parse(r.value);}}catch(e){}
+  renderHistory();
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='r')doReveal();if(k==='c')doCollect();if(k==='f')doFlag();
+  if(k==='+'||k==='=')zoom(1.15);if(k==='-')zoom(.87);if(k==='0'||k==='escape')resetView();
+  if(k==='arrowleft')camX+=50/camZ;if(k==='arrowright')camX-=50/camZ;
+  if(k==='arrowup')camY+=50/camZ;if(k==='arrowdown')camY-=50/camZ;
+});
+
+// ── RENDER LOOP ──
+let shakeT=0,lastT=0;
+function loop(t){
+  requestAnimationFrame(loop);
+  const dt=Math.min((t-lastT)/1000,.05);lastT=t;
+  portalPhase+=dt*2.2;
+  if(shakeT>0){shakeT-=dt*1000;const s=(shakeT/450)*.014;camX+=(Math.random()-.5)*s;camY+=(Math.random()-.5)*s;}
+  tickParts(dt);drawAll();
+}
+
+// ── START ──
+loadHistory();
+buildPlanet();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
