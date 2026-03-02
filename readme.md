@@ -1,16 +1,16 @@
-﻿🎮 ppGames ﻿🎮
+﻿🎮 ppGames 🎮
  
 A collection of lightweight browser games built using pure HTML5, CSS, and Vanilla JavaScript.
 No frameworks. No external dependencies. Just simple and fun web games.
 Each game is self-contained inside a single HTML file and runs directly in any modern browser.
 
-🚀 Live Demo 🚀
+🚀 LIVE DEMO 🚀
 
 The games are playable online:
 https://ppistino.github.io/ppGames/
 
 
-🕹️ Games Included 🕹️
+🕹️ GAMES INCLUDED 🕹️
 ______________________________________________________________________________________
 
 🌍 ppMinePlanet 🌍 
@@ -41,20 +41,44 @@ ________________________________________________________________________________
 
 
 
-🛠 Technologies Used 🛠
+🛠 TECHNOLOGIES USED 🛠
 
 HTML5, CSS3, Vanilla JavaScript, Browser-native APIs
 
-📌 Notes 📌
+📌 NOTES 📌
 
 100% client-side
 No installation required
 Works in all modern desktop browsers
 You can also download and open the .html files locally
 
-📜 License 📜
+License 
 
-These applications are provided FREE OF CHARGE for personal, non-commercial use only.
-The software is provided "as is", without warranty of any kind — use at your own risk.
-Modification of this software, in whole or in part, is NOT permitted without explicit written authorization from the author.
-Sale, sublicensing, redistribution or any commercial exploitation of this software is strictly NOT permitted, except by the original author.
+📜 SOFTWARE LICENSE AGREEMENT 📜
+
+Copyright (c) 2026 [Your Name]
+All Rights Reserved.
+
+1. License Grant
+The author grants a limited, revocable, non-exclusive license
+to use the software for personal, non-commercial purposes only.
+
+2. Commercial Use
+Any commercial use, redistribution, sublicensing,
+or monetization requires prior written authorization
+from the author.
+
+3. Modification
+Modification, adaptation, or creation of derivative works
+is prohibited without explicit written consent.
+
+4. Ownership
+All rights, title, and interest in the software remain
+exclusively with the author.
+
+5. Disclaimer
+The software is provided "AS IS", without warranty of any kind.
+The author shall not be liable for any damages or claims.
+
+By accessing or using this software, you agree to these terms.
+
