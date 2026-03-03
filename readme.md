@@ -15,7 +15,7 @@ ________________________________________________________________________________
 
 🌍 ppMinePlanet 🌍 
 
-https://ppistino.github.io/ppGames/ppMinePlanet.html
+https://ppistino.github.io/ppGames/ppMinePlanet/ppMinePlanet.html
 
 A space-themed arcade / exploration game inspired by minesweeper-style mechanics.
 Navigate the planet surface, avoid hidden dangers, and complete your objectives.
@@ -28,7 +28,7 @@ ________________________________________________________________________________
 
 😄 ppPacSmile 😄
 
-https://ppistino.github.io/ppGames/ppPacSmile.html
+https://ppistino.github.io/ppGames/ppPacSmile/ppPacSmile.html
 
 A retro-inspired maze arcade game.
 Collect items, avoid enemies, and survive as long as possible.
