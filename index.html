@@ -49,6 +49,20 @@
             font-size: 0.95rem;
             line-height: 1.4;
         }
+        .game-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .game-card .tag {
+            font-size: 0.72rem;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            padding: 2px 8px;
+            color: #bbdefb;
+        }
         .play-btn {
             display: inline-block;
             margin-top: 10px;
@@ -71,23 +85,46 @@
 
 <header>
     <h1>🎮 ppGames</h1>
-    <div class="subtitle">A small arcade collection built with HTML5 & JavaScript</div>
+    <div class="subtitle">A small arcade collection built with HTML5 &amp; JavaScript</div>
 </header>
 
 <div class="games">
 
     <div class="game-card">
-        <h2>🌍 ppMinePlanet 🌍</h2>
+        <h2>🌍ppMinePlanet🌍</h2>
         <p>An arcade space exploration game where you navigate a planet surface, avoid hidden mines, and collect points.</p>
         <p><strong>Controls:</strong> Arrow keys to move • Avoid obstacles • Collect bonuses</p>
+        <div class="tags">
+            <span class="tag">Canvas</span>
+            <span class="tag">Arcade</span>
+            <span class="tag">Exploration</span>
+        </div>
         <a class="play-btn" href="ppMinePlanet/ppMinePlanet.html">Play Now</a>
     </div>
 
     <div class="game-card">
-        <h2>😄 ppPacSmile 😄</h2>
+        <h2>😄ppPacSmile😄</h2>
         <p>A maze arcade game inspired by classic retro titles — collect items, avoid enemies, and survive as long as you can.</p>
         <p><strong>Controls:</strong> Arrow keys or WASD • Navigate maze • Dodge foes and score points</p>
+        <div class="tags">
+            <span class="tag">Maze</span>
+            <span class="tag">Arcade</span>
+            <span class="tag">Retro</span>
+        </div>
         <a class="play-btn" href="ppPacSmile/ppPacSmile.html">Play Now</a>
+    </div>
+
+    <div class="game-card">
+        <h2>🔢ppSudoka Classic🔢</h2>
+        <p>A full-featured Sudoku with four game modes: Classic, Visual (emojis), Irregular (free regions), and Killer (cage sums). Notes, hints, undo, score system and game history included.</p>
+        <p><strong>Difficulty:</strong> Easy · Medium · Hard · Expert</p>
+        <div class="tags">
+            <span class="tag">Classic</span>
+            <span class="tag">Visual</span>
+            <span class="tag">Irregular</span>
+            <span class="tag">Killer</span>
+        </div>
+        <a class="play-btn" href="ppSudoka/ppSudoka_Classic.html">Play Now</a>
     </div>
 
 </div>

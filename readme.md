@@ -39,6 +39,23 @@ Collision detection
 Score tracking
 ______________________________________________________________________________________
 
+🔢 ppSudoka Classic 🔢
+
+https://ppistino.github.io/ppGames/ppSudoka/ppSudoka_Classic.html
+
+A full-featured Sudoku game with four distinct game modes, all packed in a single HTML file.
+Choose your mode, set the difficulty, and challenge your logic skills.
+
+Features:
+4 game modes — Classic · Visual (emoji symbols) · Irregular (free-form regions) · Killer (cage sums)
+4 difficulty levels — Easy · Medium · Hard · Expert
+Notes mode, Undo, Check, Hints (max 3 per game)
+Score system with time, error and hint penalties
+Game history saved locally (last 50 sessions)
+Dark / Light theme toggle
+Fully responsive — works on desktop and mobile
+______________________________________________________________________________________
+
 
 
 🛠 TECHNOLOGIES USED 🛠
@@ -80,4 +97,3 @@ The software is provided "AS IS", without warranty of any kind.
 The author shall not be liable for any damages or claims.
 
 By accessing or using this software, you agree to these terms.
-

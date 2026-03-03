@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🎮 ppTemplate</title>
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  ppTEMPLATE v1.0  —  PISTINO DEVELOPMENT  —  Feb 2026       ║
+  ║  Reusable single-file HTML5 app shell                        ║
+  ║  ─────────────────────────────────────────────────────────── ║
+  ║  INCLUDES:                                                   ║
+  ║  • Start screen: name input + avatar/emoji picker            ║
+  ║  • Theme toggle (dark ↔ light), no external fonts            ║
+  ║  • History screen: saved sessions with medals & scores       ║
+  ║  • Help popup: scrollable game guide                         ║
+  ║  • About / copyright popup                                   ║
+  ║  • Game screen with HUD (name, level, score, lives)          ║
+  ║  • Overlay: win / game over                                  ║
+  ║  • Confirm dialog                                            ║
+  ║  • Toast notifications                                       ║
+  ║  • Starfield background (dark) / soft gradient (light)       ║
+  ║  ─────────────────────────────────────────────────────────── ║
+  ║  HOW TO USE THIS TEMPLATE:                                   ║
+  ║  1. Find all  ← CUSTOMIZE  comments and fill them in         ║
+  ║  2. Replace APP_NAME, APP_EMOJI, APP_VERSION throughout      ║
+  ║  3. Add your game canvas / grid inside #game-area            ║
+  ║  4. Wire up your game logic in the GAME ENGINE section       ║
+  ║  5. Delete this comment block when done                      ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<style>
+/* ══════════════════════════════════════════════════════
+   DESIGN TOKENS — edit these to skin the app
+   ══════════════════════════════════════════════════════ */
+:root {
+  /* ← CUSTOMIZE: swap accent colors to match your game's theme */
+  --bg:       #080818;
+  --bg2:      #0c0c22;
+  --panel:    #12122e;
+  --panel2:   #18183a;
+  --border:   rgba(120,180,255,.22);
+  --border2:  rgba(120,180,255,.10);
+  --accent:   #4fc3f7;   /* primary accent — buttons, highlights */
+  --accent2:  #81d4fa;   /* lighter accent */
+  --accent3:  #b3e5fc;   /* very light accent */
+  --hot:      #ff9d3d;   /* warm accent — toast, secondary CTA */
+  --hot2:     #ffcc02;
+  --red:      #ff5252;
+  --green:    #69f0ae;
+  --blue:     #40c4ff;
+  --purple:   #ea80fc;
+  --text:     #e8f4ff;
+  --text2:    rgba(232,244,255,.68);
+  --text3:    rgba(232,244,255,.40);
+  --text4:    rgba(232,244,255,.20);
+  --hud-bg:   rgba(8,8,24,.97);
+  --overlay:  rgba(0,0,0,.85);
+  --shadow:   0 8px 40px rgba(0,0,0,.7);
+  --radius:   18px;
+  --transition: background .3s, color .3s, border-color .3s;
+}
+body.light {
+  --bg:       #f0f4ff;
+  --bg2:      #e4eaff;
+  --panel:    #ffffff;
+  --panel2:   #f2f5ff;
+  --border:   rgba(30,80,200,.20);
+  --border2:  rgba(30,80,200,.10);
+  --accent:   #1565c0;
+  --accent2:  #1976d2;
+  --accent3:  #1a237e;
+  --hot:      #e65100;
+  --hot2:     #f57f17;
+  --red:      #c62828;
+  --green:    #1b5e20;
+  --blue:     #0277bd;
+  --purple:   #6a1b9a;
+  --text:     #0d1440;
+  --text2:    rgba(13,20,64,.68);
+  --text3:    rgba(13,20,64,.42);
+  --text4:    rgba(13,20,64,.20);
+  --hud-bg:   rgba(255,255,255,.97);
+  --overlay:  rgba(200,210,240,.88);
+  --shadow:   0 8px 30px rgba(0,0,50,.15);
+}
+
+/* ── RESET ── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);
+  font-family:Georgia,'Times New Roman',serif;
+  overflow:hidden;touch-action:none;transition:var(--transition)}
+
+/* ── STARFIELD (dark only) ── */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff}
+body.light #stars{display:none}
+#light-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:radial-gradient(ellipse at 20% 15%,rgba(200,220,255,.7) 0%,transparent 55%),
+             radial-gradient(ellipse at 80% 85%,rgba(255,220,200,.5) 0%,transparent 50%),#f0f4ff}
+body.light #light-bg{opacity:1}
+
+/* ── THEME TOGGLE ── */
+#theme-btn{position:fixed;top:12px;right:12px;z-index:600;
+  width:42px;height:24px;border-radius:12px;border:1.5px solid var(--border);
+  background:var(--panel2);cursor:pointer;display:flex;align-items:center;padding:2px;
+  transition:all .3s;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+#theme-btn:hover{border-color:var(--accent)}
+#theme-knob{width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,#ffd700,#ff9500);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;font-size:.55rem;
+  box-shadow:0 1px 4px rgba(0,0,0,.3)}
+body.light #theme-knob{transform:translateX(18px);background:linear-gradient(135deg,#88aaff,#4466dd)}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:16px 16px 28px;overflow-y:auto}
+.screen.hidden{display:none!important}
+.hidden{display:none!important}
+
+/* ──────────────────────────────────────
+   START SCREEN
+   ────────────────────────────────────── */
+.logo{
+  /* ← CUSTOMIZE: change gradient colors to match your game */
+  font-family:Georgia,'Palatino Linotype',serif;
+  font-size:clamp(2.4rem,10vw,4rem);font-weight:700;
+  letter-spacing:4px;line-height:1;
+  background:linear-gradient(135deg,#40c4ff,#ea80fc,#69f0ae,#ffcc02);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 30px rgba(64,196,255,.5));
+  animation:logoPulse 4s ease-in-out infinite}
+@keyframes logoPulse{
+  0%,100%{filter:drop-shadow(0 0 20px rgba(64,196,255,.35))}
+  50%{filter:drop-shadow(0 0 55px rgba(64,196,255,.9))}}
+body.light .logo{
+  background:linear-gradient(135deg,#1565c0,#6a1b9a,#1b5e20,#e65100);
+  -webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 0 12px rgba(21,101,192,.4))}
+.tagline{font-family:Georgia,serif;font-size:.7rem;letter-spacing:5px;
+  text-transform:uppercase;color:var(--text3);margin-top:6px;text-align:center}
+
+/* ── CARD ── */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;width:100%;max-width:420px;backdrop-filter:blur(10px)}
+.clbl{font-family:Georgia,serif;font-size:.6rem;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:8px;display:block}
+.cinp{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:10px;padding:10px 14px;color:var(--text);font-family:Georgia,serif;
+  font-size:1rem;font-weight:600;outline:none;transition:border-color .2s;margin-bottom:14px}
+body.light .cinp{background:rgba(0,0,0,.03)}
+.cinp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(64,196,255,.12)}
+.cinp::placeholder{color:var(--text3)}
+
+/* ── AVATAR GRID ── */
+/* ← CUSTOMIZE: add/remove avatars in the AVATARS object in JS */
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.avbtn{background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:12px;
+  padding:10px 4px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;
+  align-items:center;gap:4px;color:var(--text);font-family:Georgia,serif;font-size:.7rem}
+.avbtn .ae{font-size:1.9rem;line-height:1}
+.avbtn .al{font-size:.58rem;color:var(--text3);text-align:center}
+.avbtn:hover{border-color:var(--accent);background:rgba(64,196,255,.08)}
+.avbtn.active{border-color:var(--accent2);background:rgba(64,196,255,.18);
+  box-shadow:0 0 18px rgba(64,196,255,.2)}
+
+/* ── PLAY / SECONDARY BUTTONS ── */
+.playbtn{background:linear-gradient(135deg,var(--accent),#1565c0);color:#fff;border:none;
+  border-radius:50px;padding:14px 44px;font-family:Georgia,serif;font-size:1rem;
+  letter-spacing:3px;cursor:pointer;box-shadow:0 5px 28px rgba(64,196,255,.4);
+  transition:all .2s;width:100%;max-width:300px;font-weight:700}
+.playbtn:hover{transform:translateY(-2px);box-shadow:0 9px 38px rgba(64,196,255,.6)}
+.secbtn{background:rgba(255,255,255,.04);color:var(--text2);border:1.5px solid var(--border);
+  border-radius:50px;padding:11px 36px;font-family:Georgia,serif;font-size:.8rem;
+  letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:300px}
+.secbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ──────────────────────────────────────
+   GAME SCREEN — HUD
+   ────────────────────────────────────── */
+#gs{padding:0 0 18px 0;justify-content:flex-start;background:transparent}
+#hud{position:relative;z-index:20;width:100%;background:var(--hud-bg);
+  border-bottom:1px solid var(--border2);padding:7px 14px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;
+  transition:var(--transition)}
+.hs{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.04);
+  border-radius:6px;padding:3px 8px}
+.hl{font-family:Georgia,serif;font-size:.52rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--text3)}
+.hv{font-family:Georgia,serif;font-size:.9rem;font-weight:700;color:var(--accent)}
+.hud-btn{background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:7px;padding:4px 8px;font-size:.9rem;cursor:pointer;
+  transition:all .15s;color:var(--text);line-height:1}
+.hud-btn:hover{border-color:var(--accent);color:var(--accent)}
+.hud-btn.danger:hover{background:rgba(255,82,82,.18);border-color:var(--red);color:var(--red)}
+
+/* ── GAME AREA (put your canvas / grid here) ── */
+#game-area{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-start;width:100%;overflow:hidden;padding:6px 8px 0}
+/* ← CUSTOMIZE: add your grid / canvas styles below */
+
+/* ──────────────────────────────────────
+   HISTORY SCREEN
+   ────────────────────────────────────── */
+#hs-screen{z-index:50;overflow-y:auto;padding:20px 16px 28px;gap:12px;
+  align-items:center;justify-content:flex-start;padding-top:28px}
+.hs-title{font-family:Georgia,serif;font-size:1.8rem;font-weight:700;color:var(--accent);
+  text-align:center;letter-spacing:3px}
+.hs-sub{font-size:.68rem;color:var(--text3);letter-spacing:3px;text-transform:uppercase;
+  text-align:center;margin-top:-6px}
+#hs-list{width:100%;max-width:500px;display:flex;flex-direction:column;gap:8px}
+.hi{background:rgba(255,255,255,.03);border:1px solid var(--border2);
+  border-radius:12px;padding:12px 16px;display:grid;
+  grid-template-columns:auto 1fr auto;gap:6px 12px;align-items:center;transition:background .15s}
+.hi:hover{background:rgba(255,255,255,.05)}
+.hi.win{border-left:3px solid var(--accent)}
+.hi.fail{border-left:3px solid var(--red)}
+.hi-rank{font-family:Georgia,serif;font-size:1.4rem;color:var(--accent);
+  width:24px;text-align:center}
+.hi-main{display:flex;flex-direction:column;gap:2px}
+.hi-name{font-weight:700;font-size:.9rem;color:var(--text)}
+.hi-detail{font-size:.68rem;color:var(--text3);line-height:1.5}
+.hi-score{font-family:Georgia,serif;font-size:1.2rem;color:var(--accent);
+  text-align:right;white-space:nowrap}
+.hs-empty{color:var(--text3);font-size:.9rem;text-align:center;
+  padding:30px;font-style:italic}
+.hs-acts{display:flex;gap:10px;width:100%;max-width:500px;flex-wrap:wrap;margin-top:4px}
+.hs-back{flex:1;padding:11px;border-radius:50px;border:1.5px solid var(--border);
+  background:rgba(64,196,255,.05);color:var(--text);font-family:Georgia,serif;
+  font-size:.85rem;cursor:pointer;letter-spacing:1px;transition:all .2s}
+.hs-back:hover{border-color:var(--accent);color:var(--accent)}
+.hs-del{flex:1;padding:11px;border-radius:50px;background:rgba(255,82,82,.08);
+  color:var(--red);border:1.5px solid rgba(255,82,82,.2);font-family:Georgia,serif;
+  font-size:.85rem;cursor:pointer;transition:all .2s}
+.hs-del:hover{background:rgba(255,82,82,.18)}
+
+/* ──────────────────────────────────────
+   POPUPS (Help, About)
+   ────────────────────────────────────── */
+.popup-bg{position:fixed;inset:0;z-index:500;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.popup-box{background:var(--panel);border:1px solid var(--border);border-radius:20px;
+  padding:26px 22px;max-width:400px;width:94%;max-height:88vh;overflow-y:auto;
+  box-shadow:var(--shadow);animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+.popup-title{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;color:var(--accent);
+  letter-spacing:3px;text-align:center;margin-bottom:16px}
+.popup-row{font-size:.88rem;color:var(--text2);margin-bottom:10px;line-height:1.7}
+.popup-row strong{color:var(--text)}
+.popup-row .tag{display:inline-block;background:rgba(64,196,255,.12);color:var(--accent2);
+  border-radius:4px;padding:0 6px;font-size:.75rem;font-family:Georgia,serif;
+  letter-spacing:1px;margin-right:4px}
+.popup-close{width:100%;margin-top:16px;padding:11px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--accent),#1565c0);color:#fff;
+  font-family:Georgia,serif;font-size:.85rem;letter-spacing:2px;cursor:pointer;transition:all .15s}
+.popup-close:hover{transform:translateY(-1px)}
+.lic{font-size:.62rem;color:var(--text3);border:1px solid var(--border2);
+  border-radius:10px;padding:12px;line-height:2;margin-top:12px}
+.lic p{margin-bottom:3px}
+.lic .lt{color:var(--accent);font-weight:700;letter-spacing:2px;font-size:.65rem;
+  display:block;margin-bottom:6px;font-family:Georgia,serif}
+
+/* ──────────────────────────────────────
+   OVERLAY (win / game over)
+   ────────────────────────────────────── */
+#ov{position:fixed;inset:0;z-index:400;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+#ov.hidden{display:none}
+.ovb{background:var(--panel);border:1px solid var(--border);border-radius:22px;
+  padding:32px 28px;text-align:center;max-width:340px;width:92%;
+  box-shadow:0 0 80px rgba(64,196,255,.12),var(--shadow);
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.75);opacity:0}to{transform:scale(1);opacity:1}}
+.oe{font-size:3rem;margin-bottom:10px}
+.ot{font-family:Georgia,serif;font-size:1.6rem;font-weight:700;
+  margin-bottom:8px;color:var(--accent);letter-spacing:2px}
+.ox{color:var(--text2);margin-bottom:22px;font-size:.95rem;line-height:1.6}
+.obtn{background:linear-gradient(135deg,var(--accent),#1565c0);color:#fff;border:none;
+  border-radius:50px;padding:12px 34px;font-family:Georgia,serif;font-size:.9rem;
+  letter-spacing:2px;cursor:pointer;box-shadow:0 4px 18px rgba(64,196,255,.4);transition:all .15s}
+.obtn:hover{transform:translateY(-2px)}
+.obtn.sec{background:rgba(255,255,255,.06);color:var(--text2);border:1.5px solid var(--border);
+  box-shadow:none;margin-top:8px;display:block;width:100%}
+.obtn.sec:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ──────────────────────────────────────
+   CONFIRM DIALOG
+   ────────────────────────────────────── */
+#conf{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.82);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.conf-box{background:var(--panel);border:1.5px solid var(--border);border-radius:18px;
+  padding:26px 22px;text-align:center;max-width:290px;width:90%;
+  animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
+.conf-ico{font-size:2.6rem;margin-bottom:8px}
+.conf-t{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;
+  color:var(--accent);margin-bottom:8px}
+.conf-tx{color:var(--text2);font-size:.88rem;margin-bottom:18px;line-height:1.5}
+.conf-btns{display:flex;gap:10px;justify-content:center}
+.conf-yes{padding:10px 22px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#ff5252,#b71c1c);color:#fff;
+  font-family:Georgia,serif;font-size:.82rem;cursor:pointer;transition:all .15s}
+.conf-no{padding:10px 22px;border-radius:50px;background:rgba(255,255,255,.05);
+  color:var(--text2);border:1.5px solid var(--border);font-family:Georgia,serif;
+  font-size:.82rem;cursor:pointer;transition:all .15s}
+.conf-yes:hover{transform:translateY(-1px)}
+.conf-no:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ──────────────────────────────────────
+   TOAST
+   ────────────────────────────────────── */
+#toast{position:fixed;top:clamp(55px,11vh,70px);left:50%;
+  transform:translateX(-50%) translateY(-16px);
+  background:linear-gradient(135deg,var(--hot),#c84a00);color:#fff;
+  font-family:Georgia,serif;font-size:.82rem;padding:8px 22px;letter-spacing:1px;
+  border-radius:50px;z-index:900;opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(255,157,61,.5)}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ──────────────────────────────────────
+   COPYRIGHT BAR
+   ────────────────────────────────────── */
+#cpbar{position:fixed;bottom:0;left:0;right:0;z-index:200;text-align:center;
+  font-family:Georgia,serif;font-size:9px;color:var(--text4);letter-spacing:1px;
+  pointer-events:none;padding:4px 0 5px;
+  background:var(--panel);border-top:1px solid var(--border2)}
+#cpbar span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 6px}
+#cpbar span:hover{color:var(--accent)}
+
+/* ── ANIMATIONS ── */
+@keyframes cellPop{0%{transform:scale(.8);opacity:.5}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+.pop{animation:cellPop .18s ease-out}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.shake{animation:shake .22s ease}
+</style>
+</head>
+<body>
+
+<!-- ── BACKGROUNDS ── -->
+<div id="stars"></div>
+<div id="light-bg"></div>
+<div id="toast"></div>
+
+<!-- ── THEME TOGGLE ── -->
+<button id="theme-btn" title="Toggle theme" aria-label="Toggle dark/light theme">
+  <div id="theme-knob"><span id="theme-icon">☀️</span></div>
+</button>
+
+<!-- ══════════════════════════════════════
+     START SCREEN
+     ══════════════════════════════════════ -->
+<div id="ss" class="screen">
+  <div style="text-align:center;margin-bottom:4px">
+    <!-- ← CUSTOMIZE: change emoji and app name -->
+    <div class="logo">🎮 AppName</div>
+    <div class="tagline">Your catchy tagline here ✦</div>
+  </div>
+
+  <div class="card">
+    <span class="clbl">Your Name</span>
+    <input id="pname" class="cinp" type="text" placeholder="e.g. Marco…" maxlength="14" autocomplete="off">
+
+    <span class="clbl">Choose your Avatar</span>
+    <!-- ← CUSTOMIZE: avatar buttons are generated from AVATARS object in JS -->
+    <div class="avatar-grid" id="avatar-grid"></div>
+  </div>
+
+  <!-- ← CUSTOMIZE: add extra option cards here (mode select, difficulty, etc.) -->
+
+  <button class="playbtn" id="pbtn">🚀 PLAY!</button>
+  <button class="secbtn" id="hist-btn">🏆 Game History</button>
+  <button class="secbtn" id="help-ss-btn">❓ How to Play</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     HISTORY SCREEN
+     ══════════════════════════════════════ -->
+<div id="hs-screen" class="screen hidden">
+  <!-- ← CUSTOMIZE: update title to match app name -->
+  <div class="hs-title">🏆 History</div>
+  <div class="hs-sub">Your AppName sessions</div>
+  <div id="hs-list"></div>
+  <div class="hs-acts">
+    <button class="hs-back" id="hs-back">← Back</button>
+    <button class="hs-del" id="hs-del">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GAME SCREEN
+     ══════════════════════════════════════ -->
+<div id="gs" class="screen hidden">
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hs"><span class="hv" id="h-avatar" style="font-size:1.2rem">🎮</span>
+      <span class="hv" id="h-name" style="font-size:.85rem;color:var(--accent2)">Player</span></div>
+    <!-- ← CUSTOMIZE: add/remove HUD segments as needed -->
+    <div class="hs"><span class="hl">LEVEL</span><span class="hv" id="h-level">1</span></div>
+    <div class="hs"><span class="hl">SCORE</span><span class="hv" id="h-score">0</span></div>
+    <div class="hs"><span class="hl">LIVES</span><span class="hv" id="h-lives">❤️❤️❤️</span></div>
+    <div id="h-fx" style="margin-left:auto;font-size:.85rem"></div>
+    <button class="hud-btn" id="hud-hist" title="History" style="margin-left:auto">🏆</button>
+    <button class="hud-btn" id="hud-help" title="Help">❓</button>
+    <button class="hud-btn danger" id="hud-quit" title="Quit" style="margin-right:50px">🚪</button>
+  </div>
+
+  <!-- ← CUSTOMIZE: put your game content here -->
+  <div id="game-area">
+    <!-- canvas, grid, or any game UI goes here -->
+    <div style="color:var(--text3);font-size:.9rem;margin-top:40px;text-align:center;font-style:italic">
+      ← Replace this with your game's canvas or grid →
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     OVERLAY (win / level up / game over)
+     ══════════════════════════════════════ -->
+<div id="ov" class="hidden">
+  <div class="ovb">
+    <div class="oe" id="oe">🎉</div>
+    <div class="ot" id="ot">Title</div>
+    <div class="ox" id="ox">Message</div>
+    <button class="obtn" id="ob">OK</button>
+    <button class="obtn sec hidden" id="ob2">Secondary</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CONFIRM DIALOG
+     ══════════════════════════════════════ -->
+<div id="conf" class="hidden">
+  <div class="conf-box">
+    <div class="conf-ico" id="conf-ico">⚠️</div>
+    <div class="conf-t" id="conf-t">Are you sure?</div>
+    <div class="conf-tx" id="conf-tx">Message</div>
+    <div class="conf-btns">
+      <button class="conf-no" id="conf-no">Cancel</button>
+      <button class="conf-yes" id="conf-yes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HELP POPUP
+     ══════════════════════════════════════ -->
+<div id="help-popup" class="popup-bg hidden">
+  <div class="popup-box">
+    <!-- ← CUSTOMIZE: replace all content below with your game's instructions -->
+    <div class="popup-title">❓ How to Play</div>
+    <div class="popup-row"><strong>🎯 Goal:</strong> [Describe the main objective of your game here.]</div>
+    <div class="popup-row"><strong>🕹 Controls:</strong><br>
+      ⌨️ Arrow keys / WASD — move<br>
+      📱 D-Pad / Swipe — touch controls<br>
+      [Add more controls as needed]</div>
+    <div class="popup-row"><strong>🏆 Scoring:</strong> [Explain how points are earned.]</div>
+    <div class="popup-row"><strong>💡 Tips:</strong><br>
+      • [Tip 1]<br>
+      • [Tip 2]<br>
+      • [Tip 3]</div>
+    <button class="popup-close" id="help-close">✕ Close</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ABOUT / COPYRIGHT POPUP
+     ══════════════════════════════════════ -->
+<div id="about-popup" class="popup-bg hidden">
+  <div class="popup-box">
+    <!-- ← CUSTOMIZE: update app details -->
+    <div class="popup-title">🎮 AppName</div>
+    <div class="popup-row"><strong>Version:</strong> 01.00 — February 2026</div>
+    <div class="popup-row"><strong>Genre:</strong> [Your genre here]</div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉:<a class="popup-row" href="mailto:pistino@libero.it">pistino@libero.it</a></div>
+    <div class="popup-row"><strong>Platform:</strong> Single-file HTML5 — works on any modern browser and smartphone</div>
+    <div class="lic">
+      <span class="lt">⚖ SOFTWARE LICENSE</span>
+        <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
+        <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
+        <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
+        <p>4. OWNERSHIP:All rights, title, and interest in the software remain exclusively with the author.</p>
+        <p>5. DISCLAIMER: The software is provided "AS IS", without warranty of any kind. The author shall not be liable for any damages or claims.</p>
+        <p>By accessing or using this software, you agree to these terms.</p>
+        <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
+    </div>
+    <button class="popup-close" id="about-close">✕ Close</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     COPYRIGHT BAR
+     ══════════════════════════════════════ -->
+<!-- ← CUSTOMIZE: update app name and version -->
+<div id="cpbar">
+  <span id="cp-span">© 2026 PISTINO DEVELOPMENT — AppName v.01.00 — click for info &amp; license</span>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ══════════════════════════════════════
+   THEME SYSTEM
+   ══════════════════════════════════════ */
+const THEME_KEY = 'ppTemplate_theme'; // ← CUSTOMIZE: change key per app
+let isDark = localStorage.getItem(THEME_KEY) !== 'light';
+function applyTheme(dark) {
+  isDark = dark;
+  document.body.classList.toggle('light', !dark);
+  document.getElementById('theme-icon').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+}
+document.getElementById('theme-btn').addEventListener('click', () => applyTheme(!isDark));
+applyTheme(isDark);
+
+/* ══════════════════════════════════════
+   STARFIELD
+   ══════════════════════════════════════ */
+(()=>{
+  const sf = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div'); s.className = 'star';
+    const sz = (Math.random() * 1.6 + 0.3).toFixed(1);
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      opacity:0;animation:twinkle ${(Math.random()*4+2).toFixed(1)}s ease-in-out infinite;
+      animation-delay:${(Math.random()*5).toFixed(1)}s`;
+    sf.appendChild(s);
+  }
+  const tw = document.createElement('style');
+  tw.textContent = '@keyframes twinkle{0%,100%{opacity:.05}50%{opacity:.55}}';
+  document.head.appendChild(tw);
+})();
+
+/* ══════════════════════════════════════
+   AVATARS
+   ← CUSTOMIZE: edit this object to add/remove characters
+   Each key: { emoji, label, color }
+   ══════════════════════════════════════ */
+const AVATARS = {
+  smile:  { emoji:'😊', label:'Smile',   color:'#ffcc02' },
+  cool:   { emoji:'😎', label:'Cool',    color:'#40c4ff' },
+  devil:  { emoji:'😈', label:'Devil',   color:'#ff5252' },
+  angel:  { emoji:'😇', label:'Angel',   color:'#ea80fc' },
+  alien:  { emoji:'👽', label:'Alien',   color:'#69f0ae' },
+  robot:  { emoji:'🤖', label:'Robot',   color:'#81d4fa' },
+  monkey: { emoji:'🐵', label:'Monkey',  color:'#ff9d3d' },
+  cat:    { emoji:'🐱', label:'Cat',     color:'#f48fb1' },
+  fox:    { emoji:'🦊', label:'Fox',     color:'#ffab40' },
+  wolf:   { emoji:'🐺', label:'Wolf',    color:'#b0bec5' },
+};
+
+/* ══════════════════════════════════════
+   HISTORY
+   ← CUSTOMIZE: change key per app
+   ══════════════════════════════════════ */
+const HISTORY_KEY = 'ppTemplate_history';
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+}
+function saveHistory(h) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch {}
+}
+function addHistoryEntry(result) {
+  const h = loadHistory();
+  const dur = G.startTime ? Math.floor((Date.now() - G.startTime) / 1000) : 0;
+  const mm = String(Math.floor(dur / 60)).padStart(2, '0');
+  const ss = String(dur % 60).padStart(2, '0');
+  // ← CUSTOMIZE: add/remove fields to match your game's data
+  h.unshift({
+    name:   G.name,
+    avatar: G.avatar.emoji,
+    score:  G.score,
+    level:  G.level,
+    result,
+    date:   new Date().toLocaleDateString('en-GB', {
+              day:'2-digit', month:'2-digit', year:'numeric',
+              hour:'2-digit', minute:'2-digit' }),
+    duration: `${mm}:${ss}`,
+  });
+  if (h.length > 50) h.length = 50;
+  saveHistory(h);
+}
+
+/* ══════════════════════════════════════
+   HISTORY SCREEN
+   ══════════════════════════════════════ */
+function showHistoryScreen(returnTo = 'ss') {
+  hideAll();
+  document.getElementById('hs-screen').classList.remove('hidden');
+  renderHistory();
+  document.getElementById('hs-back').onclick = () => {
+    hideAll();
+    document.getElementById(returnTo).classList.remove('hidden');
+  };
+}
+function renderHistory() {
+  const h = loadHistory();
+  const el = document.getElementById('hs-list');
+  if (!h.length) {
+    el.innerHTML = '<div class="hs-empty">✦ No games yet…<br>Play your first game!</div>';
+    return;
+  }
+  const medals = ['🥇','🥈','🥉'];
+  el.innerHTML = h.map((e, i) => `
+    <div class="hi ${e.result === 'win' ? 'win' : 'fail'}">
+      <div class="hi-rank">${medals[i] || `<span style="font-size:.85rem;color:var(--text3)">${i+1}</span>`}</div>
+      <div class="hi-main">
+        <div class="hi-name">${e.avatar} ${e.name}
+          <span style="font-size:.7rem;color:var(--text3)">Lv.${e.level}</span></div>
+        <div class="hi-detail">⏱ ${e.duration} · ${e.date}</div>
+        <div style="font-size:.65rem;margin-top:2px">
+          ${e.result==='win'
+            ? '<span style="color:var(--green)">✓ Completed</span>'
+            : '<span style="color:var(--red)">✗ Abandoned</span>'}
+        </div>
+      </div>
+      <div class="hi-score">${(e.score||0).toLocaleString('en')}<br>
+        <span style="font-size:.6rem;color:var(--text3)">pts</span></div>
+    </div>`).join('');
+}
+document.getElementById('hist-btn').addEventListener('click', () => showHistoryScreen('ss'));
+document.getElementById('hs-del').addEventListener('click', () => {
+  confirm2('🗑','Clear History', 'Delete all saved games?', 'Delete All', () => {
+    saveHistory([]); renderHistory(); toast('🗑 History cleared!');
+  });
+});
+
+/* ══════════════════════════════════════
+   AVATAR GRID — build from AVATARS
+   ══════════════════════════════════════ */
+let pAvatarKey = null;
+(()=>{
+  const grid = document.getElementById('avatar-grid');
+  Object.entries(AVATARS).forEach(([key, av]) => {
+    const b = document.createElement('button');
+    b.className = 'avbtn'; b.dataset.key = key;
+    b.innerHTML = `<span class="ae">${av.emoji}</span><span class="al">${av.label}</span>`;
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.avbtn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      pAvatarKey = key;
+    });
+    grid.appendChild(b);
+  });
+})();
+
+/* ══════════════════════════════════════
+   UTILITIES
+   ══════════════════════════════════════ */
+function hideAll() {
+  ['ss','gs','hs-screen'].forEach(id => document.getElementById(id).classList.add('hidden'));
+}
+
+let toastTimer = null;
+function toast(msg, duration = 2300) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('on'), duration);
+}
+
+function confirm2(ico, title, text, yesTxt, cb) {
+  document.getElementById('conf-ico').textContent = ico;
+  document.getElementById('conf-t').textContent   = title;
+  document.getElementById('conf-tx').textContent  = text;
+  document.getElementById('conf-yes').textContent = yesTxt;
+  document.getElementById('conf').classList.remove('hidden');
+  const y = document.getElementById('conf-yes');
+  const n = document.getElementById('conf-no');
+  const cleanup = () => document.getElementById('conf').classList.add('hidden');
+  y.onclick = () => { cleanup(); cb(); };
+  n.onclick = () => { cleanup(); };
+}
+
+function showOverlay(emoji, title, text, btn1Txt, cb1, btn2Txt, cb2) {
+  document.getElementById('oe').textContent = emoji;
+  document.getElementById('ot').textContent = title;
+  document.getElementById('ox').textContent = text;
+  document.getElementById('ob').textContent = btn1Txt;
+  document.getElementById('ov').classList.remove('hidden');
+  const b2 = document.getElementById('ob2');
+  if (btn2Txt) { b2.textContent = btn2Txt; b2.classList.remove('hidden'); }
+  else b2.classList.add('hidden');
+  document.getElementById('ob').onclick  = () => { document.getElementById('ov').classList.add('hidden'); if (cb1) cb1(); };
+  b2.onclick = btn2Txt ? () => { document.getElementById('ov').classList.add('hidden'); if (cb2) cb2(); } : null;
+}
+
+function updateHUD() {
+  const av = G.avatar;
+  document.getElementById('h-avatar').textContent = av ? av.emoji : '🎮';
+  document.getElementById('h-name').textContent   = G.name  || '—';
+  document.getElementById('h-level').textContent  = G.level || 1;
+  document.getElementById('h-score').textContent  = G.score || 0;
+  document.getElementById('h-lives').textContent  = '❤️'.repeat(Math.max(0, G.lives || 0));
+}
+
+/* ══════════════════════════════════════
+   HUD BUTTONS
+   ══════════════════════════════════════ */
+document.getElementById('hud-quit').addEventListener('click', () => {
+  if (!G.name || G.over) return;
+  confirm2('🚪', 'Quit Game',
+    'Quit? The game will be saved as abandoned.',
+    'Quit', () => {
+      stopTimer();
+      addHistoryEntry('fail');
+      hideAll();
+      document.getElementById('ss').classList.remove('hidden');
+      toast('🚪 Game abandoned and saved.');
+      G = {};
+    });
+});
+document.getElementById('hud-hist').addEventListener('click', () => {
+  if (!G.name) return;
+  if (G.timerID) { clearInterval(G.timerID); G.timerID = null; }
+  showHistoryScreen('gs');
+});
+document.getElementById('hud-help').addEventListener('click', () => {
+  if (G.timerID) G.paused = true;
+  document.getElementById('help-popup').classList.remove('hidden');
+});
+
+/* ══════════════════════════════════════
+   POPUPS
+   ══════════════════════════════════════ */
+document.getElementById('help-close').addEventListener('click', () => {
+  document.getElementById('help-popup').classList.add('hidden');
+  if (G.name && !G.over) G.paused = false;
+});
+document.getElementById('help-ss-btn').addEventListener('click', () => {
+  document.getElementById('help-popup').classList.remove('hidden');
+});
+document.getElementById('cp-span').addEventListener('click', () => {
+  document.getElementById('about-popup').classList.remove('hidden');
+});
+document.getElementById('about-close').addEventListener('click', () => {
+  document.getElementById('about-popup').classList.add('hidden');
+});
+
+/* ══════════════════════════════════════
+   PLAY BUTTON — validation then startGame
+   ══════════════════════════════════════ */
+document.getElementById('pbtn').addEventListener('click', () => {
+  const name = document.getElementById('pname').value.trim();
+  if (!name)       { toast('✏️ Enter your name first!'); return; }
+  if (!pAvatarKey) { toast('👆 Choose your avatar!');    return; }
+  startGame(name, pAvatarKey);
+});
+
+/* ══════════════════════════════════════
+   TIMER HELPERS
+   ══════════════════════════════════════ */
+function startTimer() {
+  stopTimer();
+  G.timerID = setInterval(() => {
+    if (G.paused) return;
+    G.elapsed = (G.elapsed || 0) + 1;
+    // ← CUSTOMIZE: update a timer display in HUD if needed
+  }, 1000);
+}
+function stopTimer() {
+  if (G.timerID) { clearInterval(G.timerID); G.timerID = null; }
+}
+
+/* ══════════════════════════════════════
+   GAME STATE
+   ══════════════════════════════════════ */
+let G = {};
+
+/* ══════════════════════════════════════
+   GAME START
+   ← CUSTOMIZE: initialize your game here
+   ══════════════════════════════════════ */
+function startGame(name, avatarKey) {
+  hideAll();
+  document.getElementById('gs').classList.remove('hidden');
+
+  G = {
+    name,
+    avatar:    AVATARS[avatarKey],
+    avatarKey,
+    level:     1,
+    score:     0,
+    lives:     3,
+    over:      false,
+    paused:    false,
+    startTime: Date.now(),
+    elapsed:   0,
+    timerID:   null,
+    // ← CUSTOMIZE: add your game-specific fields here
+  };
+
+  updateHUD();
+  startTimer();
+
+  // ← CUSTOMIZE: call your game's init function here
+  // e.g.: initLevel(); buildGrid(); loop();
+  toast(`Welcome, ${name}! 🎮`);
+}
+
+/* ══════════════════════════════════════
+   WIN / LOSE EXAMPLES
+   (call these from your game logic)
+   ══════════════════════════════════════ */
+function gameWin() {
+  stopTimer();
+  G.over = true;
+  // ← CUSTOMIZE: calculate score
+  addHistoryEntry('win');
+  showOverlay('🏆', 'YOU WIN!',
+    `Score: ${G.score} pts · Level: ${G.level}`,
+    '✦ New Game', () => { G = {}; hideAll(); document.getElementById('ss').classList.remove('hidden'); },
+    '🏆 History', () => { G = {}; showHistoryScreen('ss'); });
+}
+function gameLose() {
+  stopTimer();
+  G.over = true;
+  addHistoryEntry('fail');
+  showOverlay('💀', 'GAME OVER',
+    `Score: ${G.score} pts · Level: ${G.level}`,
+    '✦ Try Again', () => { G = {}; hideAll(); document.getElementById('ss').classList.remove('hidden'); });
+}
+
+/* ══════════════════════════════════════
+   BOOT
+   ══════════════════════════════════════ */
+document.getElementById('ss').classList.remove('hidden');
+
+/*
+  ┌─────────────────────────────────────────────────────────────┐
+  │  YOUR GAME ENGINE GOES HERE                                  │
+  │                                                              │
+  │  Suggested structure:                                        │
+  │  • Constants (ROWS, COLS, TILE types, etc.)                  │
+  │  • generateLevel() / buildGrid()                             │
+  │  • render() / loop()                                         │
+  │  • Input handlers (keyboard, touch, swipe)                   │
+  │  • Collision / pickup / win-condition checks                 │
+  │  • Level progression                                         │
+  │                                                              │
+  │  Call gameWin() or gameLose() when appropriate.              │
+  └─────────────────────────────────────────────────────────────┘
+*/
+</script>
+</body>
+</html>
