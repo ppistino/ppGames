@@ -129,9 +129,9 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   position:relative;user-select:none;touch-action:none}
 .s-cell.given{color:var(--gold2);cursor:default}
 .s-cell.selected{background:var(--cell-sel)!important;box-shadow:inset 0 0 0 2px var(--gold)}
-.s-cell.highlight{background:var(--cell-hl)}
-.s-cell.same{background:var(--cell-same)}
-.s-cell.error{background:var(--cell-err);color:var(--red)!important}
+.s-cell.highlight{background:var(--cell-hl)!important}
+.s-cell.same{background:var(--cell-same)!important}
+.s-cell.error{background:var(--cell-err)!important;color:var(--red)!important}
 .s-cell.note-mode{background:var(--cell-note)}
 .s-cell:not(.given):hover{background:var(--cell-hover)}
 .s-cell.bb-r{border-right:2.5px solid var(--gold)!important}
@@ -148,9 +148,9 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   user-select:none;touch-action:none;border:1px solid var(--border2)}
 .irr-cell.given{color:var(--gold2);cursor:default}
 .irr-cell.selected{background:var(--cell-sel)!important;box-shadow:inset 0 0 0 2px var(--gold)}
-.irr-cell.highlight{background:var(--cell-hl)}
-.irr-cell.same{background:var(--cell-same)}
-.irr-cell.error{background:var(--cell-err);color:var(--red)!important}
+.irr-cell.highlight{background:var(--cell-hl)!important}
+.irr-cell.same{background:var(--cell-same)!important}
+.irr-cell.error{background:var(--cell-err)!important;color:var(--red)!important}
 .irr-cell:not(.given):hover{background:var(--cell-hover)}
 .irr-cell.rbl{border-left:3px solid var(--gold)!important}
 .irr-cell.rbt{border-top:3px solid var(--gold)!important}
@@ -464,7 +464,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
     <div class="popup-title">🔢 ppSudoka</div>
     <div class="popup-row"><strong>Version:</strong> 01.00 — February 2026</div>
     <div class="popup-row"><strong>Modes:</strong> Classic · Visual · Irregular · Killer</div>
-    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-row" href="mailto:pistino@libero.it">pistino@libero.it</a>)</div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-row" href="/cdn-cgi/l/email-protection#cbbba2b8bfa2a5a48ba7a2a9aeb9a4e5a2bf"><span class="__cf_email__" data-cfemail="0c7c657f786562634c60656e697e63226578">[email&#160;protected]</span></a>)</div>
     <div class="popup-row"><strong>Platform:</strong> Single-file HTML5 — works on any modern browser and smartphone</div>
     <div class="lic">
       <span class="lt">⚖ SOFTWARE LICENSE</span>
@@ -478,7 +478,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 
 <div id="cpbar"><span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppSudoka v.01.00 — click for info &amp; license</span></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 'use strict';
 /* ppSudoka v.01.00 — 4 game modes */
 
@@ -643,6 +643,43 @@ function makeHoles(full,nRemove){
   }
   return puzzle;
 }
+function makeHolesIrr(full,regions,nRemove){
+  const puzzle=full.map(r=>[...r]);
+  let removed=0,attempts=0;
+  const positions=shuffle(Array.from({length:81},(_,i)=>i));
+  for(const pos of positions){
+    if(removed>=nRemove||attempts>=300)break;
+    attempts++;
+    const r=~~(pos/9),c=pos%9;
+    if(puzzle[r][c]===0)continue;
+    const bk=puzzle[r][c];puzzle[r][c]=0;
+    if(countSolutionsIrr(puzzle.map(x=>[...x]),regions)===1)removed++;
+    else puzzle[r][c]=bk;
+  }
+  return puzzle;
+}
+function countSolutionsIrr(g,regions,max=2){
+  const N=9;
+  const regCells=Array.from({length:N},()=>[]);
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++)regCells[regions[r][c]].push(r*N+c);
+  let count=0;
+  function okIrr(r,c,v){
+    for(let i=0;i<N;i++){if(g[r][i]===v||g[i][c]===v)return false;}
+    for(const idx of regCells[regions[r][c]]){if(g[~~(idx/N)][idx%N]===v)return false;}
+    return true;
+  }
+  function solve(pos=0){
+    if(count>=max)return;
+    if(pos===N*N){count++;return;}
+    const r=~~(pos/N),c=pos%N;
+    if(g[r][c]!==0){solve(pos+1);return;}
+    for(let v=1;v<=9;v++){
+      if(count>=max)return;
+      if(okIrr(r,c,v)){g[r][c]=v;solve(pos+1);g[r][c]=0;}
+    }
+  }
+  solve();return count;
+}
 function countSolutions(g,max=2){
   let count=0;
   function ok9(g,r,c,v){
@@ -707,7 +744,7 @@ function solveIrregular(g,regions){
     if(pos===N*N)return true;
     const r=~~(pos/N),c=pos%N;
     if(g[r][c]!==0)return solve(pos+1);
-    for(let v=1;v<=9;v++){if(okIrr(r,c,v)){g[r][c]=v;if(solve(pos+1))return true;g[r][c]=0;}}
+    for(const v of shuffle([1,2,3,4,5,6,7,8,9])){if(okIrr(r,c,v)){g[r][c]=v;if(solve(pos+1))return true;g[r][c]=0;}}
     return false;
   }
   return solve();
@@ -823,17 +860,13 @@ const IRR_COLORS=['rgba(64,196,255,.14)','rgba(105,240,174,.12)','rgba(234,128,2
 function buildIrregular(nRemove){
   // Pick a template index; remember which to decide rendering style
   const tplIdx=~~(Math.random()*IRR_TEMPLATES.length);
-  const isMazeStyle=tplIdx>=6; // templates 6-9 are maze-corridor style
   const tpl=IRR_TEMPLATES[tplIdx];
   const perm=shuffle([0,1,2,3,4,5,6,7,8]);
   const regions=Array.from({length:9},(_,r)=>Array.from({length:9},(_,c)=>perm[tpl[r*9+c]]));
 
   const full=Array.from({length:9},()=>Array(9).fill(0));
   solveIrregular(full,regions);
-  const puzzle=full.map(r=>[...r]);
-  let holes=0;
-  const positions=shuffle(Array.from({length:81},(_,i)=>i));
-  for(const pos of positions){if(holes>=nRemove)break;puzzle[Math.floor(pos/9)][pos%9]=0;holes++;}
+  const puzzle=makeHolesIrr(full,regions,nRemove);
   G.full=full;G.puzzle=puzzle;G.regions=regions;
   G.cells=Array.from({length:9},(_,r)=>Array.from({length:9},(_,c)=>({r,c,given:puzzle[r][c]!==0,val:puzzle[r][c],notes:new Set()})));
   const cs=cellSize();
@@ -842,39 +875,19 @@ function buildIrregular(nRemove){
   document.documentElement.style.setProperty('--nfont',(cs*.25)+'px');
   const wrap=document.getElementById('irr-wrap');wrap.classList.remove('hidden');
   const grid=document.createElement('div');
-
-  if(isMazeStyle){
-    // Maze rendering: no background fill, only thick border walls
-    grid.style.cssText=`display:grid;grid-template-columns:repeat(9,${cs}px);grid-template-rows:repeat(9,${cs}px);border:3px solid var(--gold);border-radius:4px;background:var(--cell-bg)`;
-    for(let r=0;r<9;r++)for(let c=0;c<9;c++){
-      const cell=G.cells[r][c],reg=regions[r][c],div=document.createElement('div');
-      div.className='irr-cell'+(cell.given?' given':'');
-      // Maze walls: thick when region boundary, thin when same region
-      div.style.borderTop=   (r===0||regions[r-1][c]!==reg)?'3px solid var(--gold)':'1px solid var(--border2)';
-      div.style.borderBottom=(r===8||regions[r+1][c]!==reg)?'3px solid var(--gold)':'1px solid var(--border2)';
-      div.style.borderLeft=  (c===0||regions[r][c-1]!==reg)?'3px solid var(--gold)':'1px solid var(--border2)';
-      div.style.borderRight= (c===8||regions[r][c+1]!==reg)?'3px solid var(--gold)':'1px solid var(--border2)';
-      div.dataset.r=r;div.dataset.c=c;
-      if(cell.val)div.textContent=cell.val;
-      div.addEventListener('click',()=>selectCell(r,c));
-      grid.appendChild(div);cell.el=div;
-    }
-  } else {
-    // Organic rendering: colored regions + thick border lines
-    grid.style.cssText=`display:grid;grid-template-columns:repeat(9,${cs}px);grid-template-rows:repeat(9,${cs}px);border:2.5px solid var(--gold);border-radius:4px;overflow:hidden`;
-    for(let r=0;r<9;r++)for(let c=0;c<9;c++){
-      const cell=G.cells[r][c],reg=regions[r][c],div=document.createElement('div');
-      div.className='irr-cell'+(cell.given?' given':'');
-      div.style.background=IRR_COLORS[reg%IRR_COLORS.length];
-      if(c===0||regions[r][c-1]!==reg)div.classList.add('rbl');
-      if(r===0||regions[r-1][c]!==reg)div.classList.add('rbt');
-      if(c===8||regions[r][c+1]!==reg)div.classList.add('rbr');
-      if(r===8||regions[r+1][c]!==reg)div.classList.add('rbb');
-      div.dataset.r=r;div.dataset.c=c;
-      if(cell.val)div.textContent=cell.val;
-      div.addEventListener('click',()=>selectCell(r,c));
-      grid.appendChild(div);cell.el=div;
-    }
+  grid.style.cssText=`display:grid;grid-template-columns:repeat(9,${cs}px);grid-template-rows:repeat(9,${cs}px);border:2.5px solid var(--gold);border-radius:4px;overflow:hidden`;
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++){
+    const cell=G.cells[r][c],reg=regions[r][c],div=document.createElement('div');
+    div.className='irr-cell'+(cell.given?' given':'');
+    div.style.background=IRR_COLORS[reg%IRR_COLORS.length];
+    div.style.borderTop=   (r===0||regions[r-1][c]!==reg)?'2.5px solid var(--gold)':'1px solid var(--border2)';
+    div.style.borderBottom=(r===8||regions[r+1][c]!==reg)?'2.5px solid var(--gold)':'1px solid var(--border2)';
+    div.style.borderLeft=  (c===0||regions[r][c-1]!==reg)?'2.5px solid var(--gold)':'1px solid var(--border2)';
+    div.style.borderRight= (c===8||regions[r][c+1]!==reg)?'2.5px solid var(--gold)':'1px solid var(--border2)';
+    div.dataset.r=r;div.dataset.c=c;
+    if(cell.val)div.textContent=cell.val;
+    div.addEventListener('click',()=>selectCell(r,c));
+    grid.appendChild(div);cell.el=div;
   }
   wrap.appendChild(grid);
 }
