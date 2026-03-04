@@ -13,6 +13,20 @@ https://ppistino.github.io/ppGames/
 🕹️ GAMES INCLUDED 🕹️
 ______________________________________________________________________________________
 
+🥚 ppTamaEmoji 🥚
+
+https://ppistino.github.io/ppGames/ppTamaEmoj/ppTamaEmoj.html
+
+A digital companion that lives with you in real time. Born from an egg, it grows, 
+develops a unique personality, works, studies, travels, falls ill, ages and eventually 
+passes away — leaving an heir. No two companions are the same.
+
+Features:
+HTML5 CSS3 Vanilla JS localStorage 
+Web Speech API Web Audio API 
+MyMemory Translation API
+______________________________________________________________________________________
+
 🌍 ppMinePlanet 🌍 
 
 https://ppistino.github.io/ppGames/ppMinePlanet/ppMinePlanet.html
