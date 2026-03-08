@@ -165,6 +165,10 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   transition:all .15s;color:var(--text);line-height:1}
 .hud-btn:hover{border-color:var(--accent);color:var(--accent)}
 .hud-btn.danger:hover{background:rgba(255,68,68,.18);border-color:var(--red);color:var(--red)}
+/* mini-bar per HP nell'HUD */
+.hud-hpbar{width:48px;height:6px;background:rgba(255,255,255,.1);border-radius:3px;
+  overflow:hidden;border:1px solid rgba(255,255,255,.12);margin-top:1px}
+.hud-hpfill{height:100%;border-radius:3px;transition:width .3s,background .3s}
 
 /* GAME AREA */
 #game-area{flex:1;display:flex;flex-direction:column;align-items:center;
@@ -181,7 +185,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 /* MOBILE CONTROLS */
 #mobile-controls{position:absolute;bottom:0;left:0;right:0;z-index:25;
   display:flex;justify-content:space-between;align-items:flex-end;
-  padding:8px 12px 10px;pointer-events:none}
+  padding:8px 12px 40px;pointer-events:none}
 #dpad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);
   gap:3px;pointer-events:all}
 .dpbtn{background:rgba(91,200,255,.12);border:1.5px solid rgba(91,200,255,.3);
@@ -195,6 +199,42 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   pointer-events:all;transition:background .1s;user-select:none}
 #fire-btn:active,#fire-btn.pressed{background:rgba(255,100,100,.5)}
+#upgrade-bar{pointer-events:all}
+.upg-btn{
+  width:48px;height:52px;border-radius:10px;
+  background:rgba(10,25,70,0.88);
+  border:1.5px solid rgba(91,200,255,0.4);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  transition:background .12s,border-color .12s;
+  position:relative;overflow:hidden;gap:1px}
+.upg-btn:active{background:rgba(40,80,160,0.9)}
+.upg-btn.active{background:rgba(40,160,90,0.30);border-color:#50e8a0}
+.upg-btn.on-cd{background:rgba(20,20,50,0.85);border-color:#334466}
+.upg-btn.spent{opacity:0.28;pointer-events:none}
+.upg-btn.inactive-phase{opacity:0.22;pointer-events:none}
+.upg-emoji{font-size:1.3rem;line-height:1;pointer-events:none}
+.upg-label{font-size:0.55rem;font-family:monospace;font-weight:700;
+  letter-spacing:0.5px;color:#5bc8ff;pointer-events:none;line-height:1}
+.upg-btn.active  .upg-label{color:#50e8a0}
+.upg-btn.on-cd   .upg-label{color:#ff9900}
+.upg-btn.spent   .upg-label{color:#444}
+.upg-btn.locked{opacity:0.38;cursor:default;pointer-events:none;
+  background:rgba(10,10,20,0.70);border-color:rgba(80,80,120,0.3)}
+.upg-btn.locked .upg-label{color:#445566}
+.upg-cd-ring{
+  position:absolute;inset:0;border-radius:10px;
+  background:rgba(0,0,0,0);pointer-events:none}
+#shop-quick-btn{
+  width:48px;height:52px;border-radius:10px;
+  background:rgba(255,180,0,0.15);
+  border:1.5px solid rgba(255,180,0,0.5);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  font-size:1.3rem;gap:1px;pointer-events:all}
+#shop-quick-btn:active{background:rgba(255,180,0,0.35)}
+#shop-quick-lbl{font-size:0.52rem;font-family:monospace;font-weight:700;
+  color:#ffcc02;letter-spacing:0.5px}
 
 /* SHOP SCREEN */
 #shop-screen{z-index:50;overflow-y:auto;padding:16px 16px 32px;gap:10px;
@@ -401,12 +441,19 @@ body.light .cinp{background:rgba(0,0,0,.03)}
       <span class="hv" id="h-name" style="font-size:.8rem;color:var(--accent2)">Pilot</span></div>
     <div class="hs"><span class="hl">LVL</span><span class="hv" id="h-level">1</span></div>
     <div class="hs"><span class="hl">SCORE</span><span class="hv" id="h-score">0</span></div>
-    <div class="hs"><span class="hl">LIVES</span><span class="hv" id="h-lives">❤️❤️❤️</span></div>
     <div class="hs"><span class="hl">⛽</span><span class="hv" id="h-fuel" style="color:var(--green)">100%</span></div>
+    <!-- HP tracking elements: hidden, updated by JS, drawn on canvas -->
+    <div id="h-hp-hidden" style="display:none">
+      <div id="h-hp-bar" style="width:100%"></div>
+      <span id="h-hp-pct">100%</span>
+    </div>
     <div class="hs"><span class="hl">💎</span><span class="hv" id="h-cargo" style="color:var(--hot2)">0</span></div>
     <button class="hud-btn" id="hud-hist" title="Mission Log" style="margin-left:auto">🏆</button>
     <button class="hud-btn" id="hud-help" title="Help">❓</button>
-    <button class="hud-btn danger" id="hud-quit" title="Abort Mission" style="margin-right:50px">🚪</button>
+    <button class="hud-btn" id="hud-sound" title="Sound ON/OFF">🔊</button>
+    <button class="hud-btn" id="hud-pause" title="Pause / Resume">⏸</button>
+    <button class="hud-btn danger" id="hud-abandon" title="Abandon Mission" style="margin-right:50px">🚪</button>
+    <button class="hud-btn danger" id="hud-quit" title="Abort" style="display:none">🚪</button>
   </div>
   <div id="game-area">
     <canvas id="game-canvas"></canvas>
@@ -424,7 +471,26 @@ body.light .cinp{background:rgba(0,0,0,.03)}
         <div class="dpbtn" id="btn-down">▼</div>
         <div class="dpbtn empty"></div>
       </div>
-      <div id="fire-btn">🔥</div>
+      <!-- UPGRADE BUTTONS — always visible, all 8 slots -->
+      <div id="upgrade-bar" style="display:flex;flex-direction:row;align-items:flex-end;
+           gap:4px;pointer-events:all;flex-wrap:wrap;max-width:calc(100% - 180px);
+           justify-content:center"></div>
+      <!-- Quick-shop + fire -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:all">
+        <div id="shop-quick-btn" title="Open Upgrade Shop">🛒<span id="shop-quick-lbl">SHOP</span></div>
+        <div id="fire-btn">🔥</div>
+      </div>
+    </div>
+    <!-- PAUSA OVERLAY -->
+    <div id="pause-overlay" style="display:none;position:absolute;inset:0;z-index:80;
+         background:rgba(0,0,0,.72);flex-direction:column;align-items:center;
+         justify-content:center;gap:18px;backdrop-filter:blur(4px)">
+      <div style="font-family:Georgia,serif;font-size:2rem;color:#5bc8ff;letter-spacing:4px">⏸ PAUSED</div>
+      <div style="font-size:.75rem;color:var(--text3);letter-spacing:2px">Game saved · Press ⏸ or P to resume</div>
+      <button id="pause-resume-btn" style="margin-top:8px;padding:10px 32px;
+        font-family:Georgia,serif;font-size:1rem;background:rgba(91,200,255,.15);
+        border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
+        letter-spacing:2px">▶ RESUME</button>
     </div>
   </div>
 </div>
@@ -439,6 +505,24 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   <div class="credits-bar" style="max-width:500px;width:100%">
     <span style="font-size:.75rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase">Credits</span>
     <span class="credits-val" id="shop-credits">0 ₡</span>
+  </div>
+
+  <!-- Status bars in debrief -->
+  <div id="debrief-bars" style="width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;margin:4px 0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:.85rem;min-width:22px">⛽</span>
+      <div style="flex:1;height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden">
+        <div id="db-fuel-bar" style="height:100%;width:100%;border-radius:5px;background:#50e8a0;transition:width .5s"></div>
+      </div>
+      <span id="db-fuel-pct" style="font-size:.7rem;color:#50e8a0;min-width:36px;text-align:right">100%</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:.85rem;min-width:22px">❤️</span>
+      <div style="flex:1;height:10px;background:rgba(180,0,0,.14);border-radius:5px;overflow:hidden">
+        <div id="db-hp-bar" style="height:100%;width:100%;border-radius:5px;background:#ff4444;transition:width .5s"></div>
+      </div>
+      <span id="db-hp-pct" style="font-size:.7rem;color:#ff4444;min-width:36px;text-align:right">100%</span>
+    </div>
   </div>
 
   <div class="resources-summary" id="resources-summary">
@@ -745,7 +829,15 @@ function updateHUD() {
   document.getElementById('h-name').textContent   = G.name || '—';
   document.getElementById('h-level').textContent  = G.level || 1;
   document.getElementById('h-score').textContent  = (G.score || 0).toLocaleString('en');
-  document.getElementById('h-lives').textContent  = '❤️'.repeat(Math.max(0, G.lives || 0));
+
+  // HP bar
+  const hpPct   = Math.max(0, Math.round(G.hp || 0));
+  const hpColor = hpPct > 60 ? '#50e8a0' : hpPct > 30 ? '#ffcc02' : '#ff4444';
+  const hpBar = document.getElementById('h-hp-bar');
+  const hpPctEl = document.getElementById('h-hp-pct');
+  if (hpBar)   { hpBar.style.width = hpPct + '%'; hpBar.style.background = hpColor; }
+  if (hpPctEl) { hpPctEl.textContent = hpPct + '%'; hpPctEl.style.color = hpColor; }
+
   const fp = Math.max(0, Math.round((G.fuel / G.maxFuel) * 100));
   const fEl = document.getElementById('h-fuel');
   fEl.textContent = fp + '%';
@@ -779,6 +871,233 @@ document.getElementById('hud-quit').addEventListener('click', () => {
       G = {};
     });
 });
+
+/* ══════════════════════════════════════
+   ABBANDONA MISSIONE
+   ══════════════════════════════════════ */
+document.getElementById('hud-abandon').addEventListener('click', () => {
+  if (!G.name || G.over) return;
+  G.paused = true;
+  const po = document.getElementById('pause-overlay');
+  if (po) po.style.display = 'none';
+  confirm2('🚪', 'Abandon Mission',
+    'Abandon? Mission will be logged as failed.',
+    'Abandon', () => {
+      stopGameLoop();
+      addHistoryEntry('fail');
+      hideAll();
+      document.getElementById('ss').classList.remove('hidden');
+      toast('🚀 Mission abandoned.');
+      G = {};
+    });
+});
+
+/* ══════════════════════════════════════
+   PAUSA
+   ══════════════════════════════════════ */
+function setPaused(val) {
+  if (!G.name || G.over) return;
+  G.paused = val;
+  const ov  = document.getElementById('pause-overlay');
+  const btn = document.getElementById('hud-pause');
+  if (ov)  ov.style.display  = val ? 'flex' : 'none';
+  if (btn) { btn.textContent = val ? '▶' : '⏸'; btn.title = val ? 'Resume' : 'Pause'; }
+}
+document.getElementById('hud-pause').addEventListener('click', () => setPaused(!G.paused));
+document.getElementById('pause-resume-btn').addEventListener('click', () => setPaused(false));
+document.addEventListener('keydown', e => {
+  if (e.code === 'KeyP' && G.name && !G.over) { e.preventDefault(); setPaused(!G.paused); }
+  // Keys 1-8: activate upgrade by slot index
+  const nk = parseInt(e.key);
+  if (!isNaN(nk) && nk >= 1 && nk <= 8 && G.upgrades && G.upgrades.length >= nk && !G.paused && !G.over) {
+    activateUpgrade(G.upgrades[nk - 1]);
+  }
+});
+
+/* ══════════════════════════════════════
+   AUDIO SYSTEM — Procedural Web Audio API
+   ══════════════════════════════════════ */
+let _audioCtx = null;
+let soundEnabled = true;
+
+function _getAC() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function soundPlay(type) {
+  if (!soundEnabled) return;
+  try {
+    const ac  = _getAC();
+    const now = ac.currentTime;
+    const master = ac.createGain();
+    master.gain.setValueAtTime(0.7, now);
+    master.connect(ac.destination);
+
+    switch (type) {
+
+      case 'shoot': {
+        const o = ac.createOscillator(); o.type = 'square';
+        o.frequency.setValueAtTime(900, now);
+        o.frequency.exponentialRampToValueAtTime(180, now + 0.09);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.16, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        o.connect(g); g.connect(master);
+        o.start(now); o.stop(now + 0.1);
+        break;
+      }
+
+      case 'collect': {
+        [0, 0.06, 0.12].forEach((t, i) => {
+          const o = ac.createOscillator(); o.type = 'sine';
+          o.frequency.value = 440 * Math.pow(1.26, i);
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.18, now + t);
+          g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.1);
+          o.connect(g); g.connect(master);
+          o.start(now + t); o.stop(now + t + 0.11);
+        });
+        break;
+      }
+
+      case 'hit': {
+        // Rumore bianco breve (impatto scafo)
+        const len = Math.ceil(ac.sampleRate * 0.22);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ac.sampleRate * 0.06));
+        const src = ac.createBufferSource(); src.buffer = buf;
+        const flt = ac.createBiquadFilter(); flt.type = 'bandpass'; flt.frequency.value = 220; flt.Q.value = 1.5;
+        const g   = ac.createGain(); g.gain.setValueAtTime(0.55, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        src.connect(flt); flt.connect(g); g.connect(master);
+        src.start(now);
+        break;
+      }
+
+      case 'explosion': {
+        const len = Math.ceil(ac.sampleRate * 0.6);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ac.sampleRate * 0.18));
+        const src = ac.createBufferSource(); src.buffer = buf;
+        const flt = ac.createBiquadFilter(); flt.type = 'lowpass'; flt.frequency.value = 380;
+        const g   = ac.createGain(); g.gain.setValueAtTime(0.75, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        src.connect(flt); flt.connect(g); g.connect(master);
+        src.start(now);
+        break;
+      }
+
+      case 'refuel': {
+        const o = ac.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(330, now);
+        o.frequency.linearRampToValueAtTime(500, now + 0.35);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.10, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        o.connect(g); g.connect(master);
+        o.start(now); o.stop(now + 0.39);
+        break;
+      }
+
+      case 'land': {
+        const o = ac.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(260, now); o.frequency.exponentialRampToValueAtTime(120, now + 0.4);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.30, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        o.connect(g); g.connect(master);
+        o.start(now); o.stop(now + 0.46);
+        break;
+      }
+
+      case 'fuelEmpty': {
+        // 3 beep discendenti
+        [0, 0.18, 0.36].forEach((t, i) => {
+          const o = ac.createOscillator(); o.type = 'sawtooth';
+          o.frequency.value = 180 - i * 40;
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.14, now + t); g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.15);
+          o.connect(g); g.connect(master);
+          o.start(now + t); o.stop(now + t + 0.16);
+        });
+        break;
+      }
+
+      case 'levelup': {
+        [261, 329, 392, 523].forEach((f, i) => {
+          const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.20, now + i * 0.12); g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.18);
+          o.connect(g); g.connect(master);
+          o.start(now + i * 0.12); o.stop(now + i * 0.12 + 0.19);
+        });
+        break;
+      }
+
+      case 'thruster': {
+        // Engine hum — filtered noise burst while thrusting
+        const len = Math.ceil(ac.sampleRate * 0.12);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        const d   = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.6;
+        const src = ac.createBufferSource(); src.buffer = buf;
+        const flt = ac.createBiquadFilter(); flt.type = 'bandpass';
+        flt.frequency.value = 140; flt.Q.value = 2.5;
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.07, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        src.connect(flt); flt.connect(g); g.connect(master);
+        src.start(now);
+        break;
+      }
+
+      case 'hpAlarm': {
+        // Urgent pulsing beep — HP critically low
+        [0, 0.22].forEach((t) => {
+          const o = ac.createOscillator(); o.type = 'square';
+          o.frequency.setValueAtTime(880, now + t);
+          o.frequency.exponentialRampToValueAtTime(440, now + t + 0.10);
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.18, now + t); g.gain.exponentialRampToValueAtTime(0.001, now + t + 0.12);
+          o.connect(g); g.connect(master);
+          o.start(now + t); o.stop(now + t + 0.13);
+        });
+        break;
+      }
+
+      case 'upgradeOn': {
+        // Upgrade activated — ascending chime
+        [440, 660, 880].forEach((f, i) => {
+          const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.14, now + i*0.07); g.gain.exponentialRampToValueAtTime(0.001, now + i*0.07 + 0.10);
+          o.connect(g); g.connect(master);
+          o.start(now + i*0.07); o.stop(now + i*0.07 + 0.11);
+        });
+        break;
+      }
+
+      case 'upgradeBuy': {
+        // Purchase confirmed — satisfying ding
+        [523, 659].forEach((f, i) => {
+          const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+          const g = ac.createGain();
+          g.gain.setValueAtTime(0.20, now + i*0.10); g.gain.exponentialRampToValueAtTime(0.001, now + i*0.10 + 0.16);
+          o.connect(g); g.connect(master);
+          o.start(now + i*0.10); o.stop(now + i*0.10 + 0.17);
+        });
+        break;
+      }
+    }
+  } catch (e) { /* audio non disponibile */ }
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('hud-sound');
+  if (btn) btn.textContent = soundEnabled ? '🔊' : '🔇';
+  toast(soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF');
+}
+document.getElementById('hud-sound').addEventListener('click', toggleSound);
 document.getElementById('hud-hist').addEventListener('click', () => {
   if (!G.name) return;
   G.paused = true;
@@ -816,15 +1135,173 @@ document.getElementById('pbtn').addEventListener('click', () => {
    UPGRADES DATA
    ══════════════════════════════════════ */
 const UPGRADES_DEF = [
-  { id:'shield',   emoji:'🛡️', name:'Energy Shield',   desc:'Absorbs 1 hit before hull damage',        price:300 },
-  { id:'cannon2',  emoji:'🔫', name:'Double Cannon',    desc:'Fire 2 bullets simultaneously',           price:450 },
-  { id:'engine2',  emoji:'⚡', name:'Ionic Engine',     desc:'Reduces fuel consumption by 25%',         price:350 },
-  { id:'magnet',   emoji:'🧲', name:'Tractor Beam',     desc:'Auto-collects nearby resources',          price:500 },
-  { id:'tank',     emoji:'🔋', name:'Extra Tank',       desc:'+50% max fuel capacity',                  price:400 },
-  { id:'radar',    emoji:'📡', name:'Deep Radar',       desc:'Highlights resources and enemies',        price:250 },
-  { id:'repair',   emoji:'🔧', name:'Repair Kit',       desc:'Restore 1 life (one-time use)',           price:600 },
-  { id:'cryo',     emoji:'🧊', name:'Cryo Shield',      desc:'5 sec immunity vs aliens (cooldown 30s)', price:700 },
+  { id:'shield',  emoji:'🛡️', name:'Energy Shield',  price:300,
+    desc:'Activate: absorb next hit (30s CD)',
+    duration:0,   cooldown:30*60, phases:['travel','planet','landing','return'], uses:-1 },
+  { id:'cannon2', emoji:'🔫', name:'Double Cannon',  price:450,
+    desc:'Activate: double-fire burst for 5s (15s CD)',
+    duration:5*60, cooldown:15*60, phases:['travel','return'], uses:-1 },
+  { id:'engine2', emoji:'⚡', name:'Ionic Engine',   price:350,
+    desc:'Activate: -60% fuel burn for 8s (20s CD)',
+    duration:8*60, cooldown:20*60, phases:['launch','travel','planet','return','landing'], uses:-1 },
+  { id:'magnet',  emoji:'🧲', name:'Tractor Beam',   price:500,
+    desc:'Activate: attract all resources for 10s (25s CD)',
+    duration:10*60, cooldown:25*60, phases:['travel','planet','return'], uses:-1 },
+  { id:'tank',    emoji:'🔋', name:'Fuel Boost',     price:400,
+    desc:'Activate: instant +30% fuel (2 uses per level)',
+    duration:0,   cooldown:0,    phases:['launch','travel','planet','return','landing'], uses:2 },
+  { id:'radar',   emoji:'📡', name:'Deep Radar',     price:250,
+    desc:'Activate: highlight all targets for 8s (20s CD)',
+    duration:8*60, cooldown:20*60, phases:['travel','planet','return'], uses:-1 },
+  { id:'repair',  emoji:'🔧', name:'Repair Kit',     price:600,
+    desc:'Activate: restore +25% HP (one use)',
+    duration:0,   cooldown:0,    phases:['travel','planet','landing','return'], uses:1 },
+  { id:'medical', emoji:'💉', name:'Medical Kit',    price:500,
+    desc:'Activate: restore +40% HP (one use)',
+    duration:0,   cooldown:0,    phases:['travel','planet','landing','return'], uses:1 },
 ];
+
+// Runtime state for each active upgrade
+let upgradeState = {};  // { id: { cooldown, active, uses, timer } }
+
+function initUpgradeStates() {
+  upgradeState = {};
+  G.upgrades.forEach(id => {
+    const def = UPGRADES_DEF.find(u => u.id === id);
+    if (!def) return;
+    upgradeState[id] = { cooldown: 0, active: false, timer: 0, uses: def.uses };
+  });
+}
+
+function activateUpgrade(id) {
+  const def = UPGRADES_DEF.find(u => u.id === id);
+  const st  = upgradeState[id];
+  if (!def || !st) return;
+  if (st.cooldown > 0) { toast(`⏳ ${def.emoji} on cooldown!`); return; }
+  if (st.uses === 0)   { toast(`❌ ${def.emoji} depleted!`);    return; }
+
+  // Apply effect
+  switch(id) {
+    case 'shield':
+      if (G.ship) G.ship.shieldHits = (G.ship.shieldHits || 0) + 1;
+      toast('🛡️ Shield raised — next hit absorbed!');
+      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      break;
+    case 'cannon2':
+      st.active = true; st.timer = def.duration;
+      toast('🔫 Double Cannon active!');
+      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      break;
+    case 'engine2':
+      st.active = true; st.timer = def.duration;
+      toast('⚡ Ionic Engine — reduced burn!');
+      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      break;
+    case 'magnet':
+      st.active = true; st.timer = def.duration;
+      toast('🧲 Tractor Beam activated!');
+      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      break;
+    case 'tank':
+      G.fuel = Math.min(G.maxFuel, (G.fuel||0) + 30);
+      floatText && floatText(canvas.width/2, canvas.height/2, '+30% ⛽', '#5bc8ff');
+      toast('🔋 Fuel Boost — +30% fuel!');
+      updateHUD();
+      break;
+    case 'radar':
+      st.active = true; st.timer = def.duration;
+      toast('📡 Deep Radar — scanning…');
+      st.cooldown = def.cooldown;
+      break;
+    case 'repair':
+      G.hp = Math.min(100, (G.hp||0) + 25);
+      floatText && floatText(canvas.width/2, canvas.height/2, '+25% ❤️', '#ff6680');
+      toast('🔧 Repair Kit — +25% HP!');
+      updateHUD();
+      break;
+    case 'medical':
+      G.hp = Math.min(100, (G.hp||0) + 40);
+      floatText && floatText(canvas.width/2, canvas.height/2, '+40% ❤️', '#ff6680');
+      toast('💉 Medical Kit — +40% HP!');
+      updateHUD();
+      break;
+  }
+  if (st.uses > 0) st.uses--;
+  if (st.uses === 0 && def.cooldown === 0) st.cooldown = 1; // mark spent
+}
+
+function tickUpgrades() {
+  G.upgrades.forEach(id => {
+    const st = upgradeState[id];
+    if (!st) return;
+    if (st.cooldown > 0) st.cooldown--;
+    if (st.active) {
+      st.timer--;
+      if (st.timer <= 0) { st.active = false; st.timer = 0; }
+    }
+  });
+}
+
+// renderUpgradeBar — always shows all 8 slots; locked if not purchased
+function renderUpgradeBar() {
+  const bar = document.getElementById('upgrade-bar');
+  if (!bar) return;
+  const phase    = G.phase || '';
+  const owned    = G.upgrades || [];
+  const allDefs  = UPGRADES_DEF;
+
+  // Rebuild if slot count changed
+  if (bar.childElementCount !== allDefs.length) {
+    bar.innerHTML = '';
+    allDefs.forEach((def, idx) => {
+      const btn = document.createElement('div');
+      btn.className = 'upg-btn locked';
+      btn.dataset.id = def.id;
+      btn.innerHTML = `<span class="upg-emoji">${def.emoji}</span><span class="upg-label" id="uplbl-${def.id}">🔒</span>`;
+      btn.addEventListener('click', () => {
+        if (owned.includes(def.id)) activateUpgrade(def.id);
+      });
+      btn.addEventListener('touchend', e => {
+        e.stopPropagation();
+        if (owned.includes(def.id)) activateUpgrade(def.id);
+      }, { passive:true });
+      bar.appendChild(btn);
+    });
+  }
+
+  // Update each slot
+  allDefs.forEach((def, idx) => {
+    const purchased = owned.includes(def.id);
+    const st  = upgradeState[def.id] || {};
+    const btn = bar.querySelector(`[data-id="${def.id}"]`);
+    const lbl = document.getElementById(`uplbl-${def.id}`);
+    if (!btn) return;
+    const inPhase = !def.phases || def.phases.includes(phase);
+    const spent   = st.uses === 0;
+    const onCD    = st.cooldown > 0;
+    const isOn    = st.active;
+
+    if (!purchased) {
+      btn.className = 'upg-btn locked';
+      if (lbl) lbl.textContent = '🔒';
+    } else {
+      btn.className = 'upg-btn' +
+        (!inPhase ? ' inactive-phase' : spent ? ' spent' : onCD ? ' on-cd' : isOn ? ' active' : '');
+      if (lbl) {
+        if (spent)         lbl.textContent = 'USED';
+        else if (onCD)     lbl.textContent = Math.ceil(st.cooldown/60)+'s';
+        else if (isOn)     lbl.textContent = '●ON';
+        else if (def.uses > 0) lbl.textContent = st.uses+'×';
+        else               lbl.textContent = 'TAP';
+      }
+    }
+  });
+}
+
+// drawUpgradeButtons — called from draw fns; just refreshes DOM bar
+function drawUpgradeButtons(phase) {
+  renderUpgradeBar();
+}
 const UPGRADES_KEY = 'ppDeepOrbit_upgrades';
 function loadUpgrades() {
   try { return JSON.parse(localStorage.getItem(UPGRADES_KEY) || '[]'); } catch { return []; }
@@ -837,14 +1314,20 @@ function saveUpgrades(u) {
    RESOURCES
    ══════════════════════════════════════ */
 const RESOURCES = {
-  crystal: { emoji:'⚡', name:'Energy Crystal', value:40,  type:'space' },
-  iron:    { emoji:'🔩', name:'Iron',           value:25,  type:'space' },
-  xenite:  { emoji:'💜', name:'Xenite',         value:120, type:'space' },
-  nuclear: { emoji:'☢️', name:'Nuclearite',     value:200, type:'space' },
+  // Space drops — from asteroids/comets
+  crystal: { emoji:'⚡', name:'Energy Crystal', value:40,  type:'space', effect:'fuel'  },
+  iron:    { emoji:'🔩', name:'Iron Scrap',     value:25,  type:'space'                 },
+  gear:    { emoji:'⚙️', name:'Nano Gear',      value:80,  type:'space'                 },
+  xenite:  { emoji:'💜', name:'Xenite',         value:120, type:'space', effect:'hp_half' },
+  nuclear: { emoji:'☢️', name:'Nuclearite',     value:200, type:'space'                 },
+  diamond: { emoji:'💎', name:'Star Diamond',   value:250, type:'space'                 },
+  heart:   { emoji:'❤️', name:'Life Cell',      value:60,  type:'space', effect:'hp'    },
+  // Land drops — planet terrain
   flora:   { emoji:'🌿', name:'Alien Flora',    value:60,  type:'land'  },
   rcry:    { emoji:'🪸', name:'Rock Crystal',   value:90,  type:'land'  },
   gold:    { emoji:'🟡', name:'Gold',           value:150, type:'land'  },
   fungus:  { emoji:'🍄', name:'Fungus',         value:50,  type:'land'  },
+  // Ocean drops — lake zones
   shell:   { emoji:'🐚', name:'Plasma Shell',   value:70,  type:'ocean' },
   water:   { emoji:'💧', name:'Pure Water',     value:130, type:'ocean' },
   essence: { emoji:'🦑', name:'Essence',        value:180, type:'ocean' },
@@ -867,31 +1350,37 @@ function startGame(name, avatarKey, continuing) {
   hideAll();
   document.getElementById('gs').classList.remove('hidden');
 
-  const ownedUpgrades = loadUpgrades();
-  const hasUpgrade = id => ownedUpgrades.includes(id);
-
   if (!continuing) {
+    // Fresh game — wipe all persisted upgrades
+    saveUpgrades([]);
     G = {
       name, avatarKey,
       avatar:    AVATARS[avatarKey],
       level:     1,
       score:     0,
-      lives:     3,
+      hp:        100,   // hull integrity 0-100%
       over:      false,
       paused:    false,
       startTime: Date.now(),
       credits:   0,
       cargo:     {},
-      upgrades:  ownedUpgrades,
-      maxFuel:   hasUpgrade('tank') ? 150 : 100,
-      fuel:      hasUpgrade('tank') ? 150 : 100,
-      phase:     'launch', // launch, travel, orbit, planet, return, landing, debrief
+      upgrades:  [],   // start with nothing
+      maxFuel:   100,
+      fuel:      100,
+      phase:     'launch',
       phaseStep: 0,
     };
   }
 
   G.paused = false;
   G.over   = false;
+  const _po = document.getElementById('pause-overlay');
+  if (_po) { _po.style.display = 'none'; }
+  const _pb = document.getElementById('hud-pause');
+  if (_pb) { _pb.textContent = '⏸'; }
+  applyUpgrades();
+  initUpgradeStates();
+  renderUpgradeBar();
   updateHUD();
   initPhase(G.phase);
   toast(`🚀 Mission Start, ${name}!`);
@@ -1004,7 +1493,7 @@ function makeShip() {
   return {
     x: canvas.width / 2, y: canvas.height * 0.7,
     vx: 0, vy: 0,
-    angle: -Math.PI / 2, // pointing up
+    angle: -Math.PI / 2,
     size: 28,
     invincible: 0,
     shieldHits: G.upgrades.includes('shield') ? 1 : 0,
@@ -1013,26 +1502,44 @@ function makeShip() {
   };
 }
 
+// Apply all upgrade effects to G state at phase start
+function applyUpgrades() {
+  // Tank is now an active ability (manual fuel boost) — base maxFuel stays 100
+  G.maxFuel = 100;
+  G.fuel = Math.min(G.fuel || 100, G.maxFuel);
+  // Init/refresh upgrade states (preserves cooldowns across phases)
+  initUpgradeStates();
+}
+
 /* ══════════════════════════════════════
    BULLETS
    ══════════════════════════════════════ */
 const bullets  = [];
 let fireCooldown = 0;
+// ── Fisica navicella — costanti globali usate in TUTTE le fasi ──────────────
+const SHIP_ACCEL  = 0.14;    // accelerazione spinta (valori del viaggio come default)
+const SHIP_ROTATE = 0.045;   // velocità rotazione
+const SHIP_DRAG   = 0.985;   // attrito (1=nessuno, 0=stop istantaneo)
+const SHIP_MAXSPD = 4.5;     // velocità massima
+
 const FIRE_RATE  = 12; // frames
 
 function shootBullet(ship) {
   if (fireCooldown > 0) return;
   fireCooldown = FIRE_RATE;
-  const speed = 9;
-  const double = G.upgrades.includes('cannon2');
-  const offsets = double ? [-6, 6] : [0];
+  soundPlay('shoot');
+  const speed = 8;
+  const doubleSt = upgradeState['cannon2'];
+  const double = doubleSt && doubleSt.active;
+  const offsets = double ? [-5, 5] : [0];
+  const origin = getBulletOrigin(ship);
   offsets.forEach(off => {
-    const px = ship.x + Math.cos(ship.angle) * (ship.size * 0.6) + Math.cos(ship.angle + Math.PI/2) * off;
-    const py = ship.y + Math.sin(ship.angle) * (ship.size * 0.6) + Math.sin(ship.angle + Math.PI/2) * off;
+    const px = origin.x + Math.cos(ship.angle + Math.PI/2) * off;
+    const py = origin.y + Math.sin(ship.angle + Math.PI/2) * off;
     bullets.push({ x: px, y: py,
       vx: Math.cos(ship.angle) * speed,
       vy: Math.sin(ship.angle) * speed,
-      life: 55 });
+      life: 60 });
   });
 }
 
@@ -1071,7 +1578,8 @@ function spawnParticles(x, y, color, count = 8, speed = 2.5) {
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.life--;
+    p.x += p.vx; p.y += p.vy; 
+    p.life--;
     if (p.life <= 0) particles.splice(i, 1);
   }
 }
@@ -1112,78 +1620,120 @@ function drawFloatTexts() {
 
 /* ══════════════════════════════════════
    SHIP DRAW
+   🚀 native orientation: nose points UP-RIGHT with ~25° tilt.
+   Compensation: rotate by (angle + PI/2 - 25°) so nose aligns with ship.angle.
+   Flame comes out of the nozzle (bottom of rocket in rotated frame).
    ══════════════════════════════════════ */
+// 🚀 emoji is natively tilted ~25° clockwise vs vertical-up.
+// To make the nose follow ship.angle: rotate by (angle + PI/2 - 25°)
+const ROCKET_OFFSET = Math.PI / 2 - (43 * Math.PI / 180);
+
 function drawShip(ship) {
-  if (ship.invincible > 0 && Math.floor(ship.invincible / 4) % 2 === 0) return;
   ctx.save();
   ctx.translate(ship.x, ship.y);
-  ctx.rotate(ship.angle + Math.PI/2);
+  ctx.rotate(ship.angle + ROCKET_OFFSET);
 
-  // Thrust flame
-  if (isUp() && G.fuel > 0) {
-    ctx.save();
-    const flameSize = rnd(8, 16);
-    ctx.font = `${flameSize}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('🔥', 0, ship.size * 0.55);
-    ctx.restore();
+  // Flash only immediately after collision (invincible > 60 = just got hit)
+  // Ship becomes solid after the flash period — always 100% when no recent hit
+  if (ship.invincible > 60) {
+    ctx.globalAlpha = 0.25 + Math.abs(Math.sin(ship.invincible * 0.45)) * 0.75;
   }
+  // invincible 1-60: fully visible but protected (no opacity effect)
 
-  // Ship emoji
+  // Ship — always 🚀
   ctx.font = `${ship.size * 2}px serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(G.avatar ? G.avatar.emoji : '🚀', 0, 0);
+  ctx.fillText('🚀', 0, 0);
 
   // Shield glow
   if (ship.shieldHits > 0) {
     ctx.beginPath();
-    ctx.arc(0, 0, ship.size + 6, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(91,200,255,0.5)';
+    ctx.arc(0, 0, ship.size + 8, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(91,200,255,0.55)';
     ctx.lineWidth = 3;
+    ctx.shadowBlur = 12; ctx.shadowColor = '#5bc8ff';
     ctx.stroke();
   }
-  // Cryo
+  // Cryo shield
   if (ship.cryoActive > 0) {
     ctx.beginPath();
-    ctx.arc(0, 0, ship.size + 10, 0, Math.PI*2);
-    ctx.strokeStyle = 'rgba(100,220,255,0.7)';
+    ctx.arc(0, 0, ship.size + 13, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(100,220,255,0.75)';
     ctx.lineWidth = 4;
     ctx.setLineDash([6, 4]);
+    ctx.shadowBlur = 16; ctx.shadowColor = '#64dcff';
     ctx.stroke();
     ctx.setLineDash([]);
   }
   ctx.restore();
 }
 
+// Bullet spawn offset: from the nose of the rocket
+function getBulletOrigin(ship) {
+  // Nose is at -Y in ship's rotated frame → ship.angle direction in world
+  return {
+    x: ship.x + Math.cos(ship.angle) * ship.size * 0.75,
+    y: ship.y + Math.sin(ship.angle) * ship.size * 0.75,
+  };
+}
+
 /* ══════════════════════════════════════
    ASTEROIDS
+   Two types:
+   🪨 Rock  — slow, spins, drops resources on final break
+   ☄️ Comet — fast, no rotation (linear travel), no drops until final break
    ══════════════════════════════════════ */
 const asteroids = [];
-const ASTEROID_EMOJIS = ['☄️','🪨','💫'];
 
-function makeAsteroid(x, y, size, gen = 0) {
+function makeAsteroid(x, y, size, gen = 0, forceType) {
   const level = G.level || 1;
+  // forceType lets splits inherit parent type
+  const type = forceType || (Math.random() < 0.55 ? 'rock' : 'comet');
+  const isComet = type === 'comet';
+
+  // Comets: faster, travel diagonally; Rocks: slower, drift
+  const speedMult = (1 + level * 0.08);
+  let vx, vy, spin;
+  if (isComet) {
+    // Comets travel in a fixed direction, faster
+    const ang = rnd(Math.PI * 0.3, Math.PI * 0.7); // mostly downward
+    const spd = rnd(2.2, 3.8) * speedMult;
+    vx = Math.cos(ang - Math.PI/2) * spd + rnd(-0.4, 0.4);
+    vy = Math.sin(ang - Math.PI/2) * spd + rnd(0.2, 0.8);
+    spin = 0; // comets do NOT rotate
+  } else {
+    // Rocks: slow tumbling drift
+    vx = rnd(-0.8, 0.8) * speedMult;
+    vy = rnd(0.3, 1.1) * speedMult;
+    spin = rnd(-0.03, 0.03);
+  }
+
   return {
-    x: x || rnd(0, canvas.width),
-    y: y || rnd(-80, -20),
-    vx: rnd(-1.5, 1.5) * (1 + level * 0.1),
-    vy: rnd(0.5, 2.0) * (1 + level * 0.1),
-    angle: rnd(0, Math.PI*2),
-    spin: rnd(-0.05, 0.05),
-    size, gen,
-    emoji: ASTEROID_EMOJIS[rndInt(0, 2)],
-    resource: Math.random() < 0.35 ? pickSpaceResource() : null,
+    x: x != null ? x : rnd(0, canvas.width),
+    y: y != null ? y : rnd(-80, -20),
+    vx, vy,
+    angle: isComet ? Math.atan2(vy, vx) + Math.PI/2 : rnd(0, Math.PI*2),
+    spin,
+    size, gen, type,
+    emoji: isComet ? '☄️' : '🪨',
+    // Only final-gen rocks drop resources (exactly as before for rocks; comets never drop mid-split)
+    resource: (!isComet && gen >= 1 && Math.random() < 0.45) ? pickSpaceResource()
+            : (isComet  && gen >= 1 && Math.random() < 0.25) ? pickSpaceResource()
+            : (!isComet && gen === 0 && Math.random() < 0.20) ? pickSpaceResource()
+            : null,
     hp: size > 24 ? 3 : size > 14 ? 2 : 1,
   };
 }
 function pickSpaceResource() {
   const r = Math.random();
-  if (r < 0.35) return 'crystal';
-  if (r < 0.60) return 'iron';
-  if (r < 0.80) return 'xenite';
-  return 'nuclear';
+  if (r < 0.28) return 'crystal';   // ⚡ common — refuel
+  if (r < 0.48) return 'iron';      // 🔩 common
+  if (r < 0.63) return 'gear';      // ⚙️ uncommon
+  if (r < 0.76) return 'xenite';    // 💜 uncommon
+  if (r < 0.87) return 'nuclear';   // ☢️ rare
+  if (r < 0.94) return 'diamond';   // 💎 rare
+  return 'heart';                    // ❤️ very rare — heals HP
 }
 function initAsteroids(count) {
   asteroids.length = 0;
@@ -1192,16 +1742,28 @@ function initAsteroids(count) {
 function updateAsteroids() {
   for (let i = asteroids.length - 1; i >= 0; i--) {
     const a = asteroids[i];
-    a.x += a.vx; a.y += a.vy; a.angle += a.spin;
-    if (a.x < -60) a.x = canvas.width + 30;
-    if (a.x > canvas.width + 60) a.x = -30;
-    if (a.y > canvas.height + 60) {
-      a.y = -40; a.x = rnd(0, canvas.width);
+    a.x += a.vx; a.y += a.vy;
+    if (a.type === 'rock') {
+      a.angle += a.spin; // rocks tumble
+    } else {
+      // comets: angle always follows velocity direction
+      a.angle = Math.atan2(a.vy, a.vx) + Math.PI / 2;
+    }
+    if (a.x < -70) a.x = canvas.width + 35;
+    if (a.x > canvas.width + 70) a.x = -35;
+    if (a.y > canvas.height + 70) {
+      a.y = -45; a.x = rnd(0, canvas.width);
     }
   }
 }
+// ☄️ emoji tail points down-left natively; +125° aligns tail behind direction of travel
+const COMET_OFFSET = 125 * Math.PI / 180;
+
 function drawAsteroids() {
-  asteroids.forEach(a => drawEmoji(a.emoji, a.x, a.y, a.size * 2, a.angle));
+  asteroids.forEach(a => {
+    const displayAngle = a.type === 'comet' ? a.angle + COMET_OFFSET : a.angle;
+    drawEmoji(a.emoji, a.x, a.y, a.size * 2, displayAngle);
+  });
 }
 
 /* ══════════════════════════════════════
@@ -1210,12 +1772,14 @@ function drawAsteroids() {
 const drops = [];
 function spawnDrop(x, y, type) {
   drops.push({ x, y, vy: rnd(0.4, 1.2), vx: rnd(-0.5,0.5),
-    type, life: 220, bob: rnd(0, Math.PI*2) });
+    type, life: 1000, bob: rnd(0, Math.PI*2) });
 }
 function updateDrops(ship) {
-  const hasRadar  = G.upgrades.includes('radar');
-  const hasMagnet = G.upgrades.includes('magnet');
-  const magnetR   = hasMagnet ? 100 : 36;
+  const radarSt   = upgradeState['radar'];
+  const magnetSt  = upgradeState['magnet'];
+  const hasRadar  = radarSt  && radarSt.active;
+  const hasMagnet = magnetSt && magnetSt.active;
+  const magnetR   = hasMagnet ? 120 : 36;
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const d = drops[i];
@@ -1250,9 +1814,19 @@ function collectResource(type, x, y) {
   G.cargo[type] = (G.cargo[type] || 0) + 1;
   const r = RESOURCES[type];
   G.score += r.value;
-  if (type === 'crystal') {
-    G.fuel = Math.min(G.maxFuel, G.fuel + 15);
-    floatText(x, y, '+⛽15', '#50e8a0');
+  soundPlay('collect');
+  if (r.effect === 'fuel') {
+    // ⚡ Energy Crystal → refuel +15
+    G.fuel = Math.min(G.maxFuel, (G.fuel || 0) + 15);
+    floatText(x, y, '+⛽ 15', '#5bc8ff');
+  } else if (r.effect === 'hp') {
+    // ❤️ Life Cell → heal +15% HP
+    G.hp = Math.min(100, (G.hp || 0) + 15);
+    floatText(x, y, '+15% ❤️', '#ff6680');
+  } else if (r.effect === 'hp_half') {
+    // 💜 Xenite → heal +7% HP (half of ❤️)
+    G.hp = Math.min(100, (G.hp || 0) + 7.5);
+    floatText(x, y, '+7% 💜❤️', '#cc80ff');
   } else {
     floatText(x, y, `+${r.emoji}`, '#ffcc02');
   }
@@ -1365,14 +1939,29 @@ function checkBulletCollisions() {
         a.hp--;
         spawnParticles(a.x, a.y, '#ff9d3d', 6);
         if (a.hp <= 0) {
-          G.score += a.size > 24 ? 50 : a.size > 14 ? 30 : 15;
+          // Inverted scoring: large = easier to hit = fewer pts; small = harder = more pts
+          const pts = a.size > 24 ? 15 : a.size > 14 ? 30 : 60;
+          G.score += pts;
           if (a.resource) spawnDrop(a.x, a.y, a.resource);
           spawnParticles(a.x, a.y, '#ffcc02', 12, 3);
-          floatText(a.x, a.y - 10, '+' + (a.size > 24 ? 50 : a.size > 14 ? 30 : 15));
-          // Split
+          floatText(a.x, a.y - 10, '+' + pts, a.size > 24 ? '#aaaaaa' : a.size > 14 ? '#ffcc02' : '#50e8a0');
+          // Split — inherit parent type and emoji
           if (a.gen < 2 && a.size > 14) {
+            // Split into 2 children
             for (let s = 0; s < 2; s++)
-              asteroids.push(makeAsteroid(a.x + rnd(-15,15), a.y + rnd(-15,15), a.size * 0.55, a.gen+1));
+              asteroids.push(makeAsteroid(a.x + rnd(-15,15), a.y + rnd(-15,15), a.size * 0.55, a.gen+1, a.type));
+          } else {
+            // Final fragment (gen≥2 or small): count down, replenish one new large after 4 destroyed
+            travelData.pendingReplenish = (travelData.pendingReplenish || 0) + 1;
+            if (travelData.pendingReplenish >= 4) {
+              travelData.pendingReplenish = 0;
+              const delay = rnd(800, 2200);
+              setTimeout(() => {
+                if (G.phase === 'travel' || G.phase === 'return') {
+                  asteroids.push(makeAsteroid(rnd(0, canvas.width), -50, rnd(30, 46)));
+                }
+              }, delay);
+            }
           }
           asteroids.splice(ai, 1);
           updateHUD();
@@ -1429,21 +2018,23 @@ function hitShip(ship, source) {
     return;
   }
 
-  G.lives--;
+  G.hp = Math.max(0, (G.hp || 0) - 33);
   ship.invincible = 120;
   spawnParticles(ship.x, ship.y, '#ff4444', 16, 4);
+  soundPlay('hit');
+  if ((G.hp||0) <= 30) soundPlay('hpAlarm');
   updateHUD();
-
-  if (G.lives <= 0) {
-    triggerGameOver('💀 Your ship was destroyed!');
+  if (G.hp <= 0) {
+    triggerGameOver('💀 Hull destroyed!');
   } else {
-    toast(`💥 Hull breach! ${G.lives} lives left`);
+    toast(`💥 Hull breach! ${Math.round(G.hp)}% HP remaining`);
   }
 }
 
 function triggerGameOver(reason) {
   G.over = true;
   stopGameLoop();
+  soundPlay('explosion');
   addHistoryEntry('fail');
   setTimeout(() => {
     showOverlay('💀', 'MISSION FAILED',
@@ -1457,76 +2048,211 @@ function triggerGameOver(reason) {
    FUEL CONSUMPTION
    ══════════════════════════════════════ */
 function consumeFuel(amount) {
-  const mult = G.upgrades.includes('engine2') ? 0.75 : 1.0;
-  G.fuel -= amount * mult;
+  if (G.fuel <= 0) { G.fuel = 0; return false; }   // motori spenti, niente game-over
+  const eng = upgradeState['engine2'];
+  const mult = (eng && eng.active) ? 0.40 : 1.0;  // 60% reduction when active
+  G.fuel = Math.max(0, G.fuel - amount * mult);
   if (G.fuel <= 0) {
     G.fuel = 0;
     updateHUD();
-    triggerGameOver('⛽ Fuel depleted!');
-    return false;
+    soundPlay('fuelEmpty');
+    if (G.ship) floatText(G.ship.x, G.ship.y - 32, '⛽ NO FUEL!', '#ff6644');
   }
-  return true;
+  return G.fuel > 0;
 }
 
 /* ══════════════════════════════════════
-   PHASE: LAUNCH
+   PHASE: LAUNCH — Earth surface with terrain + 1 launch pad
    ══════════════════════════════════════ */
 let launchData = {};
+
 function initLaunch() {
   resizeCanvas();
   initBgStars();
-  launchData = { progress: 0, earth: { x: canvas.width/2, y: canvas.height * 0.85, size: 90 }, target: null };
-  setPhaseBanner('🌍 PHASE 1 — LAUNCH');
   bullets.length = 0; particles.length = 0; floatTexts.length = 0;
+  drops.length = 0;
+
+  // Earth palette — blue/green
+  const earthPal = {
+    sky: ['#020818', '#041830'],
+    ground: '#1a4a18', ground2: '#265c22',
+    lake: '#0a2a5a', lake2: '#1840a0',
+    rock: '#3a4a28', flatGround: '#2a5a20',
+    atmo: 'rgba(30,80,160,0.18)', name: 'Earth',
+  };
+  const terrain = generateTerrain(canvas.width, canvas.height);
+
+  // Launch pad: at centre, but must NOT be on a lake
+  // If centre is over a lake, scan outward to find nearest solid ground
+  const ctrIdx = Math.round(canvas.width / 2);
+  const isOnLake = (x) => terrain.lakeZones.some(
+    lz => x >= lz.x && x <= lz.x + lz.w
+  );
+  let padX = Math.round(canvas.width / 2);
+  if (isOnLake(padX)) {
+    // Scan outward left/right for first non-lake x
+    let found = false;
+    for (let d = 1; d < canvas.width / 2; d++) {
+      if (!isOnLake(padX - d)) { padX = padX - d; found = true; break; }
+      if (!isOnLake(padX + d)) { padX = padX + d; found = true; break; }
+    }
+    if (!found) padX = Math.round(canvas.width / 2); // fallback
+  }
+  const padTerrY = terrain.points[clamp(padX, 0, terrain.points.length - 1)];
+  const launchPad = {
+    x: padX,
+    y: padTerrY,
+    w: 120,
+    active: true,
+  };
+
+  launchData = {
+    terrain, earthPal, launchPad,
+    progress: 0,
+    timer: 0,
+    launched: false,
+  };
+
   G.ship = makeShip();
-  G.ship.x = canvas.width / 2;
-  G.ship.y = canvas.height * 0.72;
+  applyUpgrades();
+  G.ship.x  = launchPad.x;
+  // Sit exactly on pad surface: pad.y IS the terrain surface, ship bottom = size*0.58
+  G.ship.y  = launchPad.y - G.ship.size * 0.58;
+  G.ship.vx = 0; G.ship.vy = 0;
+  G.ship.angle = -Math.PI / 2; // nose up
+  G.ship.onGround = true;
+
+  setPhaseBanner('🌍 PHASE 1 — LAUNCH FROM EARTH');
+  toast('🌍 Launch from Earth! Hit THRUST to take off.');
 }
 
 function updateLaunch() {
   if (G.paused) return;
   const ship = G.ship;
+  const terrain = launchData.terrain;
+  launchData.timer++;
 
-  // Auto-thrust upward at start, then player takes over
-  launchData.progress += 0.004;
+  const ix       = Math.round(clamp(ship.x, 0, terrain.points.length - 1));
+  const rawTerrY = terrain.points[ix];
+  const pad      = launchData.launchPad;
+  // Use pad surface if ship is over it, else raw terrain
+  const overPad  = ship.x >= pad.x - pad.w/2 - 6 && ship.x <= pad.x + pad.w/2 + 6;
+  const surfaceY = overPad ? pad.y : rawTerrY;
+  const SBOT     = ship.size * 0.58;
+  const onGround = ship.y + SBOT >= surfaceY;
 
-  ship.angle = -Math.PI / 2;
-  const thrusting = isUp() || launchData.progress < 0.3;
-  if (thrusting && consumeFuel(0.05)) {
-    ship.vy -= 0.12;
-    spawnParticles(ship.x, ship.y + 20, '#ff9d3d', 2, 2);
+  if (!onGround) {
+    if (isLeft())  ship.angle -= SHIP_ROTATE;
+    if (isRight()) ship.angle += SHIP_ROTATE;
+    if (isUp() && consumeFuel(0.05)) {
+      ship.vx += Math.cos(ship.angle) * 0.09;
+      ship.vy += Math.sin(ship.angle) * 0.09;
+      spawnParticles(ship.x - Math.cos(ship.angle)*18, ship.y - Math.sin(ship.angle)*18, '#ff9d3d', 3, 1.5);
+      launchData.launched = true;
+      if (launchData.timer % 8 === 0) soundPlay('thruster');
+    }
+    ship.vy += 0.025;
+  } else {
+    ship.y = surfaceY - SBOT;   // snap to correct surface
+    ship.vy = 0;
+    if (isLeft())  ship.angle -= SHIP_ROTATE;
+    if (isRight()) ship.angle += SHIP_ROTATE;
+    if (isUp() && consumeFuel(0.05)) {
+      ship.vx += Math.cos(ship.angle) * 0.09 * 1.4;
+      ship.vy += Math.sin(ship.angle) * 0.09 * 1.4;
+      spawnParticles(ship.x - Math.cos(ship.angle)*16, ship.y - Math.sin(ship.angle)*16, '#ff9d3d', 3, 1.5);
+      launchData.launched = true;
+      if (launchData.timer % 8 === 0) soundPlay('thruster');
+    } else {
+      ship.vx *= 0.85;
+    }
   }
-  if (isLeft())  ship.angle -= 0.06;
-  if (isRight()) ship.angle += 0.06;
-  ship.vy += 0.04; // gravity
+
+  ship.vx *= SHIP_DRAG; ship.vy *= SHIP_DRAG;
+  ship.vx = clamp(ship.vx, -SHIP_MAXSPD, SHIP_MAXSPD);
   ship.vy = clamp(ship.vy, -6, 6);
-  ship.vx = clamp(ship.vx, -4, 4);
   ship.x += ship.vx; ship.y += ship.vy;
   ship.x = clamp(ship.x, 20, canvas.width - 20);
+
   if (isFire()) shootBullet(ship);
+  if (ship.invincible > 0) ship.invincible--;
   updateBullets(); updateParticles(); updateFloatTexts();
 
-  launchData.earth.size = Math.max(20, 90 - launchData.progress * 120);
-  launchData.earth.y = canvas.height * 0.85 + launchData.progress * 200;
-
-  if (ship.invincible > 0) ship.invincible--;
-  if (launchData.progress >= 1.0 || ship.y < -30) nextPhase('travel');
+  // Exit when ship flies off top
+  tickUpgrades();
+  if (launchData.launched && ship.y < -30) nextPhase('travel');
 }
 
 function drawLaunch() {
-  drawBgStars(0.2);
-  const e = launchData.earth;
-  drawEmoji('🌍', e.x, e.y, e.size * 2);
+  const pal = launchData.earthPal;
+  const terrain = launchData.terrain;
+  const t = launchData.timer;
+
+  // Sky gradient
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  skyGrad.addColorStop(0, pal.sky[0]); skyGrad.addColorStop(1, pal.sky[1]);
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  drawBgStars(0.25);
+
+  // Atmospheric glow
+  const atmoGrad = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.5);
+  atmoGrad.addColorStop(0, 'rgba(30,100,200,0.18)'); atmoGrad.addColorStop(1, 'rgba(30,100,200,0)');
+  ctx.fillStyle = atmoGrad; ctx.fillRect(0, 0, canvas.width, canvas.height * 0.5);
+
+  // Lakes (sinusoidal)
+  terrain.lakeZones.forEach(lz => {
+    const lg = ctx.createLinearGradient(0, lz.y - 15, 0, canvas.height);
+    lg.addColorStop(0, pal.lake2); lg.addColorStop(1, pal.lake);
+    ctx.fillStyle = lg;
+    ctx.beginPath(); ctx.moveTo(lz.x, canvas.height);
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 4.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2.5;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.lineTo(lz.x + lz.w, canvas.height); ctx.closePath(); ctx.fill();
+    // Wave crest
+    ctx.save(); ctx.strokeStyle = 'rgba(100,180,255,0.35)'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 4.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2.5;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.stroke(); ctx.restore();
+  });
+
+  // Terrain fill
+  const terrGrad = ctx.createLinearGradient(0, terrain.baseY - 80, 0, canvas.height);
+  terrGrad.addColorStop(0, pal.ground2); terrGrad.addColorStop(0.4, pal.ground); terrGrad.addColorStop(1, '#050505');
+  ctx.fillStyle = terrGrad;
+  ctx.beginPath(); ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
+  ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath(); ctx.fill();
+  // Surface line
+  ctx.beginPath(); ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
+  ctx.strokeStyle = pal.ground2; ctx.lineWidth = 2; ctx.stroke();
+
+  // Launch pad
+  const pad = launchData.launchPad;
+  const px = pad.x - pad.w / 2;
+  ctx.save();
+  ctx.fillStyle = '#223'; ctx.fillRect(px, pad.y, pad.w, 10);
+  const glow = ctx.createLinearGradient(px, 0, px + pad.w, 0);
+  glow.addColorStop(0, '#1a8aff'); glow.addColorStop(0.5, '#80d4ff'); glow.addColorStop(1, '#1a8aff');
+  ctx.fillStyle = glow; ctx.fillRect(px, pad.y, pad.w, 4);
+  ctx.fillStyle = '#ffaa00'; ctx.fillRect(px - 2, pad.y, 5, 12); ctx.fillRect(px + pad.w - 3, pad.y, 5, 12);
+  ctx.fillStyle = 'rgba(80,180,255,0.22)';
+  ctx.fillRect(px, pad.y - 30, pad.w, 30);
+  ctx.restore();
+
   // Target planet hint top
-  const tp = G.level % 4;
-  const planetsRow = ['🪐','🔴','🟠','🟣'];
-  drawEmoji(planetsRow[tp], canvas.width/2, 30, 30);
-  drawAsteroids();
-  drawDrops();
-  drawBullets();
-  drawParticles();
-  drawFloatTexts();
-  drawShip(G.ship);
+  drawEmoji('🌑', canvas.width / 2, 32, 30);
+
+  drawBullets(); drawParticles(); drawFloatTexts(); drawShip(G.ship);
+
+  // HUD
+  drawTopBars('🌍 Earth — Launch!', 0, '#50e8a0', '#1a8aff', 'Thrust to fly');
+  drawUpgradeButtons('launch');
 }
 
 /* ══════════════════════════════════════
@@ -1540,7 +2266,8 @@ function initTravel(isReturn) {
     isReturn,
     timer: 0,
     duration: Math.max(900, 700 + G.level * 80),
-    asteroidCount: Math.min(5 + G.level * 2, 18),
+    asteroidCount: Math.min(4 + G.level, 12),   // capped lower to avoid lag
+    pendingReplenish: 0,
   };
   bullets.length = 0; particles.length = 0; floatTexts.length = 0;
   drops.length = 0; aliens.length = 0; alienBullets.length = 0; satellites.length = 0;
@@ -1548,6 +2275,7 @@ function initTravel(isReturn) {
   initAsteroids(travelData.asteroidCount);
 
   if (!G.ship) G.ship = makeShip();
+  applyUpgrades();
   G.ship.x = canvas.width / 2;
   G.ship.y = canvas.height * 0.65;
   G.ship.vx = 0; G.ship.vy = 0;
@@ -1559,24 +2287,23 @@ function initTravel(isReturn) {
 function updateTravel() {
   if (G.paused) return;
   const ship = G.ship;
-  travelData.timer++;
+  travelData.timer+=0.2; //PP: claude travelData.timer++;
 
-  // Ship physics
-  const ACCEL  = 0.28;
-  const ROTATE = 0.065;
-  const DRAG   = 0.97;
-
-  if (isLeft())  ship.angle -= ROTATE;
-  if (isRight()) ship.angle += ROTATE;
-  if (isUp() && consumeFuel(0.06)) {
-    ship.vx += Math.cos(ship.angle) * ACCEL;
-    ship.vy += Math.sin(ship.angle) * ACCEL;
-    spawnParticles(ship.x - Math.cos(ship.angle)*20, ship.y - Math.sin(ship.angle)*20, '#ff9d3d', 2, 1.5);
+  // Ship physics — costanti globali uniformi
+  if (isLeft())  ship.angle -= SHIP_ROTATE;
+  if (isRight()) ship.angle += SHIP_ROTATE;
+  if (isUp() && consumeFuel(0.05)) {
+    ship.vx += Math.cos(ship.angle) * SHIP_ACCEL;
+    ship.vy += Math.sin(ship.angle) * SHIP_ACCEL;
+    const nx = ship.x - Math.cos(ship.angle) * 22;
+    const ny = ship.y - Math.sin(ship.angle) * 22;
+    spawnParticles(nx, ny, '#ff9d3d', 2, 1.2);
   }
-  if (isDown()) { ship.vx *= 0.93; ship.vy *= 0.93; }
+  if (isDown()) { ship.vx *= 0.96; ship.vy *= 0.96; }
 
-  ship.vx *= DRAG; ship.vy *= DRAG;
-  ship.vx = clamp(ship.vx, -7, 7); ship.vy = clamp(ship.vy, -7, 7);
+  ship.vx *= SHIP_DRAG; ship.vy *= SHIP_DRAG;
+  ship.vx = clamp(ship.vx, -SHIP_MAXSPD, SHIP_MAXSPD);
+  ship.vy = clamp(ship.vy, -SHIP_MAXSPD, SHIP_MAXSPD);
   ship.x += ship.vx; ship.y += ship.vy;
 
   // Wrap
@@ -1588,6 +2315,7 @@ function updateTravel() {
   if (ship.invincible > 0) ship.invincible--;
   if (ship.cryoActive > 0) ship.cryoActive--;
   if (ship.cryoCooldown > 0) ship.cryoCooldown--;
+  tickUpgrades();
 
   updateBullets();
   updateAsteroids();
@@ -1598,28 +2326,52 @@ function updateTravel() {
   updateFloatTexts();
   checkBulletCollisions();
 
-  // Collision ship vs asteroids
-  asteroids.forEach(a => {
-    if (dist(ship, a) < ship.size * 0.65 + a.size * 0.55) hitShip(ship, 'asteroid');
-  });
-  // vs aliens
-  aliens.forEach(a => {
-    if (dist(ship, a) < ship.size * 0.6 + a.size * 0.6) hitShip(ship, 'alien');
-  });
-
-  // Refill asteroids
-  while (asteroids.length < travelData.asteroidCount) {
-    asteroids.push(makeAsteroid(rnd(0, canvas.width), rnd(-100, -30), rnd(20, 44)));
+  // Collision ship vs asteroids — destroy asteroid on impact
+  for (let ai = asteroids.length - 1; ai >= 0; ai--) {
+    const a = asteroids[ai];
+    if (dist(ship, a) < ship.size * 0.65 + a.size * 0.55) {
+      hitShip(ship, 'asteroid');
+      // Destroy asteroid: spawn particles + possible drop, then remove
+      spawnParticles(a.x, a.y, '#ffcc02', 14, 3.5);
+      soundPlay('explosion');
+      if (a.resource) spawnDrop(a.x, a.y, a.resource);
+      // Split or replenish like bullet hit
+      if (a.gen < 2 && a.size > 14) {
+        for (let s = 0; s < 2; s++)
+          asteroids.push(makeAsteroid(a.x + rnd(-15,15), a.y + rnd(-15,15), a.size * 0.55, a.gen+1, a.type));
+      } else {
+        travelData.pendingReplenish = (travelData.pendingReplenish || 0) + 1;
+        if (travelData.pendingReplenish >= 4) {
+          travelData.pendingReplenish = 0;
+          setTimeout(() => {
+            if (G.phase === 'travel' || G.phase === 'return')
+              asteroids.push(makeAsteroid(rnd(0, canvas.width), -50, rnd(30, 46)));
+          }, rnd(800, 2200));
+        }
+      }
+      asteroids.splice(ai, 1);
+      break; // one impact per frame
+    }
+  }
+  // Collision ship vs aliens — destroy alien on impact
+  for (let ai = aliens.length - 1; ai >= 0; ai--) {
+    const a = aliens[ai];
+    if (dist(ship, a) < ship.size * 0.6 + a.size * 0.6) {
+      hitShip(ship, 'alien');
+      spawnParticles(a.x, a.y, '#cc80ff', 16, 4);
+      soundPlay('explosion');
+      floatText(a.x, a.y - 20, '💥 COLLISION', '#cc80ff');
+      aliens.splice(ai, 1);
+      break;
+    }
   }
 
-  // Spawn more asteroids on return
-  if (travelData.isReturn && travelData.timer % 300 === 0 && travelData.asteroidCount < 22) {
-    travelData.asteroidCount++;
-    asteroids.push(makeAsteroid(null, null, rnd(28, 44)));
-  }
+  // Asteroid count: managed via pendingReplenish counter (no while-loop)
+
+  // Asteroid count stays constant throughout the game
 
   if (travelData.timer >= travelData.duration) {
-    nextPhase(travelData.isReturn ? 'landing' : 'orbit');
+    nextPhase(travelData.isReturn ? 'landing' : 'planet');
   }
 
   // Progress bar
@@ -1628,23 +2380,54 @@ function updateTravel() {
 
 function drawTravel() {
   drawBgStars(0.5);
-  // progress
-  const prog = travelData.timer / travelData.duration;
-  ctx.save();
-  ctx.fillStyle = 'rgba(91,200,255,0.08)';
-  ctx.fillRect(0, canvas.height - 6, canvas.width * prog, 6);
-  ctx.fillStyle = 'rgba(91,200,255,0.5)';
-  ctx.fillRect(0, canvas.height - 6, canvas.width * prog, 3);
-  ctx.restore();
 
-  const tp = G.level % 4;
-  const planetsRow = ['🪐','🔴','🟠','🟣'];
-  if (!travelData.isReturn) {
-    drawEmoji('🌍', 20, canvas.height - 20, 28 * (1 - prog * 0.7));
-    drawEmoji(planetsRow[tp], canvas.width - 20, 20, 24 + prog * 30);
-  } else {
-    drawEmoji(planetsRow[tp], 20, canvas.height - 20, 24 * (1 - prog * 0.7));
-    drawEmoji('🌍', canvas.width - 20, 20, 28 + prog * 20);
+  const prog    = travelData.timer / travelData.duration;
+  const isRet   = travelData.isReturn;
+
+  // ── Pianeti nei primi 20% e ultimi 20% del viaggio ────────────────
+  // Andata:  0–20% = Terra si allontana (grande→piccola, centrata)
+  //         80–100% = 🌑 si avvicina (piccola→grande, centrata)
+  // Ritorno: 0–20% = 🌑 si allontana (grande→piccola, centrata)
+  //         80–100% = Terra si avvicina (piccola→grande, centrata)
+
+  const cx  = canvas.width / 2;
+  const cy  = canvas.height / 2;
+
+  if (prog < 0.20) {
+    // Partenza — oggetto di partenza al centro, si rimpicciolisce
+    const t   = prog / 0.20;               // 0→1
+    const sz  = (80 - t * 60);            // 80px → 20px
+    const alpha = 1 - t * 0.55;
+    ctx.save(); ctx.globalAlpha = alpha;
+    drawEmoji(isRet ? '🌑' : '🌍', cx, cy, sz * 2);
+    ctx.restore();
+
+    // Etichetta "Partenza"
+    ctx.save();
+    ctx.globalAlpha = (1 - t) * 0.75;
+    ctx.fillStyle = '#aaccff';
+    ctx.font = 'bold 11px Georgia,serif'; ctx.textAlign = 'center';
+    ctx.shadowBlur = 6; ctx.shadowColor = '#000';
+    ctx.fillText(isRet ? '🌑 Leaving the planet…' : '🌍 Leaving Earth…', cx, cy + 55);
+    ctx.restore();
+  }
+
+  if (prog > 0.80) {
+    // Arrival — destination grows, emoji only, no circle
+    const t     = (prog - 0.80) / 0.20;
+    const sz    = 20 + t * 80;
+    const alpha = 0.4 + t * 0.6;
+    ctx.save(); ctx.globalAlpha = alpha;
+    drawEmoji(isRet ? '🌍' : '🌑', cx, cy, sz * 2);
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalAlpha = t * 0.80;
+    ctx.fillStyle = isRet ? '#aaffcc' : '#aaccff';
+    ctx.font = 'bold 11px Georgia,serif'; ctx.textAlign = 'center';
+    ctx.shadowBlur = 6; ctx.shadowColor = '#000';
+    ctx.fillText(isRet ? '🌍 Approaching Earth…' : '🌑 Approaching target planet…', cx, cy + sz + 18);
+    ctx.restore();
   }
 
   drawAsteroids();
@@ -1655,6 +2438,11 @@ function drawTravel() {
   drawParticles();
   drawFloatTexts();
   drawShip(G.ship);
+
+  // ── HUD BARS — top ────────────────────────────────────────────
+  const destName = isRet ? '🌍 Terra' : '🌑 Dark Moon';
+  drawTopBars(`🛸 Journey to ${destName}`, prog, '#5bc8ff', '#cc80ff', `${Math.round(prog*100)}%`);
+  drawUpgradeButtons(travelData.isReturn ? 'return' : 'travel');
 }
 
 /* ══════════════════════════════════════
@@ -1678,11 +2466,9 @@ function updateOrbit() {
 }
 function drawOrbit() {
   drawBgStars(0.1);
-  const tp = G.level % 4;
-  const planetsRow = ['🪐','🔴','🟠','🟣'];
-  const prog = orbitData.timer / orbitData.duration;
+  const prog  = orbitData.timer / orbitData.duration;
   const pSize = 40 + prog * 120;
-  drawEmoji(planetsRow[tp], canvas.width/2, canvas.height/2, pSize * 2);
+  drawEmoji('🌑', canvas.width/2, canvas.height/2, pSize * 2);
   drawParticles();
   drawFloatTexts();
 
@@ -1696,86 +2482,297 @@ function drawOrbit() {
 
 /* ══════════════════════════════════════
    PHASE: PLANET SURFACE
+   Procedural terrain: hills, lakes, flat landing pads
    ══════════════════════════════════════ */
 let planetData = {};
-const planetDrops = [];
 const TERRAIN_RES = ['flora','rcry','gold','fungus'];
 const OCEAN_RES   = ['shell','water','essence'];
+
+// Palette per planet type
+const PLANET_PALETTES = [
+  { sky:['#0a0a2e','#1a1a5e'], ground:'#1a3a10', ground2:'#2d5a1b',
+    lake:'#0a2a5a', lake2:'#1a4a8a', rock:'#4a3a28', flatGround:'#3a6a25',
+    atmo:'rgba(30,100,30,0.18)', name:'Verdania' },
+  { sky:['#2a0505','#4a0a0a'], ground:'#4a1a08', ground2:'#6a2a10',
+    lake:'#2a0808', lake2:'#4a1010', rock:'#5a3020', flatGround:'#5a2010',
+    atmo:'rgba(120,30,10,0.18)', name:'Infernus' },
+  { sky:['#051a05','#0a3010'], ground:'#1a4a1a', ground2:'#2a6a2a',
+    lake:'#051a2a', lake2:'#0a2a4a', rock:'#304a20', flatGround:'#2a5a2a',
+    atmo:'rgba(20,80,20,0.2)', name:'Sylvara' },
+  { sky:['#1a0530','#2a0850'], ground:'#2a104a', ground2:'#3a186a',
+    lake:'#0a0530', lake2:'#180850', rock:'#4a2060', flatGround:'#321060',
+    atmo:'rgba(80,20,120,0.18)', name:'Nebulox' },
+];
+
+function generateTerrain(w, h) {
+  // Generate terrain profile using multiple sine waves
+  const points = [];
+  const skyH = Math.floor(h * 0.38); // sky takes top 38%
+  const baseY = Math.floor(h * 0.62); // terrain baseline
+
+  const freq1 = rnd(0.006, 0.012), amp1 = rnd(40, 80);
+  const freq2 = rnd(0.018, 0.030), amp2 = rnd(15, 35);
+  const freq3 = rnd(0.040, 0.065), amp3 = rnd(5, 15);
+  const phase1 = rnd(0, Math.PI*2), phase2 = rnd(0, Math.PI*2), phase3 = rnd(0, Math.PI*2);
+
+  for (let x = 0; x <= w; x++) {
+    const y = baseY
+      + Math.sin(x * freq1 + phase1) * amp1
+      + Math.sin(x * freq2 + phase2) * amp2
+      + Math.sin(x * freq3 + phase3) * amp3;
+    points.push(Math.round(y));
+  }
+
+  // Find flat zones (nearly flat ≥30px) — used for refuel pads
+  const flatZones = [];
+  let flatStart = -1;
+  for (let x = 1; x < points.length; x++) {
+    const diff = Math.abs(points[x] - points[x-1]);
+    if (diff <= 3) {
+      if (flatStart < 0) flatStart = x - 1;
+    } else {
+      if (flatStart >= 0 && x - flatStart >= 28) {
+        const midY = points[Math.floor((flatStart + x) / 2)];
+        flatZones.push({ x: flatStart, w: x - flatStart, y: midY });
+      }
+      flatStart = -1;
+    }
+  }
+
+  // Also add hilltop zones: local minima wider than 20px, even if not perfectly flat
+  // A hilltop is where terrain reaches a local low-Y (peak) within a 60px window
+  for (let x = 30; x < points.length - 30; x++) {
+    const winMin = Math.min(...points.slice(x - 20, x + 20));
+    if (points[x] === winMin) {
+      // Check it's not already covered by a flatZone
+      const alreadyCovered = flatZones.some(fz => x >= fz.x && x <= fz.x + fz.w);
+      if (!alreadyCovered) {
+        // Create synthetic 40px wide flat zone centred on this peak
+        const x0 = Math.max(0, x - 20);
+        const x1 = Math.min(w, x + 20);
+        flatZones.push({ x: x0, w: x1 - x0, y: points[x], synthetic: true });
+      }
+      x += 20; // skip ahead past this peak
+    }
+  }
+
+  // Find lake zones (terrain dips below a threshold = low points)
+  const sorted = [...points].sort((a,b)=>a-b);
+  const lakeThresh = sorted[Math.floor(sorted.length * 0.35)];
+  const lakeZones = [];
+  let inLake = false, lakeS = 0;
+  for (let x = 0; x < points.length; x++) {
+    if (points[x] >= lakeThresh + 20 && !inLake) { inLake = true; lakeS = x; }
+    else if ((points[x] < lakeThresh + 20 || x === points.length-1) && inLake) {
+      if (x - lakeS > 30) lakeZones.push({ x: lakeS, w: x - lakeS, y: lakeThresh + 20 });
+      inLake = false;
+    }
+  }
+
+  return { points, flatZones, lakeZones, baseY, skyH };
+}
 
 function initPlanet() {
   resizeCanvas(); initBgStars();
   const tp = G.level % 4;
-  const palettes = [
-    { sky:'#1a1a4e', ground:'#2d5a1b', ocean:'#1a3a6e', gEmoji:'🌿🪸🟡🍄', oEmoji:'🐚💧🦑' },
-    { sky:'#3a0a0a', ground:'#5a2010', ocean:'#401515', gEmoji:'🌿🪸🟡🍄', oEmoji:'🐚💧🦑' },
-    { sky:'#1a3a0a', ground:'#3a5a1a', ocean:'#0a2a3a', gEmoji:'🌿🪸🟡🍄', oEmoji:'🐚💧🦑' },
-    { sky:'#2a0a3a', ground:'#3a1a4a', ocean:'#100a3a', gEmoji:'🌿🪸🟡🍄', oEmoji:'🐚💧🦑' },
-  ];
+  const pal = PLANET_PALETTES[tp];
+
+  const terrain = generateTerrain(canvas.width, canvas.height);
+  const quota   = 6 + G.level * 2;
 
   planetData = {
-    tp, pal: palettes[tp],
+    tp, pal, terrain,
     timer: 0,
-    quota: 6 + G.level * 2,
-    collected: 0,
+    quota, collected: 0,
     resources: [],
-    groundY: canvas.height * 0.58,
-    oceanY:  canvas.height * 0.75,
+    refuelPads: [],
+    landedPad: null,
+    refuelTimer: 0,
+    scrollX: 0,
+    GRAV: rnd(0.03, 0.07),
+    _groundDmgLock: false,
   };
 
-  // Spawn surface resources
-  for (let i = 0; i < 8 + G.level; i++) {
-    const isOcean = Math.random() < 0.4;
-    const y = isOcean
-      ? rnd(planetData.oceanY + 10, canvas.height - 30)
-      : rnd(planetData.groundY + 8, planetData.oceanY - 10);
-    const types = isOcean ? OCEAN_RES : TERRAIN_RES;
+  // Refuel pads: 3 highest flat zones, NOT on lakes, elevated 20px above terrain
+  const sortedFlats = [...terrain.flatZones]
+    .filter(fz => {
+      if (fz.w < 35) return false;   // relaxed min width
+      // Exclude zones that overlap any lake
+      const overLake = terrain.lakeZones.some(
+        lz => fz.x < lz.x + lz.w && fz.x + fz.w > lz.x
+      );
+      return !overLake;
+    })
+    .sort((a, b) => a.y - b.y)   // lowest Y = highest on screen
+    .slice(0, 3);
+
+  // Exactly 1 refuel pad — highest safe flat zone
+  sortedFlats.slice(0, 1).forEach(fz => {
+    planetData.refuelPads.push({
+      x: fz.x + fz.w / 2,
+      y: fz.y - 20,   // elevated 20px above terrain surface
+      w: Math.max(100, Math.min(fz.w - 4, 130)),  // min 100px
+      active: true,
+    });
+  });
+
+  // Resources: 50px above surface (terrain or lake)
+  const resCount = 8 + G.level;
+  for (let i = 0; i < resCount; i++) {
+    const px = rnd(20, canvas.width - 20);
+    const ix = Math.round(clamp(px, 0, terrain.points.length - 1));
+    const ty = terrain.points[ix];
+    const lake = terrain.lakeZones.find(lz => px >= lz.x && px <= lz.x + lz.w);
+    const surfY = lake ? lake.y : ty;
+    const inLake = !!lake;
+    const types = inLake ? OCEAN_RES : TERRAIN_RES;
     planetData.resources.push({
-      x: rnd(20, canvas.width - 20), y,
+      x: px, y: surfY - 50,
       type: types[rndInt(0, types.length - 1)],
       collected: false,
+      bob: rnd(0, Math.PI * 2),
+      inLake,
     });
   }
 
   if (!G.ship) G.ship = makeShip();
+  applyUpgrades();
   G.ship.x = canvas.width / 2;
-  G.ship.y = canvas.height * 0.25;
+  G.ship.y = terrain.skyH * 0.5;
   G.ship.vx = 0; G.ship.vy = 0;
   G.ship.angle = -Math.PI / 2;
-  setPhaseBanner('🌍 PHASE 4 — RESOURCE EXTRACTION');
+  G.ship.onGround = false;
+
+  setPhaseBanner(`🌍 PHASE 4 — ${pal.name.toUpperCase()} · RESOURCE EXTRACTION`);
+  toast(`🌍 Welcome to ${pal.name}! Collect ${quota} resources.`);
 }
 
 function updatePlanet() {
   if (G.paused) return;
   planetData.timer++;
   const ship = G.ship;
+  const terrain = planetData.terrain;
 
-  const ACCEL  = 0.22;
-  const ROTATE = 0.07;
-  const DRAG   = 0.94;
-  const GRAV   = 0.05;
+  //PP:clude const ACCEL  = 0.160; 
+  //PP:clude const ROTATE = 0.048; 
+  //PP:clude const DRAG   = 0.982; 
+  //PP:clude const GRAV   = 0.060; 
+  // Costanti globali uniformi — solo GRAV rimane locale (casuale per pianeta)
+  const GRAV = planetData.GRAV || 0.04;
 
-  if (isLeft())  ship.angle -= ROTATE;
-  if (isRight()) ship.angle += ROTATE;
-  if (isUp() && consumeFuel(0.08)) {
-    ship.vx += Math.cos(ship.angle) * ACCEL;
-    ship.vy += Math.sin(ship.angle) * ACCEL;
-    spawnParticles(ship.x - Math.cos(ship.angle)*18, ship.y - Math.sin(ship.angle)*18, '#ff9d3d', 2, 1.5);
+  // Get terrain height at ship x
+  const ix = Math.round(clamp(ship.x, 0, terrain.points.length - 1));
+  const rawGroundY = terrain.points[ix];
+
+  // Check if ship is over a refuel pad — pad surface takes priority over raw terrain
+  const activePad = planetData.refuelPads.find(
+    p => ship.x >= p.x - p.w/2 - 4 && ship.x <= p.x + p.w/2 + 4
+  );
+  // surfaceY: top of pad (pad.y is already elevated above terrain) or raw terrain
+  const surfaceY = activePad ? activePad.y : rawGroundY;
+  const SHIP_BOTTOM = ship.size * 0.58;   // distance from ship centre to bottom
+  const groundY  = surfaceY;              // unified name for snap logic below
+  const onGround = ship.y + SHIP_BOTTOM >= surfaceY;
+  ship.onGround  = false;
+
+  // Gentler controls on planet for better playability
+  const P_ROT = 0.028;
+  if (isLeft())  ship.angle -= P_ROT;
+  if (isRight()) ship.angle += P_ROT;
+
+  if (isUp() && consumeFuel(0.06)) {
+    const boost = onGround ? 1.6 : 1.0;
+    ship.vx += Math.cos(ship.angle) * 0.08 * boost;
+    ship.vy += Math.sin(ship.angle) * 0.08 * boost;
+    spawnParticles(ship.x - Math.cos(ship.angle)*18, ship.y - Math.sin(ship.angle)*18, '#ff9d3d', 2, 1.2);
   }
 
-  ship.vy += GRAV;
-  ship.vx *= DRAG; ship.vy *= DRAG;
-  ship.vx = clamp(ship.vx, -5, 5); ship.vy = clamp(ship.vy, -5, 5);
+  if (onGround) {
+    ship.onGround = true;
+    if (ship.vy >= 0) {
+      ship.y = surfaceY - SHIP_BOTTOM;  // sit ON the surface (pad or terrain)
+      ship.vy = 0;
+    }
+    ship.vx *= 0.88;
+
+    // Damage check (only on first contact with bare terrain, not on pad)
+    const pad = activePad;  // already computed above
+    if (pad) {
+      // Check landing angle: must be within ±10° of vertical (-PI/2)
+      const ANGLE_TOL = 10 * Math.PI / 180;  // 10 degrees in radians
+      // Normalize angle to -PI..PI range
+      let normAngle = ((ship.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      if (normAngle > Math.PI) normAngle -= Math.PI * 2;
+      const verticalAngle = -Math.PI / 2;
+      const angleDiff = Math.abs(normAngle - verticalAngle);
+      const goodAngle = angleDiff <= ANGLE_TOL;
+
+      if (!goodAngle && !planetData._angleDmgLock && ship.invincible === 0) {
+        planetData._angleDmgLock = true;
+        G.hp = Math.max(0, (G.hp || 0) - 20);
+        spawnParticles(ship.x, ship.y, '#ff9d3d', 10, 2);
+        floatText(ship.x, ship.y - 30, `⚠️ Tilt! -20% HP`, '#ff9d3d');
+        soundPlay('hit');
+        updateHUD();
+        if (G.hp <= 0) { triggerGameOver('💥 Tilted crash on pad!'); return; }
+        ship.invincible = 60;
+      } else if (goodAngle) {
+        planetData._angleDmgLock = false;
+      }
+
+      planetData.landedPad = goodAngle ? pad : null;
+      planetData.refuelTimer++;
+      planetData._groundDmgLock = false;
+      if (goodAngle) {
+        G.fuel = Math.min(G.maxFuel, G.fuel + 0.04);   // refuel
+        G.hp   = Math.min(100, (G.hp || 0) + 0.008);   // slow HP regen on pad
+        updateHUD();
+        if (planetData.refuelTimer % 180 === 0) {
+          floatText(ship.x, ship.y - 30, '⛽ +Fuel  ❤️ +HP', '#50e8a0');
+          soundPlay('refuel');
+        }
+      } else {
+        if (planetData.refuelTimer % 90 === 0)
+          floatText(ship.x, ship.y - 30, '⚠️ Straighten up!', '#ffcc02');
+      }
+    } else {
+      planetData.landedPad = null;
+      planetData.refuelTimer = 0;
+      planetData._angleDmgLock = false;
+      if (!planetData._groundDmgLock && ship.invincible === 0) {
+        planetData._groundDmgLock = true;
+        G.hp = Math.max(0, (G.hp || 0) - 33);
+        spawnParticles(ship.x, ship.y, '#ff4444', 12, 2.5);
+        floatText(ship.x, ship.y - 30, `💥 Terrain! -33% HP`, '#ff4444');
+        soundPlay('hit');
+        updateHUD();
+        if (G.hp <= 0) { triggerGameOver('💥 Crashed into terrain!'); return; }
+        ship.invincible = 90;
+      }
+    }
+  } else {
+    // In air
+    planetData._groundDmgLock = false;
+    ship.vy += GRAV;
+  }
+
+  ship.vx *= SHIP_DRAG; ship.vy *= SHIP_DRAG;
+  ship.vx = clamp(ship.vx, -SHIP_MAXSPD, SHIP_MAXSPD);
+  ship.vy = clamp(ship.vy, -6, 6);
   ship.x += ship.vx; ship.y += ship.vy;
   ship.x = clamp(ship.x, 20, canvas.width - 20);
-  ship.y = clamp(ship.y, 10, canvas.height - 20);
+  ship.y = clamp(ship.y, 10, canvas.height - 15);
 
   if (isFire()) shootBullet(ship);
   if (ship.invincible > 0) ship.invincible--;
-  updateBullets(); updateParticles(); updateFloatTexts();
 
-  // Collect surface resources
-  const hasMagnet = G.upgrades.includes('magnet');
-  const collectR = hasMagnet ? 80 : 40;
+  // Bob resources
+  planetData.resources.forEach(r => { r.bob += 0.05; });
+
+  // Collect resources
+  const pMagSt    = upgradeState['magnet'];
+  const hasMagnet = pMagSt && pMagSt.active;
+  const collectR  = hasMagnet ? 120 : 42;
   planetData.resources.forEach(r => {
     if (!r.collected && dist(ship, r) < collectR) {
       r.collected = true;
@@ -1784,66 +2781,358 @@ function updatePlanet() {
     }
   });
 
-  if (planetData.collected >= planetData.quota) {
+  tickUpgrades();
+  updateBullets(); updateParticles(); updateFloatTexts();
+
+  if (planetData.collected >= planetData.quota && !planetData.returningHome) {
+    planetData.returningHome = true;   // prevent multiple setTimeout calls
     toast('✅ Resource quota met! Head back!');
     setTimeout(() => nextPhase('return'), 1200);
   }
 }
 
 function drawPlanet() {
-  const pal = planetData.pal;
-  const groundY = planetData.groundY;
-  const oceanY  = planetData.oceanY;
+  const pal     = planetData.pal;
+  const terrain = planetData.terrain;
+  const t       = planetData.timer;
 
-  // Sky
-  ctx.fillStyle = pal.sky;
-  ctx.fillRect(0, 0, canvas.width, groundY);
-
-  // Ground
-  ctx.fillStyle = pal.ground;
-  ctx.fillRect(0, groundY, canvas.width, oceanY - groundY);
-
-  // Ocean
-  ctx.fillStyle = pal.ocean;
-  ctx.fillRect(0, oceanY, canvas.width, canvas.height - oceanY);
-
-  // Water shimmer
-  ctx.save();
-  ctx.globalAlpha = 0.2 + Math.sin(Date.now()*0.003)*0.1;
-  ctx.fillStyle = '#5bc8ff';
-  ctx.fillRect(0, oceanY, canvas.width, 4);
-  ctx.restore();
+  // Sky gradient
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, terrain.skyH + 60);
+  skyGrad.addColorStop(0, pal.sky[0]);
+  skyGrad.addColorStop(1, pal.sky[1]);
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Stars in sky
-  bgStars.slice(0, 40).forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x, Math.min(s.y, groundY - 5), s.r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${s.alpha * 0.6})`; ctx.fill();
+  bgStars.slice(0, 35).forEach(s => {
+    if (s.y < terrain.skyH) {
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${s.alpha * 0.55})`; ctx.fill();
+    }
   });
+
+  // Atmosphere shimmer at horizon
+  const atmoGrad = ctx.createLinearGradient(0, terrain.skyH - 30, 0, terrain.skyH + 30);
+  atmoGrad.addColorStop(0, 'transparent');
+  atmoGrad.addColorStop(0.5, pal.atmo);
+  atmoGrad.addColorStop(1, 'transparent');
+  ctx.fillStyle = atmoGrad;
+  ctx.fillRect(0, terrain.skyH - 30, canvas.width, 60);
+
+  // Draw lakes first (behind terrain)
+  terrain.lakeZones.forEach(lz => {
+    const lakeGrad = ctx.createLinearGradient(0, lz.y - 15, 0, canvas.height);
+    lakeGrad.addColorStop(0, pal.lake2);
+    lakeGrad.addColorStop(1, pal.lake);
+    ctx.fillStyle = lakeGrad;
+
+    // Sinusoidal wave surface
+    ctx.beginPath();
+    ctx.moveTo(lz.x, canvas.height);
+    ctx.lineTo(lz.x, lz.y);
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 4.5
+                 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2.5;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.lineTo(lz.x + lz.w, canvas.height);
+    ctx.closePath();
+
+    // Fill lake body with gradient, then redraw properly
+    ctx.save(); ctx.fillStyle = lakeGrad; ctx.fill(); ctx.restore();
+
+    // Wave crest highlight
+    ctx.save();
+    ctx.strokeStyle = 'rgba(160,225,255,0.32)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 4.5
+                 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2.5;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.stroke();
+
+    // Sub-surface shimmer
+    ctx.globalAlpha = 0.10 + Math.sin(t * 0.05) * 0.05;
+    ctx.fillStyle = '#5bc8ff';
+    for (let x = lz.x + 8; x < lz.x + lz.w - 8; x += 18) {
+      const shimY = lz.y + 14 + Math.sin(x * 0.06 + t * 0.04) * 3;
+      ctx.fillRect(x, shimY, 8, 2);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  });
+
+  // Terrain fill (ground polygon)
+  const terrGrad = ctx.createLinearGradient(0, terrain.baseY - 80, 0, canvas.height);
+  terrGrad.addColorStop(0, pal.ground2);
+  terrGrad.addColorStop(0.4, pal.ground);
+  terrGrad.addColorStop(1, '#0a0a0a');
+  ctx.fillStyle = terrGrad;
+  ctx.beginPath();
+  ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) {
+    const ix = Math.min(x, terrain.points.length - 1);
+    ctx.lineTo(x, terrain.points[ix]);
+  }
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.lineTo(0, canvas.height);
+  ctx.closePath();
+  ctx.fill();
+
+  // Terrain surface detail line
+  ctx.beginPath();
+  ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) {
+    const ix = Math.min(x, terrain.points.length - 1);
+    ctx.lineTo(x, terrain.points[ix]);
+  }
+  ctx.strokeStyle = pal.ground2;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Refuel pads
+  planetData.refuelPads.forEach(pad => {
+    const px = pad.x - pad.w/2;
+    const py = pad.y;
+
+    // Speed indicator near the planet refuel pad (shows landing approach speed)
+    if (G.ship) {
+      const pSpeed   = Math.hypot(G.ship.vx, G.ship.vy);
+      const pMaxSafe = 1.8, pMaxWarn = 3.0, pMaxDisp = 5.0;
+      const pIsGreen  = pSpeed <= pMaxSafe;
+      const pIsYellow = !pIsGreen && pSpeed <= pMaxWarn;
+      const pColor    = pIsGreen ? '#50e8a0' : pIsYellow ? '#ffcc02' : '#ff4444';
+      const pRatio    = Math.min(1, pSpeed / pMaxDisp);
+      const indW = Math.min(pad.w + 10, 110);
+      const indX = pad.x, indY = py - 46;
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      roundRect(ctx, indX - indW/2 - 6, indY - 16, indW + 12, 30, 7); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      roundRect(ctx, indX - indW/2, indY - 8, indW, 7, 4); ctx.fill();
+      if (pIsGreen) { ctx.shadowBlur = 6; ctx.shadowColor = '#50e8a0'; }
+      ctx.fillStyle = pColor;
+      roundRect(ctx, indX - indW/2, indY - 8, indW * pRatio, 7, 4); ctx.fill();
+      ctx.shadowBlur = 0;
+      // mini lights
+      const tlX3 = indX + indW/2 + 10;
+      [{y:indY-10,on:!pIsGreen&&!pIsYellow,c:'#ff2222'},{y:indY-4,on:pIsYellow,c:'#ffcc02'},{y:indY+2,on:pIsGreen,c:'#50e8a0'}].forEach(lt => {
+        ctx.beginPath(); ctx.arc(tlX3, lt.y, 3.5, 0, Math.PI*2);
+        ctx.fillStyle = lt.on ? lt.c : 'rgba(255,255,255,0.07)';
+        if (lt.on) { ctx.shadowBlur = 7; ctx.shadowColor = lt.c; }
+        ctx.fill(); ctx.shadowBlur = 0;
+      });
+      ctx.font = 'bold 7px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillStyle = pColor;
+      ctx.fillText(`⚡${pSpeed.toFixed(1)} ${pIsGreen?'SAFE':pIsYellow?'SLOW':'FAST'}`, indX, indY - 1);
+      ctx.restore();
+    }
+
+    // Pad base
+    ctx.save();
+    ctx.fillStyle = '#334';
+    ctx.fillRect(px, py, pad.w, 10);
+    // Glowing top strip
+    const padGrad = ctx.createLinearGradient(px, py, px + pad.w, py);
+    padGrad.addColorStop(0, 'rgba(91,200,255,0.3)');
+    padGrad.addColorStop(0.5, 'rgba(91,200,255,0.9)');
+    padGrad.addColorStop(1, 'rgba(91,200,255,0.3)');
+    ctx.fillStyle = padGrad;
+    ctx.fillRect(px, py, pad.w, 3);
+    // Refuel icon + flashing lights
+    const blink = Math.floor(t / 20) % 2 === 0;
+    drawEmoji('⛽', pad.x, py - 14, 16);
+    ctx.fillStyle = 'rgba(80,232,160,0.8)';
+    ctx.font = 'bold 7px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('REFUEL', pad.x, py - 26);
+    if (blink) {
+      ctx.beginPath(); ctx.arc(px + 6, py + 5, 3, 0, Math.PI*2);
+      ctx.fillStyle = '#50e8a0'; ctx.fill();
+      ctx.beginPath(); ctx.arc(px + pad.w - 6, py + 5, 3, 0, Math.PI*2);
+      ctx.fillStyle = '#50e8a0'; ctx.fill();
+    }
+    ctx.restore();
+  });
+
+  // Surface decorations (rocks, plants along terrain)
+  //PP:for (let x = 30; x < canvas.width - 30; x += 55) {
+  //PP:  const ix = Math.round(clamp(x, 0, terrain.points.length - 1));
+  //PP:  const ty = terrain.points[ix];
+  //PP:  // Only on ground, not in lakes
+  //PP:  const inLake = terrain.lakeZones.some(lz => x >= lz.x && x <= lz.x + lz.w);
+  //PP:  if (!inLake) {
+  //PP:    const decorEmojis = ['🪨','🌑','🗿'];
+  //PP:    const idx = Math.floor((x * 137 + ty * 999) % decorEmojis.length); // deterministic
+  //PP:    ctx.globalAlpha = 0.35;
+  //PP:    drawEmoji(decorEmojis[idx], x, ty - 10, 18);
+  //PP:    ctx.globalAlpha = 1;
+  //PP:  }
+  //PP:}
 
   // Resources on surface
   planetData.resources.forEach(r => {
     if (!r.collected) {
-      drawEmoji(RESOURCES[r.type].emoji, r.x, r.y, 30);
-      if (G.upgrades.includes('radar')) {
-        ctx.beginPath(); ctx.arc(r.x, r.y, 22, 0, Math.PI*2);
-        ctx.strokeStyle = 'rgba(255,204,2,0.3)'; ctx.lineWidth = 2; ctx.stroke();
+      const bobY = r.y + Math.sin(r.bob) * (r.inLake ? 3 : 1.5);
+      drawEmoji(RESOURCES[r.type].emoji, r.x, bobY, 28);
+      if (upgradeState['radar'] && upgradeState['radar'].active) {
+        ctx.beginPath(); ctx.arc(r.x, bobY, 20, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(255,204,2,0.35)'; ctx.lineWidth = 1.5; ctx.stroke();
       }
     }
   });
 
-  // Quota progress
-  const prog = Math.min(1, planetData.collected / planetData.quota);
-  ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(10, canvas.height - 22, canvas.width - 20, 12);
-  ctx.fillStyle = prog >= 1 ? '#50e8a0' : '#ffcc02';
-  ctx.fillRect(10, canvas.height - 22, (canvas.width - 20) * prog, 12);
-  ctx.fillStyle = '#fff'; ctx.font = '10px Georgia,serif'; ctx.textAlign = 'center';
-  ctx.fillText(`Resources: ${planetData.collected}/${planetData.quota}`, canvas.width/2, canvas.height - 13);
-  ctx.restore();
-
   drawBullets(); drawParticles(); drawFloatTexts();
   drawShip(G.ship);
+
+  // ── HUD BARS — top of canvas ──────────────────────────────────
+  const prog  = Math.min(1, planetData.collected / planetData.quota);
+  drawUpgradeButtons('planet');
+  const fuelRight = planetData.landedPad ? '⚡ REFUELING' : '';
+  drawTopBars(
+    `📦 Resources  ${planetData.collected} / ${planetData.quota}`,
+    prog,
+    prog >= 1 ? '#50e8a0' : '#ffaa00',
+    prog >= 1 ? '#20c880' : '#ffcc02',
+    prog >= 1 ? '✅ DONE' : `${Math.round(prog*100)}%`,
+    fuelRight
+  );
+}
+
+// ── SHARED BAR HELPERS ────────────────────────────────────────
+// Draws two bars at the top of the canvas (just below phase banner area).
+// bar1 = main progress bar, fuel bar always drawn from G state.
+// fuelRightLabel: optional override for right side label.
+function drawTopBars(label, val, c0, c1, rightLabel, fuelRightLabel) {
+  const W  = canvas.width;
+  const BH = 10;  // bar height
+  const BW = W * 0.72;
+  const BX = W * 0.14;
+
+  // Row 1 — main progress bar (phase-specific: journey %, quota %, speed)
+  const BY1 = 48;
+  ctx.save();
+  // Label left
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = 'bold 9px monospace'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, BX, BY1);
+  // Bar track
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  roundRect(ctx, BX, BY1 + 7, BW, BH, 5);
+  ctx.fill();
+  // Bar fill
+  const grad1 = ctx.createLinearGradient(BX, 0, BX + BW, 0);
+  grad1.addColorStop(0, c0); grad1.addColorStop(1, c1);
+  ctx.fillStyle = grad1;
+  roundRect(ctx, BX, BY1 + 7, Math.max(0, BW * clamp(val, 0, 1)), BH, 5);
+  ctx.fill();
+  // Right label
+  if (rightLabel) {
+    ctx.fillStyle = 'rgba(255,255,255,0.70)';
+    ctx.textAlign = 'right';
+    ctx.fillText(rightLabel, BX + BW + 28, BY1 + 12);
+  }
+
+  // Row 2 — Fuel bar
+  const BY2 = BY1 + 24;
+  const fuelPct = clamp((G.fuel || 0) / (G.maxFuel || 100), 0, 1);
+  const fuelColor = fuelPct > 0.40 ? '#50e8a0' : fuelPct > 0.20 ? '#ffcc02' : '#ff4444';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.textAlign = 'left';
+  ctx.fillText('⛽', BX, BY2);
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  roundRect(ctx, BX, BY2 + 7, BW, BH, 5);
+  ctx.fill();
+  ctx.fillStyle = fuelColor;
+  roundRect(ctx, BX, BY2 + 7, Math.max(0, BW * fuelPct), BH, 5);
+  ctx.fill();
+  ctx.fillStyle = fuelColor;
+  ctx.textAlign = 'right';
+  ctx.fillText(fuelRightLabel || Math.round(fuelPct * 100) + '%', BX + BW + 28, BY2 + 12);
+
+  // Row 3 — HP bar (always red-spectrum: bright red → dark crimson at low HP)
+  const BY3 = BY2 + 24;
+  const hpPct  = clamp((G.hp || 0) / 100, 0, 1);
+  // Red spectrum: full=bright red-orange, medium=red, low=dark crimson (pulse)
+  const hpColor = hpPct > 0.60 ? '#ff6640' : hpPct > 0.30 ? '#ff2222' : '#aa0000';
+  const hpGrad = ctx.createLinearGradient(BX, 0, BX + BW, 0);
+  hpGrad.addColorStop(0, '#cc0000');
+  hpGrad.addColorStop(1, hpPct > 0.60 ? '#ff8844' : '#ff2222');
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.textAlign = 'left';
+  ctx.fillText('❤️', BX, BY3);
+  // Track
+  ctx.fillStyle = 'rgba(180,0,0,0.18)';
+  roundRect(ctx, BX, BY3 + 7, BW, BH, 5);
+  ctx.fill();
+  // Fill
+  ctx.fillStyle = hpGrad;
+  roundRect(ctx, BX, BY3 + 7, Math.max(0, BW * hpPct), BH, 5);
+  ctx.fill();
+  // Low HP pulse glow
+  if (hpPct < 0.30) {
+    ctx.save();
+    ctx.shadowBlur = 8 + Math.sin(Date.now() * 0.01) * 4;
+    ctx.shadowColor = '#ff0000';
+    ctx.fillStyle = 'rgba(255,0,0,0.22)';
+    roundRect(ctx, BX, BY3 + 7, Math.max(0, BW * hpPct), BH, 5);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.fillStyle = hpColor;
+  ctx.textAlign = 'right';
+  ctx.fillText(Math.round(hpPct * 100) + '% HP', BX + BW + 28, BY3 + 12);
+
+
+
+
+  // ── CARGO STRIP — resources in hold ─────────────────────────────
+  const cargoEntries = G.cargo ? Object.entries(G.cargo).filter(([,v]) => v > 0) : [];
+  if (cargoEntries.length > 0) {
+    const cargoY = BY3 + 22;   // directly below HP bar
+    const startX  = BX;
+    const SLOT_W  = 42;
+
+    // Background pill
+    ctx.fillStyle = 'rgba(0,0,0,0.38)';
+    roundRect(ctx, BX - 4, cargoY - 12, Math.min(cargoEntries.length * SLOT_W + 8, W * 0.85), 20, 6);
+    ctx.fill();
+
+    ctx.font = '12px serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    let cx = startX;
+    cargoEntries.forEach(([type, count]) => {
+      const emoji = (typeof RESOURCES !== 'undefined' && RESOURCES[type]) ? RESOURCES[type].emoji : '?';
+      ctx.globalAlpha = 1;
+      ctx.fillText(emoji, cx, cargoY - 2);
+      ctx.font = 'bold 8px monospace';
+      ctx.fillStyle = '#ffcc02';
+      ctx.fillText('×' + count, cx + 15, cargoY - 2);
+      ctx.font = '12px serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      cx += SLOT_W;
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore();
+}
+
+// Helper: rounded rect path
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 /* ══════════════════════════════════════
@@ -1852,133 +3141,430 @@ function drawPlanet() {
 let landingData = {};
 function initLanding() {
   resizeCanvas(); initBgStars();
+
+  // Generate real terrain for landing phase too
+  const terrain = generateTerrain(canvas.width, canvas.height);
+
+  // Find the HIGHEST flat zone (lowest Y, not on a lake) for the platform
+  const lakeZones = terrain.lakeZones;
+  const validFlats = [...terrain.flatZones]
+    .filter(fz => {
+      if (fz.w < 38) return false;
+      const overLake = lakeZones.some(lz => fz.x < lz.x + lz.w && fz.x + fz.w > lz.x);
+      return !overLake && fz.y > 100; // must be below the HUD bars
+    })
+    .sort((a, b) => a.y - b.y); // lowest Y = highest on screen
+
+  // Fallback if no flat zones
+  if (validFlats.length === 0) {
+    let minY = Infinity, minX = canvas.width / 2;
+    for (let x = 40; x < canvas.width - 40; x++) {
+      if (terrain.points[x] < minY) { minY = terrain.points[x]; minX = x; }
+    }
+    validFlats.push({ x: Math.max(0, minX - 44), w: 88, y: minY });
+  }
+
+  // Exactly 1 landing platform — highest safe flat zone
+  const numPads = 1;
+  const platforms = validFlats.slice(0, 1).map(fz => ({
+    x:  fz.x + fz.w / 2,
+    y:  fz.y - 20,              // elevated 20px above terrain
+    w:  Math.max(100, Math.min(fz.w - 4, 130)),  // min 100px
+    h:  12,
+    groundY: fz.y,              // terrain surface at this pad
+  }));
+
+  // Primary platform = first (highest)
+  const platform = platforms[0];
+  const groundY  = platform.groundY;
+
   landingData = {
-    platform: { x: canvas.width/2, y: canvas.height * 0.82, w:70, h:12 },
+    terrain, platform, platforms, groundY,
     landed: false, crashed: false,
-    maxSafeSpeed: 2.2,
+    maxSafeSpeed: 2.0,
+    groundResources: [],
+    timer: 0,
   };
+
+  // Scatter resources on terrain surface, away from platform
+  const resTypes = ['flora','rcry','gold','fungus'];
+  const spread = [0.12, 0.22, 0.68, 0.80, 0.90];
+  spread.forEach(frac => {
+    const px = canvas.width * frac;
+    const ix = Math.round(clamp(px, 0, terrain.points.length - 1));
+    const ty = terrain.points[ix];
+    const inLakeZone = lakeZones.some(lz => px >= lz.x && px <= lz.x + lz.w);
+    if (!inLakeZone) {
+      landingData.groundResources.push({
+        x: px, y: ty - 30,
+        type: resTypes[rndInt(0, resTypes.length - 1)],
+        collected: false,
+      });
+    }
+  });
+
   bullets.length = 0; particles.length = 0; floatTexts.length = 0;
   drops.length = 0; aliens.length = 0; alienBullets.length = 0;
 
   if (!G.ship) G.ship = makeShip();
-  G.ship.x = canvas.width / 2;
-  G.ship.y = 60;
-  G.ship.vx = 0; G.ship.vy = 0.5;
-  G.ship.angle = Math.PI / 2; // pointing down
+  applyUpgrades();
+  // Ship enters from orbit: starts at horizontal center, top of screen
+  G.ship.x = canvas.width / 2;   // center of screen — orbital entry
+  G.ship.y = 90;
+  G.ship.vx = 0;
+  G.ship.vy = 0.4;                // slow initial descent from orbit
+  G.ship.angle = -Math.PI / 2;   // vertical, nose up
+  G.ship.invincible = 0;
+  // shieldHits set by applyUpgrades() above
+
   setPhaseBanner('🎯 PHASE 6 — LANDING SEQUENCE');
-  toast('⚠️ Land gently on the platform! Control your speed!');
+  toast('⚠️ Entering atmosphere — thrust ▲ to brake! Land on 🔵 platform!');
 }
 
 function updateLanding() {
   if (G.paused || landingData.landed || landingData.crashed) return;
   const ship = G.ship;
-  const pl   = landingData.platform;
+  const pl      = landingData.platform;
+  const terrain = landingData.terrain;
+  landingData.timer++;
 
-  const ROTATE = 0.07;
-  if (isLeft())  ship.angle -= ROTATE;
-  if (isRight()) ship.angle += ROTATE;
-  if (isUp() && consumeFuel(0.1)) {
-    ship.vx += Math.cos(ship.angle) * 0.25;
-    ship.vy += Math.sin(ship.angle) * 0.25;
-    spawnParticles(ship.x, ship.y + 16, '#ff9d3d', 3, 2);
+  // Landing: free rotation allowed — but must land within ±10° of vertical
+  const LAND_ACCEL = 0.055;   // reduced for precision
+  const LAND_DRAG  = 0.978;
+  const LAND_ROT   = 0.022;   // slow rotation for fine control
+
+  if (isLeft())  ship.angle -= LAND_ROT;
+  if (isRight()) ship.angle += LAND_ROT;
+  if (isUp() && consumeFuel(0.05)) {
+    ship.vx += Math.cos(ship.angle) * LAND_ACCEL;
+    ship.vy += Math.sin(ship.angle) * LAND_ACCEL;
+    const nx = ship.x - Math.cos(ship.angle) * 20;
+    const ny = ship.y - Math.sin(ship.angle) * 20;
+    spawnParticles(nx, ny, '#ff9d3d', 2, 1.2);
   }
 
-  ship.vy += 0.06; // gravity
-  ship.vx *= 0.98; ship.vy *= 0.98;
-  ship.vx = clamp(ship.vx, -5, 5); ship.vy = clamp(ship.vy, -5, 5);
-  ship.x += ship.vx; ship.y += ship.vy;
+  ship.vy += 0.038;                           // gravity
+  ship.vx *= LAND_DRAG; ship.vy *= LAND_DRAG;
+  ship.vx = clamp(ship.vx, -2.5, 2.5);       // tighter speed cap in landing
+  ship.vy = clamp(ship.vy, -4, 4);
+  ship.x += ship.vx;
+  ship.y += ship.vy;
   ship.x = clamp(ship.x, 20, canvas.width - 20);
 
-  updateParticles(); updateFloatTexts();
-
-  // Check landing
-  const onX = ship.x > pl.x - pl.w/2 - 10 && ship.x < pl.x + pl.w/2 + 10;
-  const onY = ship.y >= pl.y - 20 && ship.y <= pl.y + 10;
-  if (onX && onY) {
-    const speed = Math.hypot(ship.vx, ship.vy);
-    if (speed <= landingData.maxSafeSpeed) {
-      landingData.landed = true;
-      ship.vy = 0; ship.vx = 0;
-      ship.y = pl.y - 16;
-      G.score += 500;
-      spawnParticles(ship.x, ship.y, '#50e8a0', 20, 4);
-      floatText(ship.x, ship.y - 40, '+500 PERFECT LANDING!', '#50e8a0');
-      toast('🎯 Perfect landing! +500 pts');
-      updateHUD();
-      setTimeout(() => nextPhase('debrief'), 1800);
-    } else {
-      landingData.crashed = true;
-      G.lives--;
-      spawnParticles(ship.x, ship.y, '#ff4444', 25, 5);
-      toast(`💥 Too fast! ${G.lives} lives left`);
-      updateHUD();
-      if (G.lives <= 0) {
-        setTimeout(() => triggerGameOver('💥 Ship destroyed on landing!'), 800);
-      } else {
-        // Reset for another attempt
-        setTimeout(() => {
-          ship.x = canvas.width/2; ship.y = 60;
-          ship.vx = 0; ship.vy = 0.5;
-          ship.angle = Math.PI/2;
-          landingData.crashed = false;
-          toast('🚀 Try again — control your descent!');
-        }, 1200);
-      }
+  // Platform surface check — stop ship ON TOP of platform
+  const platforms2 = landingData.platforms || [landingData.platform];
+  const LSHIP_BOT  = ship.size * 0.58;   // consistent bottom offset
+  let onPlatformSurface = false;
+  for (const pad2 of platforms2) {
+    const overPad = ship.x > pad2.x - pad2.w/2 - 6 &&
+                    ship.x < pad2.x + pad2.w/2 + 6;
+    if (overPad && ship.y + LSHIP_BOT >= pad2.y) {
+      ship.y  = pad2.y - LSHIP_BOT;   // sit exactly ON top of platform
+      ship.vy = Math.min(0, ship.vy);
+      ship.vx *= 0.82;
+      onPlatformSurface = true;
+      break;
     }
   }
 
-  if (ship.y > canvas.height + 40) {
-    ship.y = 60; ship.vx = 0; ship.vy = 0.5;
-    toast('⚠️ Missed! Try again!');
+  if (!onPlatformSurface) {
+    // Terrain collision
+    const ix    = Math.round(clamp(ship.x, 0, terrain.points.length - 1));
+    const terrY = terrain.points[ix];
+    if (ship.y + LSHIP_BOT >= terrY) {
+      ship.y  = terrY - LSHIP_BOT;
+      ship.vy = 0; ship.vx *= 0.75;
+    }
+  }
+  if (ship.invincible > 0) ship.invincible--;
+  tickUpgrades();
+
+  // Collect ground resources
+  landingData.groundResources.forEach(r => {
+    if (!r.collected && dist(ship, r) < 44) {
+      r.collected = true;
+      collectResource(r.type, r.x, r.y);
+    }
+  });
+
+  updateParticles(); updateFloatTexts();
+
+  // Check platform landing — iterate over all platforms
+  const platforms = landingData.platforms || [landingData.platform];
+  for (const pl2 of platforms) {
+    const onX = ship.x > pl2.x - pl2.w/2 - 14 && ship.x < pl2.x + pl2.w/2 + 14;
+    const onY = ship.y >= pl2.y - 24 && ship.y <= pl2.y + 8;
+    if (!onX || !onY) continue;
+
+    // Check landing angle: ±10° of vertical (-PI/2)
+    const ANGLE_TOL = 10 * Math.PI / 180;
+    let normA = ((ship.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+    if (normA > Math.PI) normA -= Math.PI * 2;
+    const angleDiff = Math.abs(normA - (-Math.PI / 2));
+    const goodAngle = angleDiff <= ANGLE_TOL;
+
+    const speed = Math.hypot(ship.vx, ship.vy);
+    const safeSpeed = speed <= landingData.maxSafeSpeed;
+
+    const maxWarningSpd = landingData.maxSafeSpeed * 1.75;
+    const isYellowZone  = speed > landingData.maxSafeSpeed && speed <= maxWarningSpd;
+    const isRedZone     = speed > maxWarningSpd;
+
+    if (safeSpeed && goodAngle) {
+      // 🟢 PERFECT: green zone + vertical
+      landingData.landed = true;
+      soundPlay('land');
+      ship.vy = 0; ship.vx = 0;
+      ship.y = pl2.y - ship.size * 0.6;
+      ship.angle = -Math.PI / 2;
+      G.score += 500;
+      spawnParticles(ship.x, ship.y, '#50e8a0', 20, 4);
+      floatText(ship.x, ship.y - 40, '+500 PERFECT LANDING! 🟢', '#50e8a0');
+      toast('🎯 Perfect landing! +500 pts');
+      updateHUD();
+      setTimeout(() => nextPhase('debrief'), 1800);
+    } else if (isYellowZone && goodAngle && !landingData.crashed) {
+      // 🟡 CAUTION: yellow zone + vertical — land but take damage
+      landingData.landed = true;
+      landingData.crashed = true;
+      G.hp = Math.max(0, (G.hp||0) - 15);
+      ship.vy = 0; ship.vx = 0;
+      ship.y = pl2.y - ship.size * 0.6;
+      ship.angle = -Math.PI / 2;
+      G.score += 150;
+      soundPlay('hit');
+      spawnParticles(ship.x, ship.y, '#ffcc02', 14, 3);
+      floatText(ship.x, ship.y - 40, '+150 HARD LANDING 🟡 -15% HP', '#ffcc02');
+      toast(`⚠️ Hard landing! -15% HP (${Math.round(G.hp)}% remaining)`);
+      updateHUD();
+      if (G.hp <= 0) { setTimeout(() => triggerGameOver('💥 Ship destroyed on landing!'), 800); return; }
+      setTimeout(() => nextPhase('debrief'), 1800);
+    } else if (!landingData.crashed) {
+      // 🔴 CRASH: red zone or bad angle
+      landingData.crashed = true;
+      let dmgAmt = 0, dmgReason = '';
+      if (isRedZone && !goodAngle)  { dmgAmt = 50; dmgReason = '🔴 Too fast + tilted!'; }
+      else if (isRedZone)           { dmgAmt = 33; dmgReason = '🔴 Too fast!'; }
+      else                          { dmgAmt = 20; dmgReason = '⚠️ Tilt >10°! Straighten up'; }
+      G.hp = Math.max(0, (G.hp||0) - dmgAmt);
+      spawnParticles(ship.x, ship.y, '#ff4444', 22, 4);
+      floatText(ship.x, ship.y - 40, `${dmgReason}`, '#ff4444');
+      toast(`${dmgReason} — ${Math.round(G.hp)}% HP remaining`);
+      soundPlay('hit');
+      updateHUD();
+      if (G.hp <= 0) {
+        setTimeout(() => triggerGameOver('💥 Ship destroyed on landing!'), 800);
+      } else {
+        setTimeout(() => {
+          ship.x = canvas.width / 2; ship.y = 90;  // back to orbital entry
+          ship.vx = 0; ship.vy = 0.4;
+          ship.angle = -Math.PI / 2;
+          landingData.crashed = false;
+          toast('🚀 Try again! Brake with thrust ▲');
+        }, 1200);
+      }
+    }
+    break;
   }
 }
 
 function drawLanding() {
-  // Earth surface background
-  ctx.fillStyle = isDark ? '#04040f' : '#ccd8f0';
+  const pl      = landingData.platform;
+  const terrain = landingData.terrain;
+  const t       = landingData.timer || 0;
+
+  // ── Sky ──────────────────────────────────────────────────────
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.55);
+  skyGrad.addColorStop(0, '#02020a');
+  skyGrad.addColorStop(1, '#0a1828');
+  ctx.fillStyle = skyGrad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Stars
   bgStars.forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x, s.y * 0.5, s.r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(255,255,255,${s.alpha})`; ctx.fill();
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.alpha * 0.7})`; ctx.fill();
   });
 
-  // Ground
-  ctx.fillStyle = '#1a3a1a';
-  ctx.fillRect(0, landingData.platform.y + 10, canvas.width, canvas.height);
-
-  // Terrain decor
-  ['🌲','🏔️','🌲','🏗️','🌲'].forEach((e, i) => {
-    drawEmoji(e, (i+1) * canvas.width/6, landingData.platform.y + 22, 28);
-  });
-
-  // Platform
-  const pl = landingData.platform;
+  // Earth glow — reminder of home destination
   ctx.save();
-  ctx.fillStyle = '#5bc8ff';
-  ctx.shadowBlur = 20; ctx.shadowColor = '#5bc8ff';
-  ctx.fillRect(pl.x - pl.w/2, pl.y, pl.w, pl.h);
+  const ehalo = ctx.createRadialGradient(canvas.width - 50, 50, 0, canvas.width - 50, 50, 55);
+  ehalo.addColorStop(0, 'rgba(40,100,220,0.35)');
+  ehalo.addColorStop(1, 'transparent');
+  ctx.fillStyle = ehalo; ctx.fillRect(canvas.width - 110, 0, 120, 110);
+  drawEmoji('🌍', canvas.width - 50, 44, 32);
   ctx.restore();
-  // Platform lights
-  for (let i = 0; i < 5; i++) {
-    drawEmoji('💡', pl.x - pl.w/2 + i * (pl.w/4), pl.y - 6, 14);
+
+  // ── Terrain with real profile ──────────────────────────────────
+  const gndGrad = ctx.createLinearGradient(0, terrain.baseY - 60, 0, canvas.height);
+  gndGrad.addColorStop(0, '#1c3820'); gndGrad.addColorStop(0.4, '#112515'); gndGrad.addColorStop(1, '#050e05');
+  ctx.fillStyle = gndGrad;
+  ctx.beginPath(); ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
+  ctx.lineTo(canvas.width, canvas.height); ctx.lineTo(0, canvas.height); ctx.closePath(); ctx.fill();
+  // Surface line
+  ctx.beginPath(); ctx.moveTo(0, terrain.points[0]);
+  for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
+  ctx.strokeStyle = '#2d5a30'; ctx.lineWidth = 2; ctx.stroke();
+
+  // Lakes in landing terrain
+  terrain.lakeZones.forEach(lz => {
+    const lg = ctx.createLinearGradient(0, lz.y - 10, 0, canvas.height);
+    lg.addColorStop(0, '#1840a0'); lg.addColorStop(1, '#0a2a5a');
+    ctx.fillStyle = lg;
+    ctx.beginPath(); ctx.moveTo(lz.x, canvas.height);
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.lineTo(lz.x + lz.w, canvas.height); ctx.closePath(); ctx.fill();
+    ctx.save(); ctx.strokeStyle = 'rgba(100,180,255,0.30)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.stroke(); ctx.restore();
+  });
+
+  // ── Surface resources ───────────────────────────────────────────
+  if (landingData.groundResources) {
+    landingData.groundResources.forEach(r => {
+      if (!r.collected) {
+        drawEmoji(RESOURCES[r.type].emoji, r.x, r.y, 28);
+        ctx.save();
+        ctx.beginPath(); ctx.arc(r.x, r.y + 8, 16, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(255,204,2,0.28)'; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.restore();
+      }
+    });
   }
 
-  // Speed indicator
-  const speed = Math.hypot(G.ship.vx, G.ship.vy);
-  const safeRatio = Math.min(1, speed / landingData.maxSafeSpeed);
-  const sColor = safeRatio < 0.7 ? '#50e8a0' : safeRatio < 1 ? '#ffcc02' : '#ff4444';
-  ctx.save();
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(10, 10, 120, 36);
-  ctx.fillStyle = sColor;
-  ctx.font = 'bold 11px Georgia,serif'; ctx.textAlign = 'left';
-  ctx.fillText(`⚡ Speed: ${speed.toFixed(1)}`, 16, 24);
-  ctx.fillText(speed <= landingData.maxSafeSpeed ? '✅ SAFE' : '⚠️ TOO FAST', 16, 38);
-  ctx.restore();
+  // ── All platforms on hilltops ──────────────────────────────────
+  const allPlatforms = landingData.platforms || [pl];
+  const blink = Math.floor(Date.now() / 280) % 2 === 0;
 
-  drawParticles(); drawFloatTexts();
-  drawShip(G.ship);
+  allPlatforms.forEach((pad, idx) => {
+    const legTop = pad.y + pad.h;
+    const legBot = pad.groundY || landingData.groundY;
+
+    // Support legs
+    ctx.strokeStyle = '#3a5580'; ctx.lineWidth = 3;
+    [pad.x - pad.w/2 + 10, pad.x + pad.w/2 - 10].forEach(lx => {
+      ctx.beginPath(); ctx.moveTo(lx, legTop); ctx.lineTo(lx, legBot); ctx.stroke();
+    });
+    // Cross-brace
+    ctx.beginPath();
+    ctx.moveTo(pad.x - pad.w/2 + 10, legTop + (legBot - legTop) * 0.5);
+    ctx.lineTo(pad.x + pad.w/2 - 10, legTop + (legBot - legTop) * 0.5);
+    ctx.strokeStyle = '#2a4470'; ctx.lineWidth = 2; ctx.stroke();
+
+    // Deck — primary pad brighter
+    ctx.save();
+    ctx.shadowBlur = idx === 0 ? 28 : 14;
+    ctx.shadowColor = '#5bc8ff';
+    ctx.fillStyle = '#1a2d4a';
+    ctx.fillRect(pad.x - pad.w/2 - 3, pad.y + 2, pad.w + 6, pad.h + 1);
+    ctx.fillStyle = idx === 0 ? '#5bc8ff' : '#3a7a9a';
+    ctx.fillRect(pad.x - pad.w/2, pad.y, pad.w, pad.h);
+    ctx.shadowBlur = 0; ctx.restore();
+
+    // Blinking lights
+    for (let i = 0; i <= 4; i++) {
+      const lx = pad.x - pad.w/2 + i * (pad.w / 4);
+      ctx.beginPath(); ctx.arc(lx, pad.y - 4, 4, 0, Math.PI*2);
+      ctx.fillStyle = blink ? '#ffdd00' : '#774400';
+      ctx.shadowBlur = blink ? 12 : 2; ctx.shadowColor = '#ffdd00';
+      ctx.fill(); ctx.shadowBlur = 0;
+    }
+
+    // Vertical landing guide (dashed) + ±10° tolerance lines
+    ctx.save();
+    ctx.strokeStyle = 'rgba(91,200,255,0.18)';
+    ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x, 100);
+    ctx.stroke();
+    // Tolerance guides: ±10° from vertical at 80px above pad
+    const guideH = 80;
+    const tolW = Math.tan(10 * Math.PI / 180) * guideH;
+    ctx.strokeStyle = 'rgba(255,200,0,0.18)';
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x - tolW, pad.y - guideH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x + tolW, pad.y - guideH); ctx.stroke();
+    ctx.setLineDash([]); ctx.restore();
+  });
+
+  // ── Ship & FX ────────────────────────────────────────────────
+  drawParticles(); drawFloatTexts(); drawShip(G.ship);
+
+  // ── HUD BARS (fuel + hp) ───────────────────────────────────────
+  const speed      = Math.hypot(G.ship.vx, G.ship.vy);
+  const maxSafe    = landingData.maxSafeSpeed;
+  const maxWarning = maxSafe * 1.75;
+  const isGreen    = speed <= maxSafe;
+  const isYellow   = !isGreen && speed <= maxWarning;
+  const sc0 = isGreen ? '#50e8a0' : isYellow ? '#ffcc02' : '#ff4444';
+  drawTopBars('🎯 LANDING', 0, sc0, sc0, isGreen ? '✅ SAFE' : isYellow ? '⚠️ CAUTION' : '🚨 TOO FAST');
+  drawUpgradeButtons('landing');
+
+  // ── PLATFORM PROXIMITY SPEED INDICATOR ──────────────────────────
+  // Positioned near the nearest platform, above it
+  const platforms3 = landingData.platforms || [landingData.platform];
+  const nearPad = platforms3.reduce((best, p) => {
+    const d = Math.hypot(G.ship.x - p.x, G.ship.y - p.y);
+    return (!best || d < best.d) ? { p, d } : best;
+  }, null);
+  if (nearPad) {
+    const pad   = nearPad.p;
+    const indX  = pad.x;
+    const indY  = pad.y - 50;   // just above the platform
+    const barW  = Math.min(pad.w + 20, 100);
+    const maxDispSpd = maxSafe * 3.5;
+    const sRatio = Math.min(1, speed / maxDispSpd);
+
+    ctx.save();
+    // Dark background pill
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    roundRect(ctx, indX - barW/2 - 6, indY - 20, barW + 12, 38, 8); ctx.fill();
+
+    // Speed bar track
+    ctx.fillStyle = 'rgba(255,255,255,0.10)';
+    roundRect(ctx, indX - barW/2, indY - 10, barW, 8, 4); ctx.fill();
+
+    // Speed bar fill — color by zone
+    const barColor = isGreen ? '#50e8a0' : isYellow ? '#ffcc02' : '#ff4444';
+    ctx.fillStyle = barColor;
+    if (!isGreen && !isYellow) { ctx.shadowBlur = 8; ctx.shadowColor = '#ff4444'; }
+    roundRect(ctx, indX - barW/2, indY - 10, barW * sRatio, 8, 4); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Zone threshold ticks on bar
+    const gTick = indX - barW/2 + barW * (maxSafe / maxDispSpd);
+    const yTick = indX - barW/2 + barW * (maxWarning / maxDispSpd);
+    ctx.lineWidth = 1.5; ctx.setLineDash([2,2]);
+    ctx.strokeStyle = '#50e8a0'; ctx.beginPath(); ctx.moveTo(gTick, indY-12); ctx.lineTo(gTick, indY); ctx.stroke();
+    ctx.strokeStyle = '#ffcc02'; ctx.beginPath(); ctx.moveTo(yTick, indY-12); ctx.lineTo(yTick, indY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Traffic lights (mini) right of bar
+    const tlX2 = indX + barW/2 + 12;
+    const lights = [
+      { y: indY - 12, on: !isGreen && !isYellow, col: '#ff2222', glow: '#ff0000' },
+      { y: indY - 4,  on: isYellow,              col: '#ffcc02', glow: '#ffcc00' },
+      { y: indY + 4,  on: isGreen,               col: '#50e8a0', glow: '#00ff80' },
+    ];
+    lights.forEach(lt => {
+      ctx.beginPath(); ctx.arc(tlX2, lt.y, 4.5, 0, Math.PI*2);
+      ctx.fillStyle = lt.on ? lt.col : 'rgba(255,255,255,0.08)';
+      if (lt.on) { ctx.shadowBlur = 10; ctx.shadowColor = lt.glow; }
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+
+    // Speed label
+    ctx.fillStyle = barColor;
+    ctx.font = 'bold 8px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText(`⚡${speed.toFixed(1)}  ${isGreen?'SAFE':isYellow?'CAUTION':'CRASH'}`, indX, indY + 2);
+    ctx.restore();
+  }
 }
 
 /* ══════════════════════════════════════
@@ -2001,6 +3587,20 @@ function initDebrief() {
   document.getElementById('shop-level-label').textContent = `Mission Complete · Level ${G.level}`;
   document.getElementById('shop-credits').textContent = G.credits + ' ₡';
 
+  // Update status bars in debrief
+  const dbFuelPct = Math.round(clamp((G.fuel||0)/(G.maxFuel||100),0,1)*100);
+  const dbHpPct   = Math.round(clamp((G.hp||0)/100,0,1)*100);
+  const dbFuelCol = dbFuelPct > 40 ? '#50e8a0' : dbFuelPct > 20 ? '#ffcc02' : '#ff4444';
+  const dbHpCol   = dbHpPct  > 60 ? '#ff6640' : dbHpPct  > 30 ? '#ff2222' : '#aa0000';
+  const dbFuelBar = document.getElementById('db-fuel-bar');
+  const dbHpBar   = document.getElementById('db-hp-bar');
+  if (dbFuelBar) { dbFuelBar.style.width = dbFuelPct+'%'; dbFuelBar.style.background = dbFuelCol; }
+  if (dbHpBar)   { dbHpBar.style.width   = dbHpPct+'%';  dbHpBar.style.background   = dbHpCol; }
+  const dbFuelPctEl = document.getElementById('db-fuel-pct');
+  const dbHpPctEl   = document.getElementById('db-hp-pct');
+  if (dbFuelPctEl) { dbFuelPctEl.textContent = dbFuelPct+'%'; dbFuelPctEl.style.color = dbFuelCol; }
+  if (dbHpPctEl)   { dbHpPctEl.textContent   = dbHpPct+'%';  dbHpPctEl.style.color   = dbHpCol; }
+
   // Resources grid
   const resGrid = document.getElementById('res-grid');
   const entries = Object.entries(G.cargo).filter(([,v]) => v > 0);
@@ -2018,18 +3618,20 @@ function initDebrief() {
     }).join('');
   }
 
-  // Upgrades shop
-  const ownedUpgrades = loadUpgrades();
+  // Upgrades shop — all available each level, price scales per level
+  // G.upgrades = upgrades bought THIS level only (reset each level)
   const shopGrid = document.getElementById('shop-grid');
+  const levelMult = 1 + (G.level - 1) * 0.4; // +40% per level
   shopGrid.innerHTML = UPGRADES_DEF.map(u => {
-    const owned    = ownedUpgrades.includes(u.id);
-    const canAfford = G.credits >= u.price;
+    const scaledPrice = Math.round(u.price * levelMult / 10) * 10;
+    const owned     = G.upgrades.includes(u.id);
+    const canAfford = G.credits >= scaledPrice;
     const cls = owned ? 'owned' : (!canAfford ? 'cant-afford' : '');
-    return `<div class="shop-item ${cls}" data-id="${u.id}" data-price="${u.price}">
+    return `<div class="shop-item ${cls}" data-id="${u.id}" data-price="${scaledPrice}">
       <div class="si-emoji">${u.emoji}</div>
       <div class="si-name">${u.name}</div>
       <div class="si-desc">${u.desc}</div>
-      <div class="si-price">${owned ? '✅ Owned' : canAfford ? u.price+' ₡' : '🔒 '+u.price+' ₡'}</div>
+      <div class="si-price">${owned ? '✅ Purchased' : canAfford ? scaledPrice+' ₡' : '🔒 '+scaledPrice+' ₡'}</div>
     </div>`;
   }).join('');
 
@@ -2038,14 +3640,14 @@ function initDebrief() {
       const id = el.dataset.id; const price = parseInt(el.dataset.price);
       if (G.credits < price) { toast('💸 Not enough credits!'); return; }
       G.credits -= price;
-      const upg = loadUpgrades();
-      if (!upg.includes(id)) { upg.push(id); saveUpgrades(upg); }
       if (!G.upgrades.includes(id)) G.upgrades.push(id);
+      initUpgradeStates();   // rebuild state for newly purchased upgrade
+      renderUpgradeBar();    // update button display immediately
       document.getElementById('shop-credits').textContent = G.credits + ' ₡';
       el.className = 'shop-item owned';
-      el.querySelector('.si-price').textContent = '✅ Owned';
+      el.querySelector('.si-price').textContent = '✅ Purchased';
       const u = UPGRADES_DEF.find(x => x.id===id);
-      toast(`✅ ${u.emoji} ${u.name} equipped!`);
+      soundPlay('upgradeBuy'); toast(`✅ ${u.emoji} ${u.name} equipped!`);
     });
   });
 
@@ -2054,21 +3656,21 @@ function initDebrief() {
 }
 
 document.getElementById('shop-next-btn').addEventListener('click', () => {
+  soundPlay('levelup');
+  // Apply one-time consumables before entering next level
+  if (G.upgrades.includes('repair') && G.hp < 100) {
+    G.hp = Math.min(100, G.hp + 50);
+    toast('🔧 Repair kit used — +50% HP restored!');
+  }
   G.level++;
   G.cargo = {};
   G.phase = 'launch';
-  // Restore fuel
-  G.maxFuel = G.upgrades.includes('tank') ? 150 : 100;
-  G.fuel = G.maxFuel;
-  // Restore shield if owned
-  if (G.upgrades.includes('shield')) G.ship.shieldHits = 1;
-  if (G.upgrades.includes('repair') && G.lives < 3) {
-    G.lives = Math.min(3, G.lives + 1);
-    const upg = loadUpgrades().filter(u => u !== 'repair');
-    saveUpgrades(upg);
-    G.upgrades = G.upgrades.filter(u => u !== 'repair');
-    toast('🔧 Repair kit used — life restored!');
-  }
+  G._medicalUsed = false;
+  // G.upgrades intentionally NOT cleared — carry purchased upgrades into next level
+  // upgradeState will be rebuilt by initUpgradeStates() inside applyUpgrades()
+  G.maxFuel = 100;
+  G.fuel = 100;
+  // HP carries over to next level
   startGame(G.name, G.avatarKey, true);
 });
 
@@ -2078,14 +3680,13 @@ document.getElementById('shop-next-btn').addEventListener('click', () => {
 function initPhase(phase) {
   G.phase = phase;
   stopGameLoop();
-  switch (phase) {
+  switch (phase) {  // applyUpgrades() called inside each init function, after makeShip()
     case 'launch':  initLaunch();  break;
     case 'travel':  initTravel(false); break;
-    case 'orbit':   initOrbit();   break;
     case 'planet':  initPlanet();  break;
     case 'return':  initTravel(true);  break;
     case 'landing': initLanding(); break;
-    case 'debrief': initDebrief(); return; // no loop needed
+    case 'debrief': initDebrief(); return;
   }
   startGameLoop();
 }
@@ -2094,6 +3695,76 @@ function nextPhase(phase) {
   if (G.over) return;
   stopGameLoop();
   initPhase(phase);
+}
+
+
+// Quick-shop button: pause game and open upgrade shop mid-mission
+document.addEventListener('DOMContentLoaded', () => {
+  const sqb = document.getElementById('shop-quick-btn');
+  if (!sqb) return;
+  sqb.addEventListener('click',  openMidMissionShop);
+  sqb.addEventListener('touchend', e => { e.stopPropagation(); openMidMissionShop(); }, { passive:true });
+});
+
+function openMidMissionShop() {
+  if (!G.name || G.over) return;
+  setPaused(true);
+  // Build a floating shop overlay
+  let overlay = document.getElementById('mid-shop-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'mid-shop-overlay';
+    overlay.style.cssText = `position:absolute;inset:0;z-index:90;
+      background:rgba(0,0,0,0.82);display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-start;overflow-y:auto;
+      padding:16px 12px 80px;gap:10px;backdrop-filter:blur(6px)`;
+    document.getElementById('game-area').appendChild(overlay);
+  }
+  const levelMult = 1 + (G.level - 1) * 0.4;
+  overlay.innerHTML = `
+    <div style="font-family:Georgia,serif;font-size:1.2rem;color:#5bc8ff;
+      letter-spacing:3px;margin-top:8px">🛒 UPGRADE SHOP</div>
+    <div style="font-size:.7rem;color:#888;letter-spacing:2px">Level ${G.level} · ${G.credits} ₡ available</div>
+    <div id="mid-shop-grid" style="display:grid;grid-template-columns:repeat(2,1fr);
+      gap:8px;width:100%;max-width:420px"></div>
+    <button id="mid-shop-close" style="margin-top:12px;padding:10px 28px;
+      font-family:Georgia,serif;font-size:.9rem;background:rgba(91,200,255,.15);
+      border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
+      letter-spacing:2px">▶ RESUME MISSION</button>`;
+
+  const grid = overlay.querySelector('#mid-shop-grid');
+  UPGRADES_DEF.forEach(u => {
+    const scaledPrice = Math.round(u.price * levelMult / 10) * 10;
+    const owned = (G.upgrades||[]).includes(u.id);
+    const canAfford = G.credits >= scaledPrice;
+    const cls = owned ? 'owned' : (!canAfford ? 'cant-afford' : '');
+    const el = document.createElement('div');
+    el.className = 'shop-item ' + cls;
+    el.dataset.id = u.id; el.dataset.price = scaledPrice;
+    el.innerHTML = `<div class="si-emoji">${u.emoji}</div>
+      <div class="si-name">${u.name}</div>
+      <div class="si-desc">${u.desc}</div>
+      <div class="si-price">${owned ? '✅ Owned' : canAfford ? scaledPrice+' ₡' : '🔒 '+scaledPrice+' ₡'}</div>`;
+    if (!owned && canAfford) {
+      el.addEventListener('click', () => {
+        if (G.credits < scaledPrice) return;
+        G.credits -= scaledPrice;
+        if (!G.upgrades) G.upgrades = [];
+        if (!G.upgrades.includes(u.id)) G.upgrades.push(u.id);
+        initUpgradeStates();
+        renderUpgradeBar();
+        updateHUD();
+        toast('✅ ' + u.emoji + ' ' + u.name + ' equipped!');
+        openMidMissionShop(); // refresh
+      });
+    }
+    grid.appendChild(el);
+  });
+
+  overlay.querySelector('#mid-shop-close').addEventListener('click', () => {
+    overlay.remove();
+    setPaused(false);
+  });
 }
 
 /* ══════════════════════════════════════
@@ -2106,7 +3777,6 @@ function startGameLoop() {
   switch (G.phase) {
     case 'launch':  updateFn = updateLaunch;  drawFn = drawLaunch;  break;
     case 'travel':  updateFn = updateTravel;  drawFn = drawTravel;  break;
-    case 'orbit':   updateFn = updateOrbit;   drawFn = drawOrbit;   break;
     case 'planet':  updateFn = updatePlanet;  drawFn = drawPlanet;  break;
     case 'return':  updateFn = updateTravel;  drawFn = drawTravel;  break;
     case 'landing': updateFn = updateLanding; drawFn = drawLanding; break;
