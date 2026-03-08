@@ -860,11 +860,11 @@ function drawCell(c,sx,sy,sz){
     // Adjacency badge — shown on all cell types (land + water)
     if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine'){
       const col=NUM_COLORS[c.adjacent-1]||'#fff';
-      const fs=Math.max(16,Math.min(sz*.28,16));
+      const fs=Math.max(10,Math.min(sz*.28,18));
       ctx.font=`bold ${fs}px "Georgia"`;
       const ns=String(c.adjacent),tw=ctx.measureText(ns).width;
       const bx=sx+(cfg.i?sz*.3:0),by=sy-(cfg.i?sz*.28:0);
-      ctx.fillStyle='rgba(0,0,0,0.00)';
+      ctx.fillStyle='rgba(0,0,0,0.10)';
       roundRect(bx-tw/2-5,by-fs/2-3,tw+10,fs+6,3);ctx.fill();
       ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;
       ctx.textAlign='center';ctx.textBaseline='middle';
