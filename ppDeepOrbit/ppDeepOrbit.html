@@ -6,7 +6,7 @@
 <title>🚀 ppDeepOrbit</title>
 <!--
   ╔══════════════════════════════════════════════════════════════╗
-  ║  ppDeepOrbit v1.0  —  PISTINO DEVELOPMENT  —  2026          ║
+  ║  ppDeepOrbit v1.0  —  PISTINO DEVELOPMENT  —  2026           ║
   ║  Space mining adventure — single-file HTML5 game             ║
   ║  Built on ppTemplate v1.0                                    ║
   ╚══════════════════════════════════════════════════════════════╝
@@ -173,7 +173,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 /* GAME AREA */
 #game-area{flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:flex-start;width:100%;overflow:hidden;position:relative}
-#game-canvas{display:block;touch-action:none}
+#game-canvas{display:block;touch-action:none;pointer-events:none;position:relative;z-index:10}
 
 /* PHASE BANNER */
 #phase-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);
@@ -199,13 +199,13 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   pointer-events:all;transition:background .1s;user-select:none}
 #fire-btn:active,#fire-btn.pressed{background:rgba(255,100,100,.5)}
-#upgrade-bar{pointer-events:all}
+#upgrade-bar{pointer-events:all;position:relative;z-index:50;touch-action:auto}
 .upg-btn{
   width:48px;height:52px;border-radius:10px;
   background:rgba(10,25,70,0.88);
   border:1.5px solid rgba(91,200,255,0.4);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;
+  cursor:pointer;user-select:none;touch-action:auto;position:relative;z-index:50;-webkit-tap-highlight-color:transparent;
   transition:background .12s,border-color .12s;
   position:relative;overflow:hidden;gap:1px}
 .upg-btn:active{background:rgba(40,80,160,0.9)}
@@ -222,6 +222,10 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 .upg-btn.locked{opacity:0.38;cursor:default;pointer-events:none;
   background:rgba(10,10,20,0.70);border-color:rgba(80,80,120,0.3)}
 .upg-btn.locked .upg-label{color:#445566}
+.dbo-upg{background:rgba(10,10,30,0.7);border:1.5px solid rgba(91,200,255,.3);
+  border-radius:12px;padding:9px 8px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;text-align:center;transition:border-color .2s,opacity .2s}
+.dbo-upg:hover{background:rgba(30,60,120,.5)}
 .upg-cd-ring{
   position:absolute;inset:0;border-radius:10px;
   background:rgba(0,0,0,0);pointer-events:none}
@@ -415,6 +419,8 @@ body.light .cinp{background:rgba(0,0,0,.03)}
   </div>
 
   <button class="playbtn" id="pbtn">🚀 LAUNCH!</button>
+  <button class="secbtn" id="continue-btn" style="display:none;background:rgba(80,232,160,.12);
+    border-color:rgba(80,232,160,.5);color:#50e8a0">▶ Continue</button>
   <button class="secbtn" id="hist-btn">🏆 Mission Log</button>
   <button class="secbtn" id="help-ss-btn">❓ How to Play</button>
 </div>
@@ -473,7 +479,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
       </div>
       <!-- UPGRADE BUTTONS — always visible, all 8 slots -->
       <div id="upgrade-bar" style="display:flex;flex-direction:row;align-items:flex-end;
-           gap:4px;pointer-events:all;flex-wrap:wrap;max-width:calc(100% - 180px);
+           gap:4px;pointer-events:all;touch-action:auto;flex-wrap:wrap;max-width:calc(100% - 180px);
            justify-content:center"></div>
       <!-- Quick-shop + fire -->
       <div style="display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:all">
@@ -487,10 +493,19 @@ body.light .cinp{background:rgba(0,0,0,.03)}
          justify-content:center;gap:18px;backdrop-filter:blur(4px)">
       <div style="font-family:Georgia,serif;font-size:2rem;color:#5bc8ff;letter-spacing:4px">⏸ PAUSED</div>
       <div style="font-size:.75rem;color:var(--text3);letter-spacing:2px">Game saved · Press ⏸ or P to resume</div>
-      <button id="pause-resume-btn" style="margin-top:8px;padding:10px 32px;
-        font-family:Georgia,serif;font-size:1rem;background:rgba(91,200,255,.15);
-        border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
-        letter-spacing:2px">▶ RESUME</button>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+        <button id="pause-resume-btn" style="padding:10px 32px;
+          font-family:Georgia,serif;font-size:1rem;background:rgba(91,200,255,.15);
+          border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
+          letter-spacing:2px">▶ RESUME</button>
+        <button id="pause-shop-btn" style="padding:10px 32px;
+          font-family:Georgia,serif;font-size:1rem;background:rgba(255,180,0,.15);
+          border:1.5px solid #ffb400;border-radius:12px;color:#ffb400;cursor:pointer;
+          letter-spacing:2px">🛒 UPGRADE SHOP</button>
+        <div style="font-size:.65rem;color:rgba(228,244,255,.35);letter-spacing:1px;margin-top:2px">
+          Tasti 1–8 per attivare upgrade · P per riprendere
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -498,45 +513,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <!-- ══════════════════════════════════════
      SHOP SCREEN
      ══════════════════════════════════════ -->
-<div id="shop-screen" class="screen hidden">
-  <div class="shop-title">🛒 Mission Debrief</div>
-  <div class="shop-sub" id="shop-level-label">End of Mission · Level 1</div>
-
-  <div class="credits-bar" style="max-width:500px;width:100%">
-    <span style="font-size:.75rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase">Credits</span>
-    <span class="credits-val" id="shop-credits">0 ₡</span>
-  </div>
-
-  <!-- Status bars in debrief -->
-  <div id="debrief-bars" style="width:100%;max-width:500px;display:flex;flex-direction:column;gap:6px;margin:4px 0">
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:.85rem;min-width:22px">⛽</span>
-      <div style="flex:1;height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden">
-        <div id="db-fuel-bar" style="height:100%;width:100%;border-radius:5px;background:#50e8a0;transition:width .5s"></div>
-      </div>
-      <span id="db-fuel-pct" style="font-size:.7rem;color:#50e8a0;min-width:36px;text-align:right">100%</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <span style="font-size:.85rem;min-width:22px">❤️</span>
-      <div style="flex:1;height:10px;background:rgba(180,0,0,.14);border-radius:5px;overflow:hidden">
-        <div id="db-hp-bar" style="height:100%;width:100%;border-radius:5px;background:#ff4444;transition:width .5s"></div>
-      </div>
-      <span id="db-hp-pct" style="font-size:.7rem;color:#ff4444;min-width:36px;text-align:right">100%</span>
-    </div>
-  </div>
-
-  <div class="resources-summary" id="resources-summary">
-    <span class="clbl" style="margin-bottom:6px">Resources Collected</span>
-    <div class="res-grid" id="res-grid"></div>
-  </div>
-
-  <div style="font-family:Georgia,serif;font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);width:100%;max-width:500px;padding:4px 0">
-    ⚙️ UPGRADES
-  </div>
-  <div class="shop-grid" id="shop-grid"></div>
-
-  <button class="playbtn" id="shop-next-btn" style="margin-top:8px">🚀 Next Mission</button>
-</div>
+<!-- shop-screen removed: debrief now uses in-game overlay -->
 
 <!-- ══════════════════════════════════════
      OVERLAY
@@ -568,46 +545,56 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <div id="help-popup" class="popup-bg hidden">
   <div class="popup-box">
     <div class="popup-title">🚀 ppDeepOrbit</div>
-    <div class="popup-row"><strong>🎯 Objective:</strong> Launch from Earth, survive the asteroid belt, collect resources on alien planets, and return safely to sell your cargo and upgrade your ship.</div>
+    <div class="popup-row"><strong>🎯 Objective:</strong> Launch from Earth, blast through the asteroid belt, collect resources on alien planets, and land safely back home. Each mission earns credits — spend them on powerful upgrades for the next run.</div>
 
     <span class="popup-section">🗺️ MISSION PHASES</span>
     <div class="popup-row">
-      <strong>1. Launch</strong> — Lift off from Earth. Watch the planet shrink behind you.<br>
-      <strong>2. Asteroid Belt</strong> — Dodge and destroy asteroids. Collect resource drops ⚡💜🔩.<br>
-      <strong>3. Planet Orbit</strong> — Enter the target planet's atmosphere.<br>
-      <strong>4. Planet Surface</strong> — Collect terrain 🌿🪸🟡 and ocean 🐚💧🦑 resources.<br>
-      <strong>5. Return Journey</strong> — Fight back through the asteroid belt with more enemies.<br>
-      <strong>6. Landing</strong> — Control descent speed. Land gently on the platform!<br>
-      <strong>7. Debrief</strong> — Sell cargo, buy upgrades, advance to the next level.
+      <strong>1. 🌍 Launch</strong> — Thrust off the launch pad. Angle up to escape Earth's gravity.<br>
+      <strong>2. ☄️ Asteroid Belt</strong> — Shoot through the belt. Collect resource drops ⚡💜🔩⚙️.<br>
+      <strong>3. 🌑 Planet Surface</strong> — Land on the refuel pad to restore fuel &amp; HP. Fly around collecting terrain 🌿🪸🟡🍄 and ocean 🐚💧🦑 resources. Return once your quota is filled.<br>
+      <strong>4. ☄️ Return Journey</strong> — Fight back through the belt with heavier enemy waves.<br>
+      <strong>5. 🎯 Landing</strong> — Descend carefully. Stay vertical (±10°) and slow. Three outcomes: 🟢 Perfect · 🟡 Hard landing (−HP) · 🔴 Crash (−HP, retry).<br>
+      <strong>6. 🛒 Mission Complete</strong> — Cargo is sold automatically. Buy upgrades, then launch the next mission.
     </div>
 
     <span class="popup-section">🕹️ CONTROLS</span>
     <div class="popup-row">
-      ⌨️ <strong>W/↑</strong> Thrust forward &nbsp; <strong>A/←</strong> Rotate left<br>
-      ⌨️ <strong>D/→</strong> Rotate right &nbsp; <strong>S/↓</strong> Brake<br>
-      ⌨️ <strong>Space / F</strong> Fire<br>
-      📱 <strong>D-Pad</strong> Navigate &nbsp; 🔥 <strong>Fire button</strong> Shoot
+      ⌨️ <strong>W / ↑</strong> Thrust &nbsp;·&nbsp; <strong>A / ←</strong> Rotate left &nbsp;·&nbsp; <strong>D / →</strong> Rotate right<br>
+      ⌨️ <strong>S / ↓</strong> Brake (travel) &nbsp;·&nbsp; <strong>Space / F</strong> Fire weapons<br>
+      ⌨️ <strong>1–8</strong> Activate equipped upgrades &nbsp;·&nbsp; <strong>P</strong> Pause &amp; save<br>
+      📱 D-Pad to navigate · 🔥 Fire button · 🛒 Quick shop · Upgrade buttons
     </div>
 
-    <span class="popup-section">⛽ FUEL</span>
-    <div class="popup-row">Fuel is finite! Running out = <strong style="color:var(--red)">GAME OVER</strong>. Collect ⚡ Crystals from asteroids to refuel. Upgrade your engine to reduce consumption.</div>
-
-    <span class="popup-section">💎 RESOURCES</span>
+    <span class="popup-section">⛽ FUEL &amp; ❤️ HULL</span>
     <div class="popup-row">
-      <strong>Space:</strong> ⚡ Energy Crystal · 🔩 Iron · 💜 Xenite · ☢️ Nuclearite<br>
-      <strong>Terrain:</strong> 🌿 Flora · 🪸 Crystal · 🟡 Gold · 🍄 Fungus<br>
-      <strong>Ocean:</strong> 🐚 Shell · 💧 Pure Water · 🦑 Essence
+      Fuel depletes when thrusting. Collect ⚡ Energy Crystals in space, or dock on a planet refuel pad to restore fuel <em>and</em> hull integrity slowly.<br>
+      Hull drops when hit by asteroids or aliens. If it hits 0% — <strong style="color:var(--red)">GAME OVER</strong>.
     </div>
 
-    <span class="popup-section">👾 ENEMIES (scale with level)</span>
+    <span class="popup-section">💎 RESOURCES &amp; CREDITS</span>
     <div class="popup-row">
-      ☄️ Asteroids — split into smaller pieces when shot<br>
-      🛸 Alien fighters — appear at level 3+ and shoot back<br>
-      🛰️ Satellites — <strong style="color:var(--red)">DO NOT SHOOT</strong> or lose points!
+      <strong>Space drops:</strong> ⚡ Crystal (+fuel) · 🔩 Iron · ⚙️ Gear · 💜 Xenite (+HP) · ☢️ Nuclearite · 💎 Diamond · ❤️ Life Cell (+HP)<br>
+      <strong>Planet terrain:</strong> 🌿 Alien Flora · 🪸 Rock Crystal · 🟡 Gold · 🍄 Fungus<br>
+      <strong>Planet ocean:</strong> 🐚 Plasma Shell · 💧 Pure Water · 🦑 Essence<br>
+      All cargo is auto-sold at mission end. Credits fund upgrades.
     </div>
 
-    <span class="popup-section">⚙️ UPGRADES</span>
-    <div class="popup-row">Buy upgrades in the Debrief screen: shields, double cannon, fuel tank, magnet beam and more.</div>
+    <span class="popup-section">👾 ENEMIES</span>
+    <div class="popup-row">
+      ☄️ <strong>Asteroids</strong> — split when shot; small fragments score more points<br>
+      🛸 <strong>Alien Fighters</strong> — appear at level 3+, shoot back at you<br>
+      🛰️ <strong>Satellites</strong> — appear at level 5+. <strong style="color:var(--red)">DO NOT SHOOT</strong> — penalty −200 pts!
+    </div>
+
+    <span class="popup-section">⚙️ UPGRADES (8 available)</span>
+    <div class="popup-row">
+      🛡️ Shield · 🔫 Double Cannon · ⚡ Ionic Engine · 🧲 Tractor Beam<br>
+      🔋 Fuel Boost · 📡 Deep Radar · 🔧 Repair Kit · 💉 Medical Kit<br>
+      Buy in the post-mission shop or mid-mission via the 🛒 button. Activate with keys <strong>1–8</strong> or the on-screen upgrade bar.
+    </div>
+
+    <span class="popup-section">💾 SAVING</span>
+    <div class="popup-row">Press <strong>P</strong> or the ⏸ button to pause — the game auto-saves. Next time you open the game, a <strong>▶ Continue</strong> button will appear on the start screen.</div>
 
     <button class="popup-close" id="help-close">✕ Close</button>
   </div>
@@ -786,7 +773,7 @@ let pAvatarKey = null;
    UTILITIES
    ══════════════════════════════════════ */
 function hideAll() {
-  ['ss','gs','hs-screen','shop-screen'].forEach(id => {
+  ['ss','gs','hs-screen'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
@@ -896,6 +883,7 @@ document.getElementById('hud-abandon').addEventListener('click', () => {
    PAUSA
    ══════════════════════════════════════ */
 function setPaused(val) {
+  if (val && G.name && !G.over) saveGameState();  // auto-save on pause
   if (!G.name || G.over) return;
   G.paused = val;
   const ov  = document.getElementById('pause-overlay');
@@ -905,12 +893,21 @@ function setPaused(val) {
 }
 document.getElementById('hud-pause').addEventListener('click', () => setPaused(!G.paused));
 document.getElementById('pause-resume-btn').addEventListener('click', () => setPaused(false));
+document.getElementById('pause-shop-btn').addEventListener('click', () => {
+  setPaused(false);
+  openMidMissionShop();
+});
 document.addEventListener('keydown', e => {
   if (e.code === 'KeyP' && G.name && !G.over) { e.preventDefault(); setPaused(!G.paused); }
   // Keys 1-8: activate upgrade by slot index
   const nk = parseInt(e.key);
-  if (!isNaN(nk) && nk >= 1 && nk <= 8 && G.upgrades && G.upgrades.length >= nk && !G.paused && !G.over) {
-    activateUpgrade(G.upgrades[nk - 1]);
+  if (!isNaN(nk) && nk >= 1 && nk <= 8 && !G.paused && !G.over) {
+    const slotDef = UPGRADES_DEF[nk - 1];
+    if (slotDef && (G.upgrades||[]).includes(slotDef.id)) {
+      activateUpgrade(slotDef.id);
+    } else if (slotDef) {
+      toast(`🔒 Slot ${nk} (${slotDef.name}) not equipped — buy in 🛒 Shop`);
+    }
   }
 });
 
@@ -1035,18 +1032,18 @@ function soundPlay(type) {
       }
 
       case 'thruster': {
-        // Engine hum — filtered noise burst while thrusting
-        const len = Math.ceil(ac.sampleRate * 0.12);
+        const len = Math.ceil(ac.sampleRate * 0.20);
         const buf = ac.createBuffer(1, len, ac.sampleRate);
         const d   = buf.getChannelData(0);
-        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * 0.6;
-        const src = ac.createBufferSource(); src.buffer = buf;
-        const flt = ac.createBiquadFilter(); flt.type = 'bandpass';
-        flt.frequency.value = 140; flt.Q.value = 2.5;
-        const g = ac.createGain();
-        g.gain.setValueAtTime(0.07, now); g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-        src.connect(flt); flt.connect(g); g.connect(master);
-        src.start(now);
+        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1);
+        // Layer 1: main noise
+        const src1 = ac.createBufferSource(); src1.buffer = buf;
+        const flt1 = ac.createBiquadFilter(); flt1.type = 'bandpass';
+        flt1.frequency.value = 900; flt1.Q.value = 0.3;
+        const g1 = ac.createGain();
+        g1.gain.setValueAtTime(0.001, now); g1.gain.linearRampToValueAtTime(0.05, now + 0.020);
+        src1.connect(flt1); flt1.connect(g1); g1.connect(master);
+        src1.start(now);
         break;
       }
 
@@ -1124,6 +1121,28 @@ document.getElementById('about-close').addEventListener('click', () => {
 /* ══════════════════════════════════════
    PLAY BUTTON
    ══════════════════════════════════════ */
+// Wire continue button
+document.getElementById('continue-btn').addEventListener('click', () => {
+  const save = loadGameSave();
+  if (!save) return;
+  G = {
+    name: save.name, avatarKey: save.avatarKey,
+    avatar: AVATARS[save.avatarKey],
+    level: save.level, score: save.score, hp: save.hp,
+    credits: save.credits, cargo: save.cargo || {},
+    upgrades: save.upgrades || [], upgradeLevels: save.upgradeLevels || {},
+    maxFuel: save.maxFuel || 100,
+    fuel: save.fuel || 100, phase: save.phase || 'launch',
+    phaseStep: 0, over: false, paused: false,
+    startTime: Date.now() - (Date.now() - save.savedAt),
+    _medicalUsed: false,
+  };
+  clearGameSave();
+  startGame(save.name, save.avatarKey, true);
+});
+
+checkContinueBtn();  // show/hide on load
+
 document.getElementById('pbtn').addEventListener('click', () => {
   const name = document.getElementById('pname').value.trim();
   if (!name)       { toast('✏️ Enter your pilot name first!'); return; }
@@ -1134,42 +1153,136 @@ document.getElementById('pbtn').addEventListener('click', () => {
 /* ══════════════════════════════════════
    UPGRADES DATA
    ══════════════════════════════════════ */
+// ── UPGRADE DEFINITIONS ────────────────────────────────────────────
+// Each upgrade can be bought ONCE per level in the 🛒 Shop.
+// G.upgradeLevels[id] = number of times bought across all levels (0 = never).
+// Stats scale: price *1.5 per purchase, duration/radius/uses grow too.
+// Helper: upgradeStat(id, key) returns the current scaled value.
 const UPGRADES_DEF = [
-  { id:'shield',  emoji:'🛡️', name:'Energy Shield',  price:300,
-    desc:'Activate: absorb next hit (30s CD)',
-    duration:0,   cooldown:30*60, phases:['travel','planet','landing','return'], uses:-1 },
-  { id:'cannon2', emoji:'🔫', name:'Double Cannon',  price:450,
-    desc:'Activate: double-fire burst for 5s (15s CD)',
-    duration:5*60, cooldown:15*60, phases:['travel','return'], uses:-1 },
-  { id:'engine2', emoji:'⚡', name:'Ionic Engine',   price:350,
-    desc:'Activate: -60% fuel burn for 8s (20s CD)',
-    duration:8*60, cooldown:20*60, phases:['launch','travel','planet','return','landing'], uses:-1 },
-  { id:'magnet',  emoji:'🧲', name:'Tractor Beam',   price:500,
-    desc:'Activate: attract all resources for 10s (25s CD)',
-    duration:10*60, cooldown:25*60, phases:['travel','planet','return'], uses:-1 },
-  { id:'tank',    emoji:'🔋', name:'Fuel Boost',     price:400,
-    desc:'Activate: instant +30% fuel (2 uses per level)',
-    duration:0,   cooldown:0,    phases:['launch','travel','planet','return','landing'], uses:2 },
-  { id:'radar',   emoji:'📡', name:'Deep Radar',     price:250,
-    desc:'Activate: highlight all targets for 8s (20s CD)',
-    duration:8*60, cooldown:20*60, phases:['travel','planet','return'], uses:-1 },
-  { id:'repair',  emoji:'🔧', name:'Repair Kit',     price:600,
-    desc:'Activate: restore +25% HP (one use)',
-    duration:0,   cooldown:0,    phases:['travel','planet','landing','return'], uses:1 },
-  { id:'medical', emoji:'💉', name:'Medical Kit',    price:500,
-    desc:'Activate: restore +40% HP (one use)',
-    duration:0,   cooldown:0,    phases:['travel','planet','landing','return'], uses:1 },
+  { id:'shield',  emoji:'🛡️', name:'Energy Shield',
+    flavorShort: 'Absorb next hit',
+    flavor: 'Projects an energy barrier that absorbs the next incoming hit. Higher tiers stack multiple charges.',
+    basePrice:300, priceScale:1.6,
+    baseCooldown:30*60, cooldownScale:0.85,   // CD shrinks each tier
+    baseUses:-1,
+    phases:['travel','planet','landing','return'] },
+
+  { id:'cannon2', emoji:'🔫', name:'Double Cannon',
+    flavorShort: 'Double-fire burst',
+    flavor: 'Unleashes a rapid dual-shot burst. Higher tiers extend the fire window and shorten the cooldown.',
+    basePrice:450, priceScale:1.5,
+    baseDuration:5*60, durationScale:1.3,     // active window grows
+    baseCooldown:15*60, cooldownScale:0.85,
+    baseUses:-1,
+    phases:['travel','return'] },
+
+  { id:'engine2', emoji:'⚡', name:'Ionic Engine',
+    flavorShort: '-60% fuel burn',
+    flavor: 'Engages the ion drive, drastically cutting fuel consumption. Each upgrade extends the effect duration.',
+    basePrice:350, priceScale:1.5,
+    baseDuration:8*60, durationScale:1.35,
+    baseCooldown:20*60, cooldownScale:0.85,
+    baseUses:-1,
+    phases:['launch','travel','planet','return','landing'] },
+
+  { id:'magnet',  emoji:'🧲', name:'Tractor Beam',
+    flavorShort: 'Attract resources r=120',
+    flavor: 'Pulls nearby resources toward your ship automatically. Higher tiers increase attraction radius and duration.',
+    basePrice:500, priceScale:1.55,
+    baseDuration:10*60, durationScale:1.3,
+    baseCooldown:25*60, cooldownScale:0.85,
+    baseRadius:120, radiusScale:1.25,         // radius grows
+    baseUses:-1,
+    phases:['travel','planet','return'] },
+
+  { id:'tank',    emoji:'🔋', name:'Fuel Boost',
+    flavorShort: 'Instant +30% fuel',
+    flavor: 'Releases an emergency fuel canister for an instant refill. Each tier adds one extra use per mission.',
+    basePrice:400, priceScale:1.4,
+    baseUses:2, usesScale:1,                  // +1 use per tier
+    phases:['launch','travel','planet','return','landing'] },
+
+  { id:'blastall', emoji:'💥', name:'Blast All',
+    flavorShort: 'Destroy all enemies',
+    flavor: 'Fires an omnidirectional shockwave that obliterates every asteroid, comet and alien — dropping all loot.',
+    basePrice:250, priceScale:1.45,
+    baseUses:1, usesScale:1,
+    phases:['travel','planet','return'] },
+
+  { id:'repair',  emoji:'🔧', name:'Repair Kit',
+    flavorShort: '+25% HP restored',
+    flavor: 'Emergency hull repair that restores ship integrity. Higher tiers restore more HP and grant extra charges.',
+    basePrice:600, priceScale:1.5,
+    baseHeal:25, healScale:10,                // +10% HP per tier
+    baseUses:1, usesScale:1,                  // +1 use per tier
+    phases:['travel','planet','landing','return'] },
+
+  { id:'medical', emoji:'💉', name:'Medical Kit',
+    flavorShort: '+40% HP restored',
+    flavor: 'Advanced med-bay injection for deep hull regeneration. Higher tiers provide greater restoration.',
+    basePrice:500, priceScale:1.5,
+    baseHeal:40, healScale:12,
+    baseUses:1, usesScale:1,
+    phases:['travel','planet','landing','return'] },
 ];
+
+// ── UPGRADE STAT HELPER ─────────────────────────────────────────────
+// tier = how many times this upgrade has been purchased total (0-based for first buy = tier 1)
+function getUpgradeTier(id) {
+  return (G.upgradeLevels && G.upgradeLevels[id]) || 0;
+}
+function calcUpgradePrice(u, tier) {
+  return Math.round(u.basePrice * Math.pow(u.priceScale || 1.5, tier) / 10) * 10;
+}
+function calcUpgradeDuration(u, tier) {
+  if (!u.baseDuration) return 0;
+  return Math.round(u.baseDuration * Math.pow(u.durationScale || 1, tier));
+}
+function calcUpgradeCooldown(u, tier) {
+  if (!u.baseCooldown) return 0;
+  return Math.round(u.baseCooldown * Math.pow(u.cooldownScale || 1, tier));
+}
+function calcUpgradeUses(u, tier) {
+  if (!u.baseUses || u.baseUses === -1) return -1;
+  return u.baseUses + (u.usesScale || 0) * tier;
+}
+function calcUpgradeRadius(u, tier) {
+  if (!u.baseRadius) return 120;
+  return Math.round(u.baseRadius * Math.pow(u.radiusScale || 1, tier));
+}
+function calcUpgradeHeal(u, tier) {
+  if (!u.baseHeal) return 0;
+  return u.baseHeal + (u.healScale || 0) * tier;
+}
+function buildUpgradeDesc(u, tier) {
+  const parts = [];
+  if (u.baseDuration)  parts.push(`Active: ${Math.round(calcUpgradeDuration(u,tier)/60)}s`);
+  if (u.baseCooldown)  parts.push(`CD: ${Math.round(calcUpgradeCooldown(u,tier)/60)}s`);
+  if (u.baseRadius)    parts.push(`Range: ${calcUpgradeRadius(u,tier)}px`);
+  if (u.baseHeal)      parts.push(`Heal: +${calcUpgradeHeal(u,tier)}%`);
+  const uses = calcUpgradeUses(u, tier);
+  if (uses > 0)        parts.push(`Uses: ${uses}×`);
+  return parts.join(' · ') || u.flavorShort;
+}
 
 // Runtime state for each active upgrade
 let upgradeState = {};  // { id: { cooldown, active, uses, timer } }
 
 function initUpgradeStates() {
   upgradeState = {};
-  G.upgrades.forEach(id => {
-    const def = UPGRADES_DEF.find(u => u.id === id);
+  (G.upgrades || []).forEach(id => {
+    const def  = UPGRADES_DEF.find(u => u.id === id);
     if (!def) return;
-    upgradeState[id] = { cooldown: 0, active: false, timer: 0, uses: def.uses };
+    const tier = getUpgradeTier(id);
+    const dur  = calcUpgradeDuration(def, tier);
+    const cd   = calcUpgradeCooldown(def, tier);
+    const uses = calcUpgradeUses(def, tier);
+    upgradeState[id] = {
+      cooldown: 0, active: false, timer: 0,
+      duration: dur,
+      cooldownBase: cd,
+      uses: uses,
+    };
   });
 }
 
@@ -1177,67 +1290,111 @@ function activateUpgrade(id) {
   const def = UPGRADES_DEF.find(u => u.id === id);
   const st  = upgradeState[id];
   if (!def || !st) return;
-  if (st.cooldown > 0) { toast(`⏳ ${def.emoji} on cooldown!`); return; }
+  if (st.cooldown > 0) { toast(`⏳ ${def.emoji} on cooldown! ${Math.ceil(st.cooldown/60)}s`); return; }
   if (st.uses === 0)   { toast(`❌ ${def.emoji} depleted!`);    return; }
 
   // Apply effect
   switch(id) {
     case 'shield':
-      if (G.ship) G.ship.shieldHits = (G.ship.shieldHits || 0) + 1;
-      toast('🛡️ Shield raised — next hit absorbed!');
-      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      st.shieldActive = true;
+      st.cooldown = st.cooldownBase || def.baseCooldown || 0;
+      toast('🛡️ Shield active — absorbs ALL hits for ' + Math.round(st.cooldown/60) + 's!');
+      soundPlay('upgradeOn');
       break;
     case 'cannon2':
-      st.active = true; st.timer = def.duration;
-      toast('🔫 Double Cannon active!');
-      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      st.active = true; st.timer = st.duration || def.baseDuration || 0;
+      st.cooldown = 0;  // cooldown starts AFTER active window ends (set in tickUpgrades)
+      toast('🔫 Double Cannon — ' + Math.round((st.duration||def.baseDuration||0)/60) + 's active!');
+      soundPlay('upgradeOn');
       break;
     case 'engine2':
-      st.active = true; st.timer = def.duration;
-      toast('⚡ Ionic Engine — reduced burn!');
-      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      st.active = true; st.timer = st.duration || def.baseDuration || 0;
+      st.cooldown = 0;
+      toast('⚡ Ionic Engine — ' + Math.round((st.duration||def.baseDuration||0)/60) + 's active!');
+      soundPlay('upgradeOn');
       break;
     case 'magnet':
-      st.active = true; st.timer = def.duration;
-      toast('🧲 Tractor Beam activated!');
-      soundPlay('upgradeOn'); st.cooldown = def.cooldown;
+      st.active = true; st.timer = st.duration || def.baseDuration || 0;
+      st.cooldown = 0;
+      toast('🧲 Tractor Beam — ' + Math.round((st.duration||def.baseDuration||0)/60) + 's active!');
+      soundPlay('upgradeOn');
       break;
     case 'tank':
       G.fuel = Math.min(G.maxFuel, (G.fuel||0) + 30);
       floatText && floatText(canvas.width/2, canvas.height/2, '+30% ⛽', '#5bc8ff');
       toast('🔋 Fuel Boost — +30% fuel!');
+      soundPlay('upgradeOn');
       updateHUD();
       break;
-    case 'radar':
-      st.active = true; st.timer = def.duration;
-      toast('📡 Deep Radar — scanning…');
-      st.cooldown = def.cooldown;
+    case 'blastall':
+      // Destroy ALL asteroids, aliens, comets — drop all resources
+      {
+        let destroyed = 0;
+        asteroids.slice().forEach(a => {
+          if (a.resource) spawnDrop(a.x, a.y, a.resource);
+          else if (Math.random() < 0.4) spawnDrop(a.x, a.y, pickSpaceResource());
+          spawnParticles(a.x, a.y, '#ffcc02', 10, 3);
+          destroyed++;
+        });
+        asteroids.length = 0;
+        aliens.slice().forEach(a => {
+          spawnParticles(a.x, a.y, '#cc80ff', 10, 3);
+          G.score += 100; destroyed++;
+        });
+        aliens.length = 0;
+        alienBullets.length = 0;
+        // Spawn blast wave visual from ship
+        if (G.ship) {
+          for (let _bi=0; _bi<30; _bi++) spawnParticles(G.ship.x, G.ship.y, '#ffffaa', 3, 6+Math.random()*4);
+        }
+        floatText && floatText(canvas.width/2, canvas.height/3, `💥 BLAST ALL! ×${destroyed}`, '#ffcc02');
+        toast(`💥 Blast All! ${destroyed} enemies destroyed!`);
+        soundPlay('explosion');
+        updateHUD();
+      }
       break;
-    case 'repair':
-      G.hp = Math.min(100, (G.hp||0) + 25);
-      floatText && floatText(canvas.width/2, canvas.height/2, '+25% ❤️', '#ff6680');
-      toast('🔧 Repair Kit — +25% HP!');
+    case 'repair': {
+      const repHeal = calcUpgradeHeal(def, getUpgradeTier(id));
+      G.hp = Math.min(100, (G.hp||0) + repHeal);
+      floatText && floatText(canvas.width/2, canvas.height/2, '+'+repHeal+'% ❤️', '#ff6680');
+      toast('🔧 Repair Kit — +'+repHeal+'% HP!');
+      soundPlay('upgradeOn');
       updateHUD();
       break;
-    case 'medical':
-      G.hp = Math.min(100, (G.hp||0) + 40);
-      floatText && floatText(canvas.width/2, canvas.height/2, '+40% ❤️', '#ff6680');
-      toast('💉 Medical Kit — +40% HP!');
+    }
+    case 'medical': {
+      const medHeal = calcUpgradeHeal(def, getUpgradeTier(id));
+      G.hp = Math.min(100, (G.hp||0) + medHeal);
+      floatText && floatText(canvas.width/2, canvas.height/2, '+'+medHeal+'% ❤️', '#ff6680');
+      toast('💉 Medical Kit — +'+medHeal+'% HP!');
+      soundPlay('upgradeOn');
       updateHUD();
       break;
+    }
   }
   if (st.uses > 0) st.uses--;
-  if (st.uses === 0 && def.cooldown === 0) st.cooldown = 1; // mark spent
+  if (st.uses === 0 && !def.baseCooldown) st.cooldown = 1; // mark spent visually
 }
 
 function tickUpgrades() {
-  G.upgrades.forEach(id => {
-    const st = upgradeState[id];
+  (G.upgrades || []).forEach(id => {
+    const def = UPGRADES_DEF.find(u => u.id === id);
+    const st  = upgradeState[id];
     if (!st) return;
-    if (st.cooldown > 0) st.cooldown--;
+    if (st.cooldown > 0) {
+      st.cooldown--;
+      // Shield: deactivate when cooldown expires
+      if (id === 'shield' && st.cooldown <= 0) {
+        st.shieldActive = false;
+      }
+    }
     if (st.active) {
       st.timer--;
-      if (st.timer <= 0) { st.active = false; st.timer = 0; }
+      if (st.timer <= 0) {
+        st.active = false; st.timer = 0;
+        const cd = st.cooldownBase || (def && def.baseCooldown) || 0;
+        if (cd > 0) st.cooldown = cd;
+      }
     }
   });
 }
@@ -1246,31 +1403,29 @@ function tickUpgrades() {
 function renderUpgradeBar() {
   const bar = document.getElementById('upgrade-bar');
   if (!bar) return;
-  const phase    = G.phase || '';
-  const owned    = G.upgrades || [];
-  const allDefs  = UPGRADES_DEF;
 
-  // Rebuild if slot count changed
-  if (bar.childElementCount !== allDefs.length) {
-    bar.innerHTML = '';
-    allDefs.forEach((def, idx) => {
-      const btn = document.createElement('div');
-      btn.className = 'upg-btn locked';
-      btn.dataset.id = def.id;
-      btn.innerHTML = `<span class="upg-emoji">${def.emoji}</span><span class="upg-label" id="uplbl-${def.id}">🔒</span>`;
-      btn.addEventListener('click', () => {
-        if (owned.includes(def.id)) activateUpgrade(def.id);
-      });
-      btn.addEventListener('touchend', e => {
-        e.stopPropagation();
-        if (owned.includes(def.id)) activateUpgrade(def.id);
-      }, { passive:true });
-      bar.appendChild(btn);
+  // Always rebuild DOM buttons (cheap, fixes stale-closure bug)
+  bar.innerHTML = '';
+  UPGRADES_DEF.forEach(def => {
+    const btn = document.createElement('div');
+    btn.className = 'upg-btn';  // class set properly in update loop below
+    btn.dataset.id = def.id;
+    btn.innerHTML = `<span class="upg-emoji">${def.emoji}</span><span class="upg-label" id="uplbl-${def.id}">🔒</span>`;
+    // Use pointerdown — fires for both mouse and touch, respects CSS pointer-events
+    btn.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      if ((G.upgrades || []).includes(def.id)) {
+        activateUpgrade(def.id);
+      }
     });
-  }
+    bar.appendChild(btn);
+  });
 
-  // Update each slot
-  allDefs.forEach((def, idx) => {
+  // Update visual state for each slot
+  const phase = G.phase || '';
+  const owned = G.upgrades || [];
+  UPGRADES_DEF.forEach(def => {
     const purchased = owned.includes(def.id);
     const st  = upgradeState[def.id] || {};
     const btn = bar.querySelector(`[data-id="${def.id}"]`);
@@ -1282,17 +1437,17 @@ function renderUpgradeBar() {
     const isOn    = st.active;
 
     if (!purchased) {
-      btn.className = 'upg-btn locked';
+      btn.className = 'upg-btn';  // class set properly in update loop below
       if (lbl) lbl.textContent = '🔒';
     } else {
       btn.className = 'upg-btn' +
         (!inPhase ? ' inactive-phase' : spent ? ' spent' : onCD ? ' on-cd' : isOn ? ' active' : '');
       if (lbl) {
-        if (spent)         lbl.textContent = 'USED';
-        else if (onCD)     lbl.textContent = Math.ceil(st.cooldown/60)+'s';
-        else if (isOn)     lbl.textContent = '●ON';
-        else if (def.uses > 0) lbl.textContent = st.uses+'×';
-        else               lbl.textContent = 'TAP';
+        if (spent)              lbl.textContent = 'USED';
+        else if (onCD)          lbl.textContent = Math.ceil(st.cooldown/60)+'s';
+        else if (isOn)          lbl.textContent = '●ON';
+        else if (st.uses > 0)   lbl.textContent = st.uses+'×';  // fixed: st.uses not def.uses
+        else                    lbl.textContent = 'TAP';
       }
     }
   });
@@ -1351,20 +1506,22 @@ function startGame(name, avatarKey, continuing) {
   document.getElementById('gs').classList.remove('hidden');
 
   if (!continuing) {
-    // Fresh game — wipe all persisted upgrades
+    // Fresh game — wipe save + upgrades
+    clearGameSave();
     saveUpgrades([]);
     G = {
       name, avatarKey,
       avatar:    AVATARS[avatarKey],
       level:     1,
       score:     0,
-      hp:        100,   // hull integrity 0-100%
+      hp:        100,
       over:      false,
       paused:    false,
       startTime: Date.now(),
       credits:   0,
       cargo:     {},
-      upgrades:  [],   // start with nothing
+      upgrades:  [],
+      upgradeLevels: {},
       maxFuel:   100,
       fuel:      100,
       phase:     'launch',
@@ -1504,11 +1661,10 @@ function makeShip() {
 
 // Apply all upgrade effects to G state at phase start
 function applyUpgrades() {
-  // Tank is now an active ability (manual fuel boost) — base maxFuel stays 100
   G.maxFuel = 100;
   G.fuel = Math.min(G.fuel || 100, G.maxFuel);
-  // Init/refresh upgrade states (preserves cooldowns across phases)
   initUpgradeStates();
+  renderUpgradeBar();
 }
 
 /* ══════════════════════════════════════
@@ -1568,6 +1724,7 @@ function drawBullets() {
    PARTICLES
    ══════════════════════════════════════ */
 const particles = [];
+let _thrusterTick = 0; // contatore globale uniforme per il suono thruster
 function spawnParticles(x, y, color, count = 8, speed = 2.5) {
   for (let i = 0; i < count; i++) {
     const angle = rnd(0, Math.PI * 2);
@@ -1585,10 +1742,12 @@ function updateParticles() {
 }
 function drawParticles() {
   particles.forEach(p => {
+    ctx.save();
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r * (p.life / p.maxLife), 0, Math.PI*2);
     ctx.fillStyle = p.color + Math.floor((p.life/p.maxLife)*255).toString(16).padStart(2,'0');
     ctx.fill();
+    ctx.restore();
   });
 }
 
@@ -1633,12 +1792,13 @@ function drawShip(ship) {
   ctx.translate(ship.x, ship.y);
   ctx.rotate(ship.angle + ROCKET_OFFSET);
 
-  // Flash only immediately after collision (invincible > 60 = just got hit)
-  // Ship becomes solid after the flash period — always 100% when no recent hit
-  if (ship.invincible > 60) {
-    ctx.globalAlpha = 0.25 + Math.abs(Math.sin(ship.invincible * 0.45)) * 0.75;
+  // Flicker ONLY during invincibility window after a hit.
+  // Fast strobe at first, fades to solid as timer runs down.
+  if (ship.invincible > 0) {
+    const flickerSpeed = ship.invincible > 80 ? 0.55 : 0.25; // fast then slow
+    ctx.globalAlpha = 0.18 + Math.abs(Math.sin(ship.invincible * flickerSpeed)) * 0.82;
   }
-  // invincible 1-60: fully visible but protected (no opacity effect)
+  // invincible === 0: always 100% opaque
 
   // Ship — always 🚀
   ctx.font = `${ship.size * 2}px serif`;
@@ -1646,14 +1806,36 @@ function drawShip(ship) {
   ctx.textBaseline = 'middle';
   ctx.fillText('🚀', 0, 0);
 
-  // Shield glow
-  if (ship.shieldHits > 0) {
+  // Shield glow — pulsing energy ring while active
+  const _shSt = upgradeState['shield'];
+  if (_shSt && _shSt.shieldActive) {
+    const _pulse = 0.55 + Math.sin(Date.now() * 0.006) * 0.35;
+    const _r1 = ship.size + 10, _r2 = ship.size + 18;
+    // Outer ring
     ctx.beginPath();
-    ctx.arc(0, 0, ship.size + 8, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(91,200,255,0.55)';
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 12; ctx.shadowColor = '#5bc8ff';
+    ctx.arc(0, 0, _r2, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(91,200,255,${_pulse * 0.4})`;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 18; ctx.shadowColor = '#5bc8ff';
     ctx.stroke();
+    // Inner solid ring
+    ctx.beginPath();
+    ctx.arc(0, 0, _r1, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(91,200,255,${_pulse})`;
+    ctx.lineWidth = 3.5;
+    ctx.shadowBlur = 22; ctx.shadowColor = '#5bc8ff';
+    ctx.stroke();
+    // Hex segment arcs (6-segment look)
+    for (let _i = 0; _i < 6; _i++) {
+      const _a = (_i / 6) * Math.PI * 2 + Date.now() * 0.001;
+      ctx.beginPath();
+      ctx.arc(0, 0, _r1 + 4, _a, _a + Math.PI/4);
+      ctx.strokeStyle = `rgba(180,240,255,${_pulse * 0.6})`;
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+    }
+    //PPCLAUDE:ctx.shadowBlur = 0;
   }
   // Cryo shield
   if (ship.cryoActive > 0) {
@@ -1665,6 +1847,7 @@ function drawShip(ship) {
     ctx.shadowBlur = 16; ctx.shadowColor = '#64dcff';
     ctx.stroke();
     ctx.setLineDash([]);
+    ctx.shadowBlur = 0;
   }
   ctx.restore();
 }
@@ -1733,7 +1916,7 @@ function pickSpaceResource() {
   if (r < 0.76) return 'xenite';    // 💜 uncommon
   if (r < 0.87) return 'nuclear';   // ☢️ rare
   if (r < 0.94) return 'diamond';   // 💎 rare
-  return 'heart';                    // ❤️ very rare — heals HP
+  return 'heart';                   // ❤️ very rare — heals HP
 }
 function initAsteroids(count) {
   asteroids.length = 0;
@@ -1775,11 +1958,9 @@ function spawnDrop(x, y, type) {
     type, life: 1000, bob: rnd(0, Math.PI*2) });
 }
 function updateDrops(ship) {
-  const radarSt   = upgradeState['radar'];
   const magnetSt  = upgradeState['magnet'];
-  const hasRadar  = radarSt  && radarSt.active;
   const hasMagnet = magnetSt && magnetSt.active;
-  const magnetR   = hasMagnet ? 120 : 36;
+  const magnetR   = hasMagnet ? (calcUpgradeRadius(UPGRADES_DEF.find(u=>u.id==='magnet'), getUpgradeTier('magnet'))) : 36;
 
   for (let i = drops.length - 1; i >= 0; i--) {
     const d = drops[i];
@@ -1826,7 +2007,7 @@ function collectResource(type, x, y) {
   } else if (r.effect === 'hp_half') {
     // 💜 Xenite → heal +7% HP (half of ❤️)
     G.hp = Math.min(100, (G.hp || 0) + 7.5);
-    floatText(x, y, '+7% 💜❤️', '#cc80ff');
+    floatText(x, y, '+7% 💜', '#cc80ff');
   } else {
     floatText(x, y, `+${r.emoji}`, '#ffcc02');
   }
@@ -1917,11 +2098,13 @@ function drawSatellites() {
   satellites.forEach(s => {
     drawEmoji('🛰️', s.x, s.y, s.size * 2);
     // warning ring
+    ctx.save();
     ctx.beginPath();
     ctx.arc(s.x, s.y, s.size + 8, 0, Math.PI*2);
     ctx.strokeStyle = 'rgba(255,204,2,0.3)';
     ctx.lineWidth = 2; ctx.setLineDash([4,4]);
-    ctx.stroke(); ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.restore();
   });
 }
 
@@ -2010,11 +2193,13 @@ function hitShip(ship, source) {
   if (ship.invincible > 0) return;
   if (ship.cryoActive > 0 && source === 'alien bullet') return;
 
-  if (ship.shieldHits > 0) {
-    ship.shieldHits--;
-    spawnParticles(ship.x, ship.y, '#5bc8ff', 10);
-    floatText(ship.x, ship.y - 30, '🛡️ Shield hit!', '#5bc8ff');
+  // Shield: active the whole cooldown window (absorbs ALL hits)
+  const _shieldSt = upgradeState['shield'];
+  if (_shieldSt && _shieldSt.shieldActive) {
+    spawnParticles(ship.x, ship.y, '#5bc8ff', 14);
+    floatText(ship.x, ship.y - 30, '🛡️ Shielded!', '#5bc8ff');
     toast('🛡️ Shield absorbed the hit!');
+    soundPlay('hit');  // muffled confirm sound
     return;
   }
 
@@ -2082,27 +2267,38 @@ function initLaunch() {
   };
   const terrain = generateTerrain(canvas.width, canvas.height);
 
-  // Launch pad: at centre, but must NOT be on a lake
-  // If centre is over a lake, scan outward to find nearest solid ground
-  const ctrIdx = Math.round(canvas.width / 2);
-  const isOnLake = (x) => terrain.lakeZones.some(
-    lz => x >= lz.x && x <= lz.x + lz.w
-  );
-  let padX = Math.round(canvas.width / 2);
-  if (isOnLake(padX)) {
-    // Scan outward left/right for first non-lake x
-    let found = false;
-    for (let d = 1; d < canvas.width / 2; d++) {
-      if (!isOnLake(padX - d)) { padX = padX - d; found = true; break; }
-      if (!isOnLake(padX + d)) { padX = padX + d; found = true; break; }
+  // Launch pad: highest safe flat zone (same logic as planet/landing pads)
+  const validLaunchFlats = [...terrain.flatZones]
+    .filter(fz => {
+      if (fz.w < 35) return false;
+      if (fz.x < 30 || fz.x + fz.w > canvas.width - 30) return false; // avoid edges
+      return !terrain.lakeZones.some(lz => fz.x < lz.x + lz.w && fz.x + fz.w > lz.x);
+    })
+    .sort((a, b) => a.y - b.y);  // lowest Y = highest on screen = hilltop
+
+  let bestPadX, bestPadY;
+  if (validLaunchFlats.length > 0) {
+    const best = validLaunchFlats[0];
+    bestPadX = Math.round(best.x + best.w / 2);
+    bestPadY = best.y;
+  } else {
+    // Fallback: scan for terrain minimum not in lake
+    bestPadX = Math.round(canvas.width / 2);
+    bestPadY = terrain.points[bestPadX] || (canvas.height * 0.6);
+    for (let x = 60; x < canvas.width - 60; x++) {
+      const py = terrain.points[x];
+      const inLake = terrain.lakeZones.some(lz => x >= lz.x && x <= lz.x + lz.w);
+      if (!inLake && py < bestPadY) { bestPadY = py; bestPadX = x; }
     }
-    if (!found) padX = Math.round(canvas.width / 2); // fallback
   }
-  const padTerrY = terrain.points[clamp(padX, 0, terrain.points.length - 1)];
+
+  const PAD_ELEV = 24;
   const launchPad = {
-    x: padX,
-    y: padTerrY,
-    w: 120,
+    x: bestPadX,
+    y: bestPadY - PAD_ELEV,
+    groundY: bestPadY,
+    w: Math.max(100, Math.min(validLaunchFlats.length > 0 ? validLaunchFlats[0].w - 4 : 120, 130)),
+    h: 8,
     active: true,
   };
 
@@ -2115,11 +2311,10 @@ function initLaunch() {
 
   G.ship = makeShip();
   applyUpgrades();
-  G.ship.x  = launchPad.x;
-  // Sit exactly on pad surface: pad.y IS the terrain surface, ship bottom = size*0.58
-  G.ship.y  = launchPad.y - G.ship.size * 0.58;
-  G.ship.vx = 0; G.ship.vy = 0;
-  G.ship.angle = -Math.PI / 2; // nose up
+  G.ship.x     = launchPad.x;
+  G.ship.y     = launchPad.y - G.ship.size * 0.58;
+  G.ship.vx    = 0; G.ship.vy = 0;
+  G.ship.angle = -Math.PI / 2;
   G.ship.onGround = true;
 
   setPhaseBanner('🌍 PHASE 1 — LAUNCH FROM EARTH');
@@ -2149,11 +2344,11 @@ function updateLaunch() {
       ship.vy += Math.sin(ship.angle) * 0.09;
       spawnParticles(ship.x - Math.cos(ship.angle)*18, ship.y - Math.sin(ship.angle)*18, '#ff9d3d', 3, 1.5);
       launchData.launched = true;
-      if (launchData.timer % 8 === 0) soundPlay('thruster');
+      if (++_thrusterTick % 8 === 0) soundPlay('thruster');
     }
     ship.vy += 0.025;
   } else {
-    ship.y = surfaceY - SBOT;   // snap to correct surface
+    ship.y = surfaceY - SBOT;
     ship.vy = 0;
     if (isLeft())  ship.angle -= SHIP_ROTATE;
     if (isRight()) ship.angle += SHIP_ROTATE;
@@ -2162,7 +2357,7 @@ function updateLaunch() {
       ship.vy += Math.sin(ship.angle) * 0.09 * 1.4;
       spawnParticles(ship.x - Math.cos(ship.angle)*16, ship.y - Math.sin(ship.angle)*16, '#ff9d3d', 3, 1.5);
       launchData.launched = true;
-      if (launchData.timer % 8 === 0) soundPlay('thruster');
+      if (++_thrusterTick % 8 === 0) soundPlay('thruster');
     } else {
       ship.vx *= 0.85;
     }
@@ -2232,18 +2427,57 @@ function drawLaunch() {
   for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
   ctx.strokeStyle = pal.ground2; ctx.lineWidth = 2; ctx.stroke();
 
-  // Launch pad
-  const pad = launchData.launchPad;
-  const px = pad.x - pad.w / 2;
-  ctx.save();
-  ctx.fillStyle = '#223'; ctx.fillRect(px, pad.y, pad.w, 10);
-  const glow = ctx.createLinearGradient(px, 0, px + pad.w, 0);
-  glow.addColorStop(0, '#1a8aff'); glow.addColorStop(0.5, '#80d4ff'); glow.addColorStop(1, '#1a8aff');
-  ctx.fillStyle = glow; ctx.fillRect(px, pad.y, pad.w, 4);
-  ctx.fillStyle = '#ffaa00'; ctx.fillRect(px - 2, pad.y, 5, 12); ctx.fillRect(px + pad.w - 3, pad.y, 5, 12);
-  ctx.fillStyle = 'rgba(80,180,255,0.22)';
-  ctx.fillRect(px, pad.y - 30, pad.w, 30);
-  ctx.restore();
+  // Launch pad — same visual style as landing pad
+  {
+    const pad  = launchData.launchPad;
+    const px   = pad.x - pad.w / 2;
+    const legTop  = pad.y + (pad.h || 8);
+    const legBot  = pad.groundY || terrain.points[clamp(Math.round(pad.x), 0, terrain.points.length-1)];
+    const blink   = Math.floor(Date.now() / 280) % 2 === 0;
+
+    // Support legs
+    ctx.save();
+    ctx.strokeStyle = '#3a5580'; ctx.lineWidth = 3;
+    [pad.x - pad.w/2 + 14, pad.x + pad.w/2 - 14].forEach(lx => {
+      ctx.beginPath(); ctx.moveTo(lx, legTop); ctx.lineTo(lx, legBot); ctx.stroke();
+    });
+    // Cross-brace
+    ctx.beginPath();
+    ctx.moveTo(pad.x - pad.w/2 + 14, legTop + (legBot - legTop) * 0.5);
+    ctx.lineTo(pad.x + pad.w/2 - 14, legTop + (legBot - legTop) * 0.5);
+    ctx.strokeStyle = '#2a4470'; ctx.lineWidth = 2; ctx.stroke();
+
+    // Deck
+    ctx.save();
+    ctx.shadowBlur = 24; ctx.shadowColor = '#5bc8ff';
+    ctx.fillStyle = '#1a2d4a';
+    ctx.fillRect(px - 3, pad.y + 2, pad.w + 6, (pad.h||8) + 1);
+    ctx.fillStyle = '#5bc8ff';
+    ctx.fillRect(px, pad.y, pad.w, pad.h || 8);
+    ctx.restore();
+
+    // Blinking lights
+    ctx.save();
+    for (let i = 0; i <= 4; i++) {
+      const lx = pad.x - pad.w/2 + i * (pad.w / 4);
+      ctx.beginPath(); ctx.arc(lx, pad.y - 4, 4, 0, Math.PI*2);
+      ctx.fillStyle = blink ? '#ffdd00' : '#774400';
+      ctx.shadowBlur = blink ? 12 : 0; ctx.shadowColor = '#ffdd00';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Vertical guide line + angle tolerance
+    ctx.strokeStyle = 'rgba(91,200,255,0.15)';
+    ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x, 80); ctx.stroke();
+    const guideH = 70, tolW = Math.tan(10*Math.PI/180)*guideH;
+    ctx.strokeStyle = 'rgba(255,200,0,0.15)';
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x - tolW, pad.y - guideH); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.x, pad.y); ctx.lineTo(pad.x + tolW, pad.y - guideH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
 
   // Target planet hint top
   drawEmoji('🌑', canvas.width / 2, 32, 30);
@@ -2287,7 +2521,7 @@ function initTravel(isReturn) {
 function updateTravel() {
   if (G.paused) return;
   const ship = G.ship;
-  travelData.timer+=0.2; //PP: claude travelData.timer++;
+  travelData.timer+=0.2;
 
   // Ship physics — costanti globali uniformi
   if (isLeft())  ship.angle -= SHIP_ROTATE;
@@ -2298,6 +2532,7 @@ function updateTravel() {
     const nx = ship.x - Math.cos(ship.angle) * 22;
     const ny = ship.y - Math.sin(ship.angle) * 22;
     spawnParticles(nx, ny, '#ff9d3d', 2, 1.2);
+    if (++_thrusterTick % 8 === 0) soundPlay('thruster');
   }
   if (isDown()) { ship.vx *= 0.96; ship.vy *= 0.96; }
 
@@ -2607,11 +2842,20 @@ function initPlanet() {
     .slice(0, 3);
 
   // Exactly 1 refuel pad — highest safe flat zone
-  sortedFlats.slice(0, 1).forEach(fz => {
+  // Ensure at least one refuel pad exists
+  const padFlats = sortedFlats.length > 0 ? sortedFlats.slice(0, 1) : [{
+    x: canvas.width * 0.5 - 65,
+    y: planetData.terrain.points[Math.round(canvas.width * 0.5)] || (canvas.height * 0.6),
+    w: 130,
+  }];
+  padFlats.forEach(fz => {
+    const groundY = fz.y;
     planetData.refuelPads.push({
       x: fz.x + fz.w / 2,
-      y: fz.y - 20,   // elevated 20px above terrain surface
-      w: Math.max(100, Math.min(fz.w - 4, 130)),  // min 100px
+      y: groundY - 24,
+      h: 8,
+      groundY: groundY,
+      w: Math.max(100, Math.min(fz.w - 4, 130)),
       active: true,
     });
   });
@@ -2642,6 +2886,8 @@ function initPlanet() {
   G.ship.vx = 0; G.ship.vy = 0;
   G.ship.angle = -Math.PI / 2;
   G.ship.onGround = false;
+  G.ship.frozen = true;   // suspended until first input
+  G.ship.frozen = true;   // suspended until first input
 
   setPhaseBanner(`🌍 PHASE 4 — ${pal.name.toUpperCase()} · RESOURCE EXTRACTION`);
   toast(`🌍 Welcome to ${pal.name}! Collect ${quota} resources.`);
@@ -2649,16 +2895,33 @@ function initPlanet() {
 
 function updatePlanet() {
   if (G.paused) return;
+  // Freeze ship until first input
+  if (G._waitingFirstInput) {
+    const anyInput = isUp() || isDown() || isLeft() || isRight() || isFire();
+    if (!anyInput) {
+      // Draw is still running; just suppress physics
+      updateFloatTexts();
+      return;
+    }
+    G._waitingFirstInput = false;
+  }
   planetData.timer++;
   const ship = G.ship;
   const terrain = planetData.terrain;
 
-  //PP:clude const ACCEL  = 0.160; 
-  //PP:clude const ROTATE = 0.048; 
-  //PP:clude const DRAG   = 0.982; 
-  //PP:clude const GRAV   = 0.060; 
   // Costanti globali uniformi — solo GRAV rimane locale (casuale per pianeta)
   const GRAV = planetData.GRAV || 0.04;
+
+  // Frozen: hover in place until first input
+  if (G.shipFrozen) {
+    if (isUp() || isDown() || isLeft() || isRight() || isFire()) {
+      G.shipFrozen = false;
+    } else {
+      ship.vx = 0; ship.vy = 0;
+      updateParticles(); updateFloatTexts(); tickUpgrades();
+      return;
+    }
+  }
 
   // Get terrain height at ship x
   const ix = Math.round(clamp(ship.x, 0, terrain.points.length - 1));
@@ -2675,6 +2938,16 @@ function updatePlanet() {
   const onGround = ship.y + SHIP_BOTTOM >= surfaceY;
   ship.onGround  = false;
 
+  // Unfreeze on first player input
+  if (G.ship.frozen && (isLeft()||isRight()||isUp()||isDown()||isFire())) {
+    G.ship.frozen = false;
+  }
+  if (G.ship.frozen) {
+    // Ship hangs motionless — skip all physics
+    updateParticles(); updateFloatTexts(); tickUpgrades();
+    return;
+  }
+
   // Gentler controls on planet for better playability
   const P_ROT = 0.028;
   if (isLeft())  ship.angle -= P_ROT;
@@ -2684,6 +2957,7 @@ function updatePlanet() {
     const boost = onGround ? 1.6 : 1.0;
     ship.vx += Math.cos(ship.angle) * 0.08 * boost;
     ship.vy += Math.sin(ship.angle) * 0.08 * boost;
+    if (++_thrusterTick % 8 === 0) soundPlay('thruster');
     spawnParticles(ship.x - Math.cos(ship.angle)*18, ship.y - Math.sin(ship.angle)*18, '#ff9d3d', 2, 1.2);
   }
 
@@ -2714,6 +2988,7 @@ function updatePlanet() {
         floatText(ship.x, ship.y - 30, `⚠️ Tilt! -20% HP`, '#ff9d3d');
         soundPlay('hit');
         updateHUD();
+        if ((G.hp||0) <= 30) soundPlay('hpAlarm');
         if (G.hp <= 0) { triggerGameOver('💥 Tilted crash on pad!'); return; }
         ship.invincible = 60;
       } else if (goodAngle) {
@@ -2724,11 +2999,19 @@ function updatePlanet() {
       planetData.refuelTimer++;
       planetData._groundDmgLock = false;
       if (goodAngle) {
-        G.fuel = Math.min(G.maxFuel, G.fuel + 0.04);   // refuel
-        G.hp   = Math.min(100, (G.hp || 0) + 0.008);   // slow HP regen on pad
+        G.fuel = Math.min(G.maxFuel, G.fuel + 0.04);
+        G.hp   = Math.min(100, (G.hp || 0) + 0.025);
+        // Auto-align to vertical while docked (only if not thrusting)
+        if (!isUp()) {
+          ship.angle = ship.angle + (-Math.PI/2 - ship.angle) * 0.08;
+          ship.vx = 0; ship.vy = 0;
+        } else {
+          // Thrust while docked: allow liftoff by not zeroing velocity
+          ship.vy -= 0.15; // piccolo boost verso l'alto per staccarsi
+        }
         updateHUD();
         if (planetData.refuelTimer % 180 === 0) {
-          floatText(ship.x, ship.y - 30, '⛽ +Fuel  ❤️ +HP', '#50e8a0');
+          floatText(ship.x, ship.y - 30, `⛽ +Fuel  ❤️ ${Math.round(G.hp)}% HP`, '#50e8a0');
           soundPlay('refuel');
         }
       } else {
@@ -2769,12 +3052,18 @@ function updatePlanet() {
   // Bob resources
   planetData.resources.forEach(r => { r.bob += 0.05; });
 
-  // Collect resources
+  // Collect resources (with magnet attraction)
   const pMagSt    = upgradeState['magnet'];
   const hasMagnet = pMagSt && pMagSt.active;
-  const collectR  = hasMagnet ? 120 : 42;
+  const collectR  = hasMagnet ? (calcUpgradeRadius(UPGRADES_DEF.find(u=>u.id==='magnet'), getUpgradeTier('magnet'))) : 42;
   planetData.resources.forEach(r => {
-    if (!r.collected && dist(ship, r) < collectR) {
+    if (r.collected) return;
+    if (hasMagnet) {
+      const dx = ship.x - r.x, dy = ship.y - r.y;
+      const dd = Math.hypot(dx, dy);
+      if (dd < collectR * 1.8 && dd > 1) { r.x += dx/dd * 2.2; r.y += dy/dd * 2.2; }
+    }
+    if (dist(ship, r) < collectR) {
       r.collected = true;
       planetData.collected++;
       collectResource(r.type, r.x, r.y);
@@ -2894,8 +3183,6 @@ function drawPlanet() {
 
   // Refuel pads
   planetData.refuelPads.forEach(pad => {
-    const px = pad.x - pad.w/2;
-    const py = pad.y;
 
     // Speed indicator near the planet refuel pad (shows landing approach speed)
     if (G.ship) {
@@ -2906,23 +3193,26 @@ function drawPlanet() {
       const pColor    = pIsGreen ? '#50e8a0' : pIsYellow ? '#ffcc02' : '#ff4444';
       const pRatio    = Math.min(1, pSpeed / pMaxDisp);
       const indW = Math.min(pad.w + 10, 110);
-      const indX = pad.x, indY = py - 46;
+      const indX = pad.x, indY = pad.y - 46;
       ctx.save();
       ctx.fillStyle = 'rgba(0,0,0,0.55)';
       roundRect(ctx, indX - indW/2 - 6, indY - 16, indW + 12, 30, 7); ctx.fill();
       ctx.fillStyle = 'rgba(255,255,255,0.08)';
       roundRect(ctx, indX - indW/2, indY - 8, indW, 7, 4); ctx.fill();
       if (pIsGreen) { ctx.shadowBlur = 6; ctx.shadowColor = '#50e8a0'; }
+      else { ctx.shadowBlur = 0; }
       ctx.fillStyle = pColor;
       roundRect(ctx, indX - indW/2, indY - 8, indW * pRatio, 7, 4); ctx.fill();
       ctx.shadowBlur = 0;
       // mini lights
       const tlX3 = indX + indW/2 + 10;
       [{y:indY-10,on:!pIsGreen&&!pIsYellow,c:'#ff2222'},{y:indY-4,on:pIsYellow,c:'#ffcc02'},{y:indY+2,on:pIsGreen,c:'#50e8a0'}].forEach(lt => {
+        ctx.save();
         ctx.beginPath(); ctx.arc(tlX3, lt.y, 3.5, 0, Math.PI*2);
         ctx.fillStyle = lt.on ? lt.c : 'rgba(255,255,255,0.07)';
         if (lt.on) { ctx.shadowBlur = 7; ctx.shadowColor = lt.c; }
-        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fill();
+        ctx.restore();
       });
       ctx.font = 'bold 7px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
       ctx.fillStyle = pColor;
@@ -2930,53 +3220,75 @@ function drawPlanet() {
       ctx.restore();
     }
 
-    // Pad base
-    ctx.save();
-    ctx.fillStyle = '#334';
-    ctx.fillRect(px, py, pad.w, 10);
-    // Glowing top strip
-    const padGrad = ctx.createLinearGradient(px, py, px + pad.w, py);
-    padGrad.addColorStop(0, 'rgba(91,200,255,0.3)');
-    padGrad.addColorStop(0.5, 'rgba(91,200,255,0.9)');
-    padGrad.addColorStop(1, 'rgba(91,200,255,0.3)');
-    ctx.fillStyle = padGrad;
-    ctx.fillRect(px, py, pad.w, 3);
-    // Refuel icon + flashing lights
-    const blink = Math.floor(t / 20) % 2 === 0;
-    drawEmoji('⛽', pad.x, py - 14, 16);
-    ctx.fillStyle = 'rgba(80,232,160,0.8)';
-    ctx.font = 'bold 7px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('REFUEL', pad.x, py - 26);
-    if (blink) {
-      ctx.beginPath(); ctx.arc(px + 6, py + 5, 3, 0, Math.PI*2);
-      ctx.fillStyle = '#50e8a0'; ctx.fill();
-      ctx.beginPath(); ctx.arc(px + pad.w - 6, py + 5, 3, 0, Math.PI*2);
-      ctx.fillStyle = '#50e8a0'; ctx.fill();
+    // ── Planet refuel pad — identical visual to Earth landing pad ──
+    {
+      const padX = pad.x;
+      const padY = pad.y;
+      const padH = pad.h || 8;
+      const padW = pad.w;
+      const legTop = padY + padH;
+      const legBot = pad.groundY || terrain.points[clamp(Math.round(padX), 0, terrain.points.length-1)];
+      const blinkP = Math.floor(Date.now() / 280) % 2 === 0;
+
+      // Support legs (same as landing pad)
+      ctx.strokeStyle = '#3a5580'; ctx.lineWidth = 3;
+      [padX - padW/2 + 10, padX + padW/2 - 10].forEach(lx => {
+        ctx.beginPath(); ctx.moveTo(lx, legTop); ctx.lineTo(lx, legBot); ctx.stroke();
+      });
+      // Cross-brace
+      ctx.beginPath();
+      ctx.moveTo(padX - padW/2 + 10, legTop + (legBot - legTop) * 0.5);
+      ctx.lineTo(padX + padW/2 - 10, legTop + (legBot - legTop) * 0.5);
+      ctx.strokeStyle = '#2a4470'; ctx.lineWidth = 2; ctx.stroke();
+
+      // Deck — green tint to distinguish from landing (blue)
+      ctx.save();
+      ctx.shadowBlur = 22; ctx.shadowColor = '#50e8a0';
+      ctx.fillStyle = '#1a3028';
+      ctx.fillRect(padX - padW/2 - 3, padY + 2, padW + 6, padH + 1);
+      ctx.fillStyle = '#50e8a0';
+      ctx.fillRect(padX - padW/2, padY, padW, padH);
+      ctx.shadowBlur = 0; ctx.restore();
+
+      // Blinking lights (green)
+      ctx.save();
+      for (let i = 0; i <= 4; i++) {
+        const lx = padX - padW/2 + i * (padW / 4);
+        ctx.beginPath(); ctx.arc(lx, padY - 4, 4, 0, Math.PI*2);
+        ctx.fillStyle = blinkP ? '#50e8a0' : '#1a5040';
+        ctx.shadowBlur = blinkP ? 12 : 0; ctx.shadowColor = '#50e8a0';
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Vertical docking guide + ±10° tolerance lines
+      ctx.save();
+      ctx.strokeStyle = 'rgba(80,232,160,0.18)';
+      ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+      ctx.beginPath(); ctx.moveTo(padX, padY); ctx.lineTo(padX, 100); ctx.stroke();
+      const guideH = 80;
+      const tolW = Math.tan(10 * Math.PI / 180) * guideH;
+      ctx.strokeStyle = 'rgba(255,200,0,0.18)';
+      ctx.beginPath(); ctx.moveTo(padX, padY); ctx.lineTo(padX - tolW, padY - guideH); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(padX, padY); ctx.lineTo(padX + tolW, padY - guideH); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Label
+      ctx.font = 'bold 7px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(80,232,160,0.9)';
+      ctx.fillText('⛽ REFUEL + HEAL', padX, padY - 26);
     }
-    ctx.restore();
   });
 
   // Surface decorations (rocks, plants along terrain)
-  //PP:for (let x = 30; x < canvas.width - 30; x += 55) {
-  //PP:  const ix = Math.round(clamp(x, 0, terrain.points.length - 1));
-  //PP:  const ty = terrain.points[ix];
-  //PP:  // Only on ground, not in lakes
-  //PP:  const inLake = terrain.lakeZones.some(lz => x >= lz.x && x <= lz.x + lz.w);
-  //PP:  if (!inLake) {
-  //PP:    const decorEmojis = ['🪨','🌑','🗿'];
-  //PP:    const idx = Math.floor((x * 137 + ty * 999) % decorEmojis.length); // deterministic
-  //PP:    ctx.globalAlpha = 0.35;
-  //PP:    drawEmoji(decorEmojis[idx], x, ty - 10, 18);
-  //PP:    ctx.globalAlpha = 1;
-  //PP:  }
-  //PP:}
 
   // Resources on surface
   planetData.resources.forEach(r => {
     if (!r.collected) {
       const bobY = r.y + Math.sin(r.bob) * (r.inLake ? 3 : 1.5);
       drawEmoji(RESOURCES[r.type].emoji, r.x, bobY, 28);
-      if (upgradeState['radar'] && upgradeState['radar'].active) {
+      if (upgradeState['blastall'] && upgradeState['blastall'].active) {
         ctx.beginPath(); ctx.arc(r.x, bobY, 20, 0, Math.PI*2);
         ctx.strokeStyle = 'rgba(255,204,2,0.35)'; ctx.lineWidth = 1.5; ctx.stroke();
       }
@@ -3049,7 +3361,7 @@ function drawTopBars(label, val, c0, c1, rightLabel, fuelRightLabel) {
   ctx.fill();
   ctx.fillStyle = fuelColor;
   ctx.textAlign = 'right';
-  ctx.fillText(fuelRightLabel || Math.round(fuelPct * 100) + '%', BX + BW + 28, BY2 + 12);
+  ctx.fillText(fuelRightLabel || Math.round(fuelPct * 100) + '% FUEL', BX + BW + 28, BY2 + 12); 
 
   // Row 3 — HP bar (always red-spectrum: bright red → dark crimson at low HP)
   const BY3 = BY2 + 24;
@@ -3085,12 +3397,10 @@ function drawTopBars(label, val, c0, c1, rightLabel, fuelRightLabel) {
   ctx.fillText(Math.round(hpPct * 100) + '% HP', BX + BW + 28, BY3 + 12);
 
 
-
-
   // ── CARGO STRIP — resources in hold ─────────────────────────────
   const cargoEntries = G.cargo ? Object.entries(G.cargo).filter(([,v]) => v > 0) : [];
   if (cargoEntries.length > 0) {
-    const cargoY = BY3 + 22;   // directly below HP bar
+    const cargoY = BY3 + 32;   // directly below HP bar
     const startX  = BX;
     const SLOT_W  = 42;
 
@@ -3186,36 +3496,20 @@ function initLanding() {
     timer: 0,
   };
 
-  // Scatter resources on terrain surface, away from platform
-  const resTypes = ['flora','rcry','gold','fungus'];
-  const spread = [0.12, 0.22, 0.68, 0.80, 0.90];
-  spread.forEach(frac => {
-    const px = canvas.width * frac;
-    const ix = Math.round(clamp(px, 0, terrain.points.length - 1));
-    const ty = terrain.points[ix];
-    const inLakeZone = lakeZones.some(lz => px >= lz.x && px <= lz.x + lz.w);
-    if (!inLakeZone) {
-      landingData.groundResources.push({
-        x: px, y: ty - 30,
-        type: resTypes[rndInt(0, resTypes.length - 1)],
-        collected: false,
-      });
-    }
-  });
+  // No surface resources in landing phase — this is a precision approach, not collection
 
   bullets.length = 0; particles.length = 0; floatTexts.length = 0;
   drops.length = 0; aliens.length = 0; alienBullets.length = 0;
 
   if (!G.ship) G.ship = makeShip();
   applyUpgrades();
-  // Ship enters from orbit: starts at horizontal center, top of screen
-  G.ship.x = canvas.width / 2;   // center of screen — orbital entry
+  G.ship.x = canvas.width / 2;
   G.ship.y = 90;
   G.ship.vx = 0;
-  G.ship.vy = 0.4;                // slow initial descent from orbit
-  G.ship.angle = -Math.PI / 2;   // vertical, nose up
+  G.ship.vy = 0;                  // frozen — no initial descent
+  G.ship.angle = -Math.PI / 2;
   G.ship.invincible = 0;
-  // shieldHits set by applyUpgrades() above
+  G.ship.frozen = true;   // suspended until first input
 
   setPhaseBanner('🎯 PHASE 6 — LANDING SEQUENCE');
   toast('⚠️ Entering atmosphere — thrust ▲ to brake! Land on 🔵 platform!');
@@ -3223,21 +3517,51 @@ function initLanding() {
 
 function updateLanding() {
   if (G.paused || landingData.landed || landingData.crashed) return;
+  // Freeze ship until first input
+  if (G._waitingFirstInput) {
+    const anyInput = isUp() || isDown() || isLeft() || isRight() || isFire();
+    if (!anyInput) {
+      updateFloatTexts();
+      return;
+    }
+    G._waitingFirstInput = false;
+  }
   const ship = G.ship;
   const pl      = landingData.platform;
   const terrain = landingData.terrain;
   landingData.timer++;
 
+  // Frozen: hover in place until first input
+  if (G.shipFrozen) {
+    if (isUp() || isDown() || isLeft() || isRight() || isFire()) {
+      G.shipFrozen = false;
+    } else {
+      ship.vx = 0; ship.vy = 0;
+      updateParticles(); updateFloatTexts(); tickUpgrades();
+      return;
+    }
+  }
+
+  // Unfreeze on first player input
+  if (G.ship.frozen && (isLeft()||isRight()||isUp()||isDown()||isFire())) {
+    G.ship.frozen = false;
+  }
+  if (G.ship.frozen) {
+    updateParticles(); updateFloatTexts(); tickUpgrades();
+    return;
+  }
+
   // Landing: free rotation allowed — but must land within ±10° of vertical
-  const LAND_ACCEL = 0.055;   // reduced for precision
+  const LAND_ACCEL = 0.055;
   const LAND_DRAG  = 0.978;
-  const LAND_ROT   = 0.022;   // slow rotation for fine control
+  const LAND_ROT   = 0.022;
 
   if (isLeft())  ship.angle -= LAND_ROT;
   if (isRight()) ship.angle += LAND_ROT;
   if (isUp() && consumeFuel(0.05)) {
     ship.vx += Math.cos(ship.angle) * LAND_ACCEL;
     ship.vy += Math.sin(ship.angle) * LAND_ACCEL;
+    if (++_thrusterTick % 8 === 0) soundPlay('thruster');
     const nx = ship.x - Math.cos(ship.angle) * 20;
     const ny = ship.y - Math.sin(ship.angle) * 20;
     spawnParticles(nx, ny, '#ff9d3d', 2, 1.2);
@@ -3280,12 +3604,7 @@ function updateLanding() {
   tickUpgrades();
 
   // Collect ground resources
-  landingData.groundResources.forEach(r => {
-    if (!r.collected && dist(ship, r) < 44) {
-      r.collected = true;
-      collectResource(r.type, r.x, r.y);
-    }
-  });
+  // No resource collection in landing phase
 
   updateParticles(); updateFloatTexts();
 
@@ -3340,13 +3659,20 @@ function updateLanding() {
       if (G.hp <= 0) { setTimeout(() => triggerGameOver('💥 Ship destroyed on landing!'), 800); return; }
       setTimeout(() => nextPhase('debrief'), 1800);
     } else if (!landingData.crashed) {
-      // 🔴 CRASH: red zone or bad angle
-      landingData.crashed = true;
-      let dmgAmt = 0, dmgReason = '';
-      if (isRedZone && !goodAngle)  { dmgAmt = 50; dmgReason = '🔴 Too fast + tilted!'; }
-      else if (isRedZone)           { dmgAmt = 33; dmgReason = '🔴 Too fast!'; }
-      else                          { dmgAmt = 20; dmgReason = '⚠️ Tilt >10°! Straighten up'; }
-      G.hp = Math.max(0, (G.hp||0) - dmgAmt);
+      // 🔴 CRASH: too fast (tilt alone no longer causes instant damage — bounce back)
+      if (!goodAngle && !isRedZone) {
+        // Only tilted, not too fast — warn but no damage, bounce back
+        if (!landingData._tiltWarn || Date.now() - landingData._tiltWarn > 1500) {
+          landingData._tiltWarn = Date.now();
+          floatText(G.ship.x, G.ship.y - 30, '⚠️ Straighten up!', '#ffcc02');
+          toast('⚠️ Tilt >10° — align vertically before landing!');
+        }
+      } else {
+        landingData.crashed = true;
+        let dmgAmt = 0, dmgReason = '';
+        if (isRedZone && !goodAngle) { dmgAmt = 50; dmgReason = '🔴 Too fast + tilted!'; }
+        else                         { dmgAmt = 33; dmgReason = '🔴 Too fast!'; }
+        G.hp = Math.max(0, (G.hp||0) - dmgAmt);
       spawnParticles(ship.x, ship.y, '#ff4444', 22, 4);
       floatText(ship.x, ship.y - 40, `${dmgReason}`, '#ff4444');
       toast(`${dmgReason} — ${Math.round(G.hp)}% HP remaining`);
@@ -3354,14 +3680,15 @@ function updateLanding() {
       updateHUD();
       if (G.hp <= 0) {
         setTimeout(() => triggerGameOver('💥 Ship destroyed on landing!'), 800);
-      } else {
-        setTimeout(() => {
-          ship.x = canvas.width / 2; ship.y = 90;  // back to orbital entry
-          ship.vx = 0; ship.vy = 0.4;
-          ship.angle = -Math.PI / 2;
-          landingData.crashed = false;
-          toast('🚀 Try again! Brake with thrust ▲');
-        }, 1200);
+        } else {
+          setTimeout(() => {
+            ship.x = canvas.width / 2; ship.y = 90;
+            ship.vx = 0; ship.vy = 0.4;
+            ship.angle = -Math.PI / 2;
+            landingData.crashed = false;
+            toast('🚀 Try again! Brake with thrust ▲');
+          }, 1200);
+        }
       }
     }
     break;
@@ -3395,6 +3722,31 @@ function drawLanding() {
   drawEmoji('🌍', canvas.width - 50, 44, 32);
   ctx.restore();
 
+  // Lakes in landing terrain (same algorithm as planet/launch)
+  terrain.lakeZones.forEach(lz => {
+    const lg = ctx.createLinearGradient(0, lz.y - 10, 0, canvas.height);
+    lg.addColorStop(0, '#1840a0'); lg.addColorStop(1, '#0a2a5a');
+    ctx.fillStyle = lg;
+    ctx.beginPath();
+    // Start at bottom-left of lake zone
+    ctx.moveTo(lz.x, canvas.height);
+    ctx.lineTo(lz.x, lz.y);  // up to surface start
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
+      ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.lineTo(lz.x + lz.w, canvas.height);
+    ctx.closePath(); ctx.fill();
+    // Wave crest highlight
+    ctx.save(); ctx.strokeStyle = 'rgba(100,180,255,0.30)'; ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
+      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
+      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
+    }
+    ctx.stroke(); ctx.restore();
+  });
+
   // ── Terrain with real profile ──────────────────────────────────
   const gndGrad = ctx.createLinearGradient(0, terrain.baseY - 60, 0, canvas.height);
   gndGrad.addColorStop(0, '#1c3820'); gndGrad.addColorStop(0.4, '#112515'); gndGrad.addColorStop(1, '#050e05');
@@ -3407,38 +3759,7 @@ function drawLanding() {
   for (let x = 1; x <= canvas.width; x++) ctx.lineTo(x, terrain.points[Math.min(x, terrain.points.length-1)]);
   ctx.strokeStyle = '#2d5a30'; ctx.lineWidth = 2; ctx.stroke();
 
-  // Lakes in landing terrain
-  terrain.lakeZones.forEach(lz => {
-    const lg = ctx.createLinearGradient(0, lz.y - 10, 0, canvas.height);
-    lg.addColorStop(0, '#1840a0'); lg.addColorStop(1, '#0a2a5a');
-    ctx.fillStyle = lg;
-    ctx.beginPath(); ctx.moveTo(lz.x, canvas.height);
-    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
-      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
-      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
-    }
-    ctx.lineTo(lz.x + lz.w, canvas.height); ctx.closePath(); ctx.fill();
-    ctx.save(); ctx.strokeStyle = 'rgba(100,180,255,0.30)'; ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    for (let x = lz.x; x <= lz.x + lz.w; x += 2) {
-      const wave = Math.sin(x * 0.045 + t * 0.07) * 3.5 + Math.sin(x * 0.019 + t * 0.032 + 1.1) * 2;
-      x === lz.x ? ctx.moveTo(x, lz.y + wave) : ctx.lineTo(x, lz.y + wave);
-    }
-    ctx.stroke(); ctx.restore();
-  });
-
-  // ── Surface resources ───────────────────────────────────────────
-  if (landingData.groundResources) {
-    landingData.groundResources.forEach(r => {
-      if (!r.collected) {
-        drawEmoji(RESOURCES[r.type].emoji, r.x, r.y, 28);
-        ctx.save();
-        ctx.beginPath(); ctx.arc(r.x, r.y + 8, 16, 0, Math.PI*2);
-        ctx.strokeStyle = 'rgba(255,204,2,0.28)'; ctx.lineWidth = 1.2; ctx.stroke();
-        ctx.restore();
-      }
-    });
-  }
+    // No surface resources in landing phase
 
   // ── All platforms on hilltops ──────────────────────────────────
   const allPlatforms = landingData.platforms || [pl];
@@ -3470,13 +3791,15 @@ function drawLanding() {
     ctx.shadowBlur = 0; ctx.restore();
 
     // Blinking lights
+    ctx.save();
     for (let i = 0; i <= 4; i++) {
       const lx = pad.x - pad.w/2 + i * (pad.w / 4);
       ctx.beginPath(); ctx.arc(lx, pad.y - 4, 4, 0, Math.PI*2);
       ctx.fillStyle = blink ? '#ffdd00' : '#774400';
-      ctx.shadowBlur = blink ? 12 : 2; ctx.shadowColor = '#ffdd00';
-      ctx.fill(); ctx.shadowBlur = 0;
+      ctx.shadowBlur = blink ? 12 : 0; ctx.shadowColor = '#ffdd00';
+      ctx.fill();
     }
+    ctx.restore();
 
     // Vertical landing guide (dashed) + ±10° tolerance lines
     ctx.save();
@@ -3534,6 +3857,7 @@ function drawLanding() {
     const barColor = isGreen ? '#50e8a0' : isYellow ? '#ffcc02' : '#ff4444';
     ctx.fillStyle = barColor;
     if (!isGreen && !isYellow) { ctx.shadowBlur = 8; ctx.shadowColor = '#ff4444'; }
+    else { ctx.shadowBlur = 0; }
     roundRect(ctx, indX - barW/2, indY - 10, barW * sRatio, 8, 4); ctx.fill();
     ctx.shadowBlur = 0;
 
@@ -3553,10 +3877,12 @@ function drawLanding() {
       { y: indY + 4,  on: isGreen,               col: '#50e8a0', glow: '#00ff80' },
     ];
     lights.forEach(lt => {
+      ctx.save();
       ctx.beginPath(); ctx.arc(tlX2, lt.y, 4.5, 0, Math.PI*2);
       ctx.fillStyle = lt.on ? lt.col : 'rgba(255,255,255,0.08)';
       if (lt.on) { ctx.shadowBlur = 10; ctx.shadowColor = lt.glow; }
-      ctx.fill(); ctx.shadowBlur = 0;
+      ctx.fill();
+      ctx.restore();
     });
 
     // Speed label
@@ -3566,16 +3892,16 @@ function drawLanding() {
     ctx.restore();
   }
 }
-
 /* ══════════════════════════════════════
    PHASE: DEBRIEF / SHOP
    ══════════════════════════════════════ */
+// ── DEBRIEF — in-game overlay (no separate screen) ─────────────────
 function initDebrief() {
   stopGameLoop();
   addHistoryEntry('win');
-  G.score += G.level * 200; // level bonus
+  G.score += G.level * 200;
 
-  // Convert cargo to credits
+  // Sell all cargo automatically
   let earned = 0;
   Object.entries(G.cargo).forEach(([type, count]) => {
     earned += (RESOURCES[type].value * count);
@@ -3583,96 +3909,107 @@ function initDebrief() {
   G.credits = (G.credits || 0) + earned;
   updateHUD();
 
-  // Render shop screen
-  document.getElementById('shop-level-label').textContent = `Mission Complete · Level ${G.level}`;
-  document.getElementById('shop-credits').textContent = G.credits + ' ₡';
-
-  // Update status bars in debrief
-  const dbFuelPct = Math.round(clamp((G.fuel||0)/(G.maxFuel||100),0,1)*100);
-  const dbHpPct   = Math.round(clamp((G.hp||0)/100,0,1)*100);
-  const dbFuelCol = dbFuelPct > 40 ? '#50e8a0' : dbFuelPct > 20 ? '#ffcc02' : '#ff4444';
-  const dbHpCol   = dbHpPct  > 60 ? '#ff6640' : dbHpPct  > 30 ? '#ff2222' : '#aa0000';
-  const dbFuelBar = document.getElementById('db-fuel-bar');
-  const dbHpBar   = document.getElementById('db-hp-bar');
-  if (dbFuelBar) { dbFuelBar.style.width = dbFuelPct+'%'; dbFuelBar.style.background = dbFuelCol; }
-  if (dbHpBar)   { dbHpBar.style.width   = dbHpPct+'%';  dbHpBar.style.background   = dbHpCol; }
-  const dbFuelPctEl = document.getElementById('db-fuel-pct');
-  const dbHpPctEl   = document.getElementById('db-hp-pct');
-  if (dbFuelPctEl) { dbFuelPctEl.textContent = dbFuelPct+'%'; dbFuelPctEl.style.color = dbFuelCol; }
-  if (dbHpPctEl)   { dbHpPctEl.textContent   = dbHpPct+'%';  dbHpPctEl.style.color   = dbHpCol; }
-
-  // Resources grid
-  const resGrid = document.getElementById('res-grid');
-  const entries = Object.entries(G.cargo).filter(([,v]) => v > 0);
-  if (entries.length === 0) {
-    resGrid.innerHTML = '<div style="color:var(--text3);font-size:.75rem;grid-column:span 3">No resources collected this mission.</div>';
-  } else {
-    resGrid.innerHTML = entries.map(([type, count]) => {
-      const r = RESOURCES[type];
-      return `<div class="res-item">
-        <div class="res-emoji">${r.emoji}</div>
-        <div class="res-name">${r.name}</div>
-        <div class="res-count">${count}x</div>
-        <div class="res-val">+${r.value * count} ₡</div>
-      </div>`;
-    }).join('');
-  }
-
-  // Upgrades shop — all available each level, price scales per level
-  // G.upgrades = upgrades bought THIS level only (reset each level)
-  const shopGrid = document.getElementById('shop-grid');
-  const levelMult = 1 + (G.level - 1) * 0.4; // +40% per level
-  shopGrid.innerHTML = UPGRADES_DEF.map(u => {
-    const scaledPrice = Math.round(u.price * levelMult / 10) * 10;
-    const owned     = G.upgrades.includes(u.id);
-    const canAfford = G.credits >= scaledPrice;
-    const cls = owned ? 'owned' : (!canAfford ? 'cant-afford' : '');
-    return `<div class="shop-item ${cls}" data-id="${u.id}" data-price="${scaledPrice}">
-      <div class="si-emoji">${u.emoji}</div>
-      <div class="si-name">${u.name}</div>
-      <div class="si-desc">${u.desc}</div>
-      <div class="si-price">${owned ? '✅ Purchased' : canAfford ? scaledPrice+' ₡' : '🔒 '+scaledPrice+' ₡'}</div>
-    </div>`;
-  }).join('');
-
-  shopGrid.querySelectorAll('.shop-item:not(.owned):not(.cant-afford)').forEach(el => {
-    el.addEventListener('click', () => {
-      const id = el.dataset.id; const price = parseInt(el.dataset.price);
-      if (G.credits < price) { toast('💸 Not enough credits!'); return; }
-      G.credits -= price;
-      if (!G.upgrades.includes(id)) G.upgrades.push(id);
-      initUpgradeStates();   // rebuild state for newly purchased upgrade
-      renderUpgradeBar();    // update button display immediately
-      document.getElementById('shop-credits').textContent = G.credits + ' ₡';
-      el.className = 'shop-item owned';
-      el.querySelector('.si-price').textContent = '✅ Purchased';
-      const u = UPGRADES_DEF.find(x => x.id===id);
-      soundPlay('upgradeBuy'); toast(`✅ ${u.emoji} ${u.name} equipped!`);
-    });
-  });
-
-  hideAll();
-  document.getElementById('shop-screen').classList.remove('hidden');
+  openDebriefOverlay();
 }
 
-document.getElementById('shop-next-btn').addEventListener('click', () => {
-  soundPlay('levelup');
-  // Apply one-time consumables before entering next level
-  if (G.upgrades.includes('repair') && G.hp < 100) {
-    G.hp = Math.min(100, G.hp + 50);
-    toast('🔧 Repair kit used — +50% HP restored!');
-  }
-  G.level++;
-  G.cargo = {};
-  G.phase = 'launch';
-  G._medicalUsed = false;
-  // G.upgrades intentionally NOT cleared — carry purchased upgrades into next level
-  // upgradeState will be rebuilt by initUpgradeStates() inside applyUpgrades()
-  G.maxFuel = 100;
-  G.fuel = 100;
-  // HP carries over to next level
-  startGame(G.name, G.avatarKey, true);
-});
+function openDebriefOverlay() {
+  // Remove any existing overlay
+  const old = document.getElementById('debrief-overlay');
+  if (old) old.remove();
+
+  const fuelPct = Math.round(clamp((G.fuel||0)/(G.maxFuel||100),0,1)*100);
+  const hpPct   = Math.round(clamp((G.hp||0)/100,0,1)*100);
+  const fuelCol = fuelPct > 40 ? '#50e8a0' : fuelPct > 20 ? '#ffcc02' : '#ff4444';
+  const hpCol   = hpPct  > 60 ? '#ff6640' : hpPct  > 30 ? '#ff2222' : '#aa0000';
+  // Cargo rows
+  const cargoEntries = Object.entries(G.cargo).filter(([,v])=>v>0);
+  const cargoHTML = cargoEntries.length === 0
+    ? '<div style="color:rgba(228,244,255,.35);font-size:.75rem;padding:6px 0">No cargo collected.</div>'
+    : cargoEntries.map(([type,count]) => {
+        const r = RESOURCES[type];
+        return `<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="font-size:1.1rem">${r.emoji}</span>
+          <span style="flex:1;font-size:.78rem;color:rgba(228,244,255,.8)">${r.name}</span>
+          <span style="font-size:.75rem;color:rgba(228,244,255,.5)">${count}×</span>
+          <span style="font-size:.78rem;color:#ffcc02;min-width:52px;text-align:right">+${r.value*count} ₡</span>
+        </div>`;
+      }).join('');
+
+  // No upgrade shop in debrief — upgrades available only in 🛒 mid-mission shop
+
+  const overlay = document.createElement('div');
+  overlay.id = 'debrief-overlay';
+  overlay.style.cssText = `position:absolute;inset:0;z-index:95;background:rgba(0,0,0,.88);
+    display:flex;flex-direction:column;align-items:center;overflow-y:auto;
+    padding:16px 14px 80px;gap:10px;backdrop-filter:blur(8px);pointer-events:all`;
+
+  overlay.innerHTML = `
+    <div style="font-family:Georgia,serif;font-size:1.15rem;color:#5bc8ff;letter-spacing:3px;margin-top:4px">
+      🎯 MISSION COMPLETE — LEVEL ${G.level}</div>
+    <div style="font-size:.7rem;color:rgba(228,244,255,.45);letter-spacing:2px">
+      Score: ${G.score.toLocaleString()} pts</div>
+
+    <!-- Status bars -->
+    <div style="width:100%;max-width:480px;background:rgba(255,255,255,.04);border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:.9rem">⛽</span>
+        <div style="flex:1;height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${fuelPct}%;background:${fuelCol};border-radius:4px;transition:width .5s"></div>
+        </div>
+        <span style="font-size:.68rem;color:${fuelCol};min-width:32px;text-align:right">${fuelPct}%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:.9rem">❤️</span>
+        <div style="flex:1;height:8px;background:rgba(180,0,0,.14);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:4px;transition:width .5s"></div>
+        </div>
+        <span style="font-size:.68rem;color:${hpCol};min-width:32px;text-align:right">${hpPct}%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:.7rem;color:rgba(228,244,255,.4);letter-spacing:1px">CREDITS EARNED THIS MISSION</span>
+        <span style="font-size:.8rem;color:#ffcc02;font-weight:700">+${Object.entries(G.cargo).reduce((s,[t,c])=>s+(RESOURCES[t]?.value||0)*c,0)} ₡</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:.7rem;color:rgba(228,244,255,.4);letter-spacing:1px">TOTAL CREDITS</span>
+        <span id="dbo-credits" style="font-size:.9rem;color:#ffcc02;font-weight:700">${G.credits} ₡</span>
+      </div>
+    </div>
+
+    <!-- Cargo sold -->
+    <div style="width:100%;max-width:480px">
+      <div style="font-size:.65rem;letter-spacing:3px;color:#5bc8ff;text-transform:uppercase;margin-bottom:4px">📦 Cargo Sold</div>
+      ${cargoHTML}
+    </div>
+
+    <div style="font-size:.68rem;color:rgba(228,244,255,.4);text-align:center;padding:4px 0">
+      💡 Use the 🛒 Shop button during the mission to buy upgrades
+    </div>
+
+    <button id="dbo-next-btn" style="margin-top:8px;padding:13px 36px;
+      font-family:Georgia,serif;font-size:1rem;background:rgba(91,200,255,.15);
+      border:1.5px solid #5bc8ff;border-radius:50px;color:#5bc8ff;cursor:pointer;
+      letter-spacing:2px;pointer-events:all">🚀 Next Mission</button>
+  `;
+
+  document.getElementById('game-area').appendChild(overlay);
+
+  overlay.querySelector('#dbo-next-btn').addEventListener('click', () => {
+    soundPlay('levelup');
+    if ((G.upgrades||[]).includes('repair') && G.hp < 100) {
+      G.hp = Math.min(100, G.hp + 50);
+      toast('🔧 Repair kit used — +50% HP!');
+    }
+    overlay.remove();
+    G.level++;
+    G.cargo = {};
+    G.phase = 'launch';
+    G._medicalUsed = false;
+    G.upgrades = [];        // reset bought list each level — buy again from shop
+    G.maxFuel = 100;
+    G.fuel = 100;
+    startGame(G.name, G.avatarKey, true);
+  });
+}
 
 /* ══════════════════════════════════════
    PHASE MANAGER
@@ -3686,7 +4023,7 @@ function initPhase(phase) {
     case 'planet':  initPlanet();  break;
     case 'return':  initTravel(true);  break;
     case 'landing': initLanding(); break;
-    case 'debrief': initDebrief(); return;
+    case 'debrief': initDebrief(); return;  // overlay shown over gs
   }
   startGameLoop();
 }
@@ -3700,6 +4037,15 @@ function nextPhase(phase) {
 
 // Quick-shop button: pause game and open upgrade shop mid-mission
 document.addEventListener('DOMContentLoaded', () => {
+  // Unlock AudioContext on first user interaction (required by browsers)
+  const unlockAudio = () => {
+    if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+    if (!_audioCtx) { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+  };
+  document.addEventListener('click',   unlockAudio, { once: false });
+  document.addEventListener('touchend',unlockAudio, { once: false, passive: true });
+  document.addEventListener('keydown',  unlockAudio, { once: false });
+
   const sqb = document.getElementById('shop-quick-btn');
   if (!sqb) return;
   sqb.addEventListener('click',  openMidMissionShop);
@@ -3709,62 +4055,125 @@ document.addEventListener('DOMContentLoaded', () => {
 function openMidMissionShop() {
   if (!G.name || G.over) return;
   setPaused(true);
-  // Build a floating shop overlay
   let overlay = document.getElementById('mid-shop-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'mid-shop-overlay';
-    overlay.style.cssText = `position:absolute;inset:0;z-index:90;
-      background:rgba(0,0,0,0.82);display:flex;flex-direction:column;
-      align-items:center;justify-content:flex-start;overflow-y:auto;
-      padding:16px 12px 80px;gap:10px;backdrop-filter:blur(6px)`;
-    document.getElementById('game-area').appendChild(overlay);
+  if (overlay) overlay.remove();
+  overlay = document.createElement('div');
+  overlay.id = 'mid-shop-overlay';
+  overlay.style.cssText = `position:absolute;inset:0;z-index:90;
+    background:rgba(0,0,0,0.85);display:flex;flex-direction:column;
+    align-items:center;overflow-y:auto;padding:16px 12px 100px;gap:8px;
+    backdrop-filter:blur(8px);pointer-events:all`;
+  document.getElementById('game-area').appendChild(overlay);
+
+  function buildShop() {
+    overlay.innerHTML = `
+      <div style="font-family:Georgia,serif;font-size:1.1rem;color:#5bc8ff;letter-spacing:3px;margin-top:6px">🛒 UPGRADE SHOP</div>
+      <div style="font-size:.68rem;color:rgba(228,244,255,.5);letter-spacing:2px">
+        Level ${G.level} · <span id="mss-credits">${G.credits}</span> ₡ available</div>
+      <div id="mss-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:440px"></div>
+      <button id="mss-close" style="margin-top:10px;padding:10px 28px;
+        font-family:Georgia,serif;font-size:.9rem;background:rgba(91,200,255,.12);
+        border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
+        letter-spacing:2px;pointer-events:all">▶ RESUME</button>`;
+
+    const grid = overlay.querySelector('#mss-grid');
+    if (!G.upgradeLevels) G.upgradeLevels = {};
+
+    UPGRADES_DEF.forEach(u => {
+      const tier       = getUpgradeTier(u.id);          // how many times ever bought
+      const ownedNow   = (G.upgrades||[]).includes(u.id); // bought THIS level already
+      const price      = calcUpgradePrice(u, tier);
+      const canAfford  = G.credits >= price;
+      const nextTier   = tier + 1;
+      const statsNext  = buildUpgradeDesc(u, nextTier);  // what you get on next buy
+      const tierLabel  = tier === 0 ? 'NEW' : `Tier ${tier+1}`;
+
+      const bdr  = ownedNow ? '#50e8a0' : canAfford ? 'rgba(91,200,255,.5)' : 'rgba(80,80,120,.3)';
+      const op   = ownedNow || canAfford ? '1' : '0.4';
+      const curs = (!ownedNow && canAfford) ? 'pointer' : 'default';
+
+      const el = document.createElement('div');
+      el.dataset.id = u.id;
+      el.style.cssText = `background:rgba(8,8,24,.85);border:1.5px solid ${bdr};
+        border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;
+        align-items:center;gap:3px;text-align:center;opacity:${op};cursor:${curs};
+        transition:border-color .2s`;
+      el.innerHTML = `
+        <div style="font-size:1.5rem">${u.emoji}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#e4f4ff">${u.name}</div>
+        <div style="font-size:.58rem;color:rgba(91,200,255,.7);letter-spacing:1px">${tierLabel}</div>
+        <div style="font-size:.60rem;color:rgba(228,244,255,.5);margin:1px 0;min-height:26px">${u.flavor}</div>
+        <div style="font-size:.62rem;color:#aad4ff;margin-bottom:2px">${statsNext}</div>
+        <div style="font-size:.72rem;font-weight:700;color:${ownedNow?'#50e8a0':canAfford?'#ffcc02':'#557'}">
+          ${ownedNow ? '✅ Equipped' : canAfford ? price+' ₡' : '🔒 '+price+' ₡'}</div>`;
+
+      if (!ownedNow && canAfford) {
+        el.addEventListener('click', () => {
+          if ((G.upgrades||[]).includes(u.id)) return;
+          if (G.credits < price) { toast('💸 Not enough credits!'); return; }
+          G.credits -= price;
+          if (!G.upgrades) G.upgrades = [];
+          G.upgrades.push(u.id);
+          if (!G.upgradeLevels) G.upgradeLevels = {};
+          G.upgradeLevels[u.id] = (G.upgradeLevels[u.id] || 0) + 1;
+          initUpgradeStates();
+          renderUpgradeBar();
+          updateHUD();
+          soundPlay('upgradeBuy');
+          toast('✅ ' + u.emoji + ' ' + u.name + ' Tier ' + G.upgradeLevels[u.id] + ' equipped!');
+          buildShop();  // refresh
+        });
+      }
+      grid.appendChild(el);
+    });
+
+    overlay.querySelector('#mss-close').addEventListener('click', () => {
+      overlay.remove();
+      setPaused(false);
+    });
   }
-  const levelMult = 1 + (G.level - 1) * 0.4;
-  overlay.innerHTML = `
-    <div style="font-family:Georgia,serif;font-size:1.2rem;color:#5bc8ff;
-      letter-spacing:3px;margin-top:8px">🛒 UPGRADE SHOP</div>
-    <div style="font-size:.7rem;color:#888;letter-spacing:2px">Level ${G.level} · ${G.credits} ₡ available</div>
-    <div id="mid-shop-grid" style="display:grid;grid-template-columns:repeat(2,1fr);
-      gap:8px;width:100%;max-width:420px"></div>
-    <button id="mid-shop-close" style="margin-top:12px;padding:10px 28px;
-      font-family:Georgia,serif;font-size:.9rem;background:rgba(91,200,255,.15);
-      border:1.5px solid #5bc8ff;border-radius:12px;color:#5bc8ff;cursor:pointer;
-      letter-spacing:2px">▶ RESUME MISSION</button>`;
+  buildShop();
+}
 
-  const grid = overlay.querySelector('#mid-shop-grid');
-  UPGRADES_DEF.forEach(u => {
-    const scaledPrice = Math.round(u.price * levelMult / 10) * 10;
-    const owned = (G.upgrades||[]).includes(u.id);
-    const canAfford = G.credits >= scaledPrice;
-    const cls = owned ? 'owned' : (!canAfford ? 'cant-afford' : '');
-    const el = document.createElement('div');
-    el.className = 'shop-item ' + cls;
-    el.dataset.id = u.id; el.dataset.price = scaledPrice;
-    el.innerHTML = `<div class="si-emoji">${u.emoji}</div>
-      <div class="si-name">${u.name}</div>
-      <div class="si-desc">${u.desc}</div>
-      <div class="si-price">${owned ? '✅ Owned' : canAfford ? scaledPrice+' ₡' : '🔒 '+scaledPrice+' ₡'}</div>`;
-    if (!owned && canAfford) {
-      el.addEventListener('click', () => {
-        if (G.credits < scaledPrice) return;
-        G.credits -= scaledPrice;
-        if (!G.upgrades) G.upgrades = [];
-        if (!G.upgrades.includes(u.id)) G.upgrades.push(u.id);
-        initUpgradeStates();
-        renderUpgradeBar();
-        updateHUD();
-        toast('✅ ' + u.emoji + ' ' + u.name + ' equipped!');
-        openMidMissionShop(); // refresh
-      });
-    }
-    grid.appendChild(el);
-  });
 
-  overlay.querySelector('#mid-shop-close').addEventListener('click', () => {
-    overlay.remove();
-    setPaused(false);
-  });
+// ── GAME SAVE / RESUME ─────────────────────────────────────────────
+const GAME_SAVE_KEY = 'ppDeepOrbit_save';
+
+function saveGameState() {
+  if (!G.name || G.over) return;
+  try {
+    // Save serialisable parts of G (exclude ship object for safety)
+    const snap = {
+      name: G.name, avatarKey: G.avatarKey,
+      level: G.level, score: G.score, hp: G.hp,
+      credits: G.credits, cargo: G.cargo,
+      upgrades: G.upgrades, upgradeLevels: G.upgradeLevels || {}, maxFuel: G.maxFuel, fuel: G.fuel,
+      phase: G.phase, savedAt: Date.now(),
+    };
+    localStorage.setItem(GAME_SAVE_KEY, JSON.stringify(snap));
+  } catch(e) {}
+}
+
+function loadGameSave() {
+  try { return JSON.parse(localStorage.getItem(GAME_SAVE_KEY) || 'null'); } catch { return null; }
+}
+
+function clearGameSave() {
+  try { localStorage.removeItem(GAME_SAVE_KEY); } catch {}
+}
+
+function checkContinueBtn() {
+  const save  = loadGameSave();
+  const btn   = document.getElementById('continue-btn');
+  if (!btn) return;
+  if (save && save.name) {
+    const d = new Date(save.savedAt);
+    const dstr = d.toLocaleDateString('en-GB', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+    btn.textContent = `▶ Continue: ${save.name}  Lv${save.level}  (${dstr})`;
+    btn.style.display = 'block';
+  } else {
+    btn.style.display = 'none';
+  }
 }
 
 /* ══════════════════════════════════════
@@ -3787,6 +4196,12 @@ function startGameLoop() {
 
 function loop() {
   if (!updateFn || !drawFn) return;
+  // Reset contesto canvas ogni frame — evita accumulo di alpha/shadow/lineWidth sporchi
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur  = 0;
+  ctx.shadowColor = 'transparent';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([]);
   updateFn();
   drawFn();
   gameLoopId = requestAnimationFrame(loop);
