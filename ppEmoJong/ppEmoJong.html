@@ -85,7 +85,8 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 .playbtn{background:linear-gradient(135deg,var(--accent),#6d28d9);color:#fff;border:none;border-radius:50px;padding:14px 44px;font-family:Georgia,serif;font-size:1rem;letter-spacing:3px;cursor:pointer;box-shadow:0 5px 28px rgba(192,132,252,.4);transition:all .2s;width:100%;max-width:300px;font-weight:700}
 .playbtn:hover{transform:translateY(-2px);box-shadow:0 9px 38px rgba(192,132,252,.6)}
 .contbtn{background:linear-gradient(135deg,#ff9d3d,#c84a00);color:#fff;border:none;border-radius:50px;padding:13px 36px;font-family:Georgia,serif;font-size:.88rem;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:300px;font-weight:700}
-.contbtn:hover{transform:translateY(-2px)}
+.contbtn:hover:not(:disabled){transform:translateY(-2px)}
+.contbtn:disabled{opacity:.38;cursor:not-allowed;filter:grayscale(.5)}
 .secbtn{background:rgba(255,255,255,.04);color:var(--text2);border:1.5px solid var(--border);border-radius:50px;padding:11px 36px;font-family:Georgia,serif;font-size:.8rem;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:300px}
 .secbtn:hover{border-color:var(--accent);color:var(--accent)}
 .coins-display{display:inline-flex;align-items:center;gap:6px;background:rgba(255,204,2,.1);border:1px solid rgba(255,204,2,.25);border-radius:20px;padding:4px 12px;font-size:.8rem;color:var(--hot2);font-weight:700}
@@ -208,11 +209,7 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
 .particle{position:fixed;pointer-events:none;font-size:20px;animation:ptcl .75s ease-out forwards;z-index:350}
 @keyframes ptcl{0%{opacity:1;transform:scale(.5) translateY(0)}100%{opacity:0;transform:scale(1.6) translateY(-72px) rotate(var(--pr,30deg))}}
 /* PAUSE OVERLAY */
-#pause-overlay{position:fixed;inset:0;z-index:390;background:rgba(7,7,20,.93);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;backdrop-filter:blur(14px)}
-.pause-icon{font-size:4rem;animation:pausePulse 2s ease-in-out infinite}
 @keyframes pausePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-.pause-title{font-size:2rem;font-weight:700;letter-spacing:4px;color:var(--accent)}
-.pause-sub{font-size:.72rem;letter-spacing:3px;color:var(--text3);text-transform:uppercase}
 /* NO MOVES */
 #nomoves-popup .popup-box{border-color:rgba(255,82,82,.4)}
 .nm-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px}
@@ -393,11 +390,15 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
       <button class="mbtn" data-theme="space"   onclick="selectTheme('space',this)"><span class="mi">🚀</span><span class="ml">SPACE</span></button>
     </div>
   </div>
-  <button class="playbtn" id="pbtn">🀄 PLAY!</button>
-  <button class="contbtn hidden" id="cont-btn">▶ CONTINUE GAME</button>
-  <button class="secbtn" id="hist-btn">🏆 Game History</button>
-  <button class="secbtn" id="shop-ss-btn">🛒 Shop</button>
-  <button class="secbtn" id="help-ss-btn">❓ How to Play</button>
+  <div style="display:flex;gap:10px;width:100%;max-width:440px;justify-content:center">
+    <button class="playbtn" id="pbtn" style="flex:1;min-width:0;padding:14px 10px">🀄 PLAY!</button>
+    <button class="contbtn" id="cont-btn" style="flex:1;min-width:0;padding:13px 10px">▶ CONTINUE</button>
+  </div>
+  <div style="display:flex;gap:8px;width:100%;max-width:440px;justify-content:center">
+    <button class="secbtn" id="hist-btn" style="flex:1;min-width:0;padding:10px 4px;font-size:.72rem">🏆 History</button>
+    <button class="secbtn" id="shop-ss-btn" style="flex:1;min-width:0;padding:10px 4px;font-size:.72rem">🛒 Shop</button>
+    <button class="secbtn" id="help-ss-btn" style="flex:1;min-width:0;padding:10px 4px;font-size:.72rem">❓ How to</button>
+  </div>
 </div>
 
 <!-- ══ HISTORY SCREEN ══ -->
@@ -427,8 +428,9 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
     <div class="hs"><span class="hl">COMBO</span><span class="hv" id="h-combo" style="color:var(--hot2)">×1</span></div>
     <div class="hs"><span class="hl">⏱</span><span class="hv" id="h-time">0:00</span></div>
     <div class="hs"><span class="hl">🪙</span><span class="hv" id="h-coins" style="color:var(--hot2)">0</span></div>
+    <div class="hs"><span class="hl">🀄</span><span class="hv" id="h-tiles" style="font-size:.75rem;color:var(--text2)">0/0</span></div>
     <div id="h-mode-badge" class="lvl-badge" style="margin-left:auto">CLASSIC</div>
-    <button class="hud-btn" id="hud-pause">⏸</button>
+    <button class="hud-btn" id="hud-mute" title="Toggle sound">🔊</button>
     <button class="hud-btn" id="hud-hist">🏆</button>
     <button class="hud-btn" id="hud-help">❓</button>
     <button class="hud-btn danger" id="hud-quit" style="margin-right:46px">🚪</button>
@@ -452,14 +454,7 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
   </div>
 </div>
 
-<!-- ══ PAUSE OVERLAY ══ -->
-<div id="pause-overlay" class="hidden">
-  <div class="pause-icon">⏸</div>
-  <div class="pause-title">PAUSED</div>
-  <div class="pause-sub">Game suspended · Auto-saved</div>
-  <button class="playbtn" style="max-width:220px;margin-top:8px" id="resume-btn">▶ RESUME</button>
   <button class="secbtn" style="max-width:220px" onclick="resumeGame();openShop()">🛒 Shop</button>
-  <button class="secbtn" style="max-width:220px" id="suspend-btn">💾 Save &amp; Exit</button>
 </div>
 
 <!-- ══ NO MOVES POPUP ══ -->
@@ -469,10 +464,10 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
     <div class="popup-title" style="color:var(--red)">NO MORE MOVES!</div>
     <div style="font-size:.82rem;color:var(--text2);text-align:center;line-height:1.6">No valid combinations left.<br>What do you want to do?</div>
     <div class="nm-btns">
-      <button class="nm-btn nm-shuffle" id="nm-shuffle-btn">🔀 Use Shuffle <span id="nm-cnt" style="opacity:.7;font-size:.78rem"></span></button>
-      <button class="nm-btn nm-ads" id="nm-ads-btn">📺 Watch Ad → Free Shuffle</button>
-      <button class="nm-btn nm-quit" id="nm-quit-btn">🚪 Quit Game</button>
-      <button class="nm-btn" style="background:rgba(255,204,2,.12);color:var(--hot2);border:1.5px solid rgba(255,204,2,.3)" onclick="document.getElementById('nomoves-popup').classList.add('hidden');G.paused=false;openShop()">🛒 Open Shop</button>
+      <button class="nm-btn" style="background:rgba(255,204,2,.12);color:var(--hot2);border:1.5px solid rgba(255,204,2,.3)" id="nm-shop-btn">🛒 Open Shop</button>
+      <button class="nm-btn nm-quit" id="nm-save-exit-btn">💾 Save &amp; Exit</button>
+      <button class="nm-btn" style="background:rgba(255,82,82,.1);color:var(--red);border:1.5px solid rgba(255,82,82,.25)" id="nm-exit-btn">🚪 Exit (no save)</button>
+      <button class="nm-btn" style="background:rgba(255,255,255,.04);color:var(--text2);border:1.5px solid var(--border)" id="nm-cancel-btn">✕ Cancel — Back to Game</button>
     </div>
   </div>
 </div>
@@ -495,7 +490,8 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
     <div class="conf-ico" id="conf-ico">⚠️</div>
     <div class="conf-t" id="conf-t">Sure?</div>
     <div class="conf-tx" id="conf-tx">Message</div>
-    <div class="conf-btns"><button class="conf-no" id="conf-no">Cancel</button><button class="conf-yes" id="conf-yes">Confirm</button></div>
+    <div class="conf-btns"><button class="conf-no" id="conf-no">✕ Cancel</button><button class="conf-yes" id="conf-yes">Confirm</button></div>
+    <button class="conf-yes hidden" id="conf-yes2" style="width:100%;margin-top:6px;background:rgba(255,82,82,.15);border:1.5px solid var(--red);color:var(--red)">Exit</button>
   </div>
 </div>
 
@@ -507,14 +503,21 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
       <div class="coins-display">🪙 <span id="shop-coins-disp">0</span></div>
     </div>
     <div style="font-size:.6rem;color:var(--text3);margin-bottom:10px;text-align:center">Buy with coins or watch an Ad for free!</div>
-    <div class="shop-grid">
-      <div class="shop-item"><div class="si-icon">↩</div><div class="si-name">UNDO ×3</div><div class="si-desc">Restore last matched group</div><div class="si-btns"><button class="si-buy bc" onclick="shopBuy('undo')">🪙 100</button><button class="si-buy ba ad-only" onclick="shopAd('undo')">📺 Ad</button></div></div>
-      <div class="shop-item"><div class="si-icon">💡</div><div class="si-name">HINT ×3</div><div class="si-desc">Highlights a valid pair</div><div class="si-btns"><button class="si-buy bc" onclick="shopBuy('hint')">🪙 150</button><button class="si-buy ba ad-only" onclick="shopAd('hint')">📺 Ad</button></div></div>
-      <div class="shop-item"><div class="si-icon">🔀</div><div class="si-name">SHUFFLE ×2</div><div class="si-desc">Reassigns all emoji</div><div class="si-btns"><button class="si-buy bc" onclick="shopBuy('shuffle')">🪙 200</button><button class="si-buy ba ad-only" onclick="shopAd('shuffle')">📺 Ad</button></div></div>
-      <div class="shop-item"><div class="si-icon">💣</div><div class="si-name">BOMB ×1</div><div class="si-desc">Removes 4 free tiles</div><div class="si-btns"><button class="si-buy bc" onclick="shopBuy('bomb')">🪙 250</button><button class="si-buy ba ad-only" onclick="shopAd('bomb')">📺 Ad</button></div></div>
-      <div class="shop-item featured"><div class="si-icon">🤖</div><div class="si-name">AI SOLVER ×1</div><div class="si-desc">AI clears the board with animated moves</div><div class="si-btns"><button class="si-buy bc" onclick="shopBuy('ai')">🪙 500</button><button class="si-buy ba ad-only" onclick="shopAd('ai')">📺 Watch Ad</button></div></div>
+    <!-- coins-from-ad row (ADS mode only) -->
+    <div class="ad-only" id="shop-ad-coins-row" style="text-align:center;margin-bottom:8px">
+      <button class="si-buy ba" style="font-size:.72rem;padding:7px 18px;border-radius:20px" onclick="shopEarnCoins()">📺 Watch Ad → Earn Coins</button>
     </div>
-    <div style="font-size:.55rem;color:var(--text3);text-align:center;margin-bottom:6px">Match 🪙 group = +10🪙/tile · Match 💎 group = +100🪙/tile · Match normal = +5🪙<br>Each game: 3 Undo · 3 Hint · 2 Shuffle · 1 Bomb free</div>
+    <div class="shop-grid" id="shop-grid">
+      <div class="shop-item" id="si-undo"><div class="si-icon">↩</div><div class="si-name">UNDO ×3</div><div class="si-desc">Restore last matched group<br><span style="color:var(--accent);font-size:.6rem" id="si-undo-have"></span></div><div class="si-btns"><button class="si-buy bc" id="si-undo-cbtn" onclick="shopBuy('undo')">🪙 <span id="si-undo-cost">100</span></button><button class="si-buy ba ad-only" onclick="shopAd('undo')">📺 Ad</button></div></div>
+      <div class="shop-item" id="si-hint"><div class="si-icon">💡</div><div class="si-name">HINT ×3</div><div class="si-desc">Highlights a valid pair<br><span style="color:var(--accent);font-size:.6rem" id="si-hint-have"></span></div><div class="si-btns"><button class="si-buy bc" id="si-hint-cbtn" onclick="shopBuy('hint')">🪙 <span id="si-hint-cost">150</span></button><button class="si-buy ba ad-only" onclick="shopAd('hint')">📺 Ad</button></div></div>
+      <div class="shop-item" id="si-shuffle"><div class="si-icon">🔀</div><div class="si-name">SHUFFLE ×2</div><div class="si-desc">Reassigns all emoji<br><span style="color:var(--accent);font-size:.6rem" id="si-shuffle-have"></span></div><div class="si-btns"><button class="si-buy bc" id="si-shuffle-cbtn" onclick="shopBuy('shuffle')">🪙 <span id="si-shuffle-cost">200</span></button><button class="si-buy ba ad-only" onclick="shopAd('shuffle')">📺 Ad</button></div></div>
+      <div class="shop-item" id="si-bomb"><div class="si-icon">💣</div><div class="si-name">BOMB ×1</div><div class="si-desc">Removes 4 free tiles<br><span style="color:var(--accent);font-size:.6rem" id="si-bomb-have"></span></div><div class="si-btns"><button class="si-buy bc" id="si-bomb-cbtn" onclick="shopBuy('bomb')">🪙 <span id="si-bomb-cost">250</span></button><button class="si-buy ba ad-only" onclick="shopAd('bomb')">📺 Ad</button></div></div>
+      <div class="shop-item featured" id="si-ai"><div class="si-icon">🤖</div><div class="si-name">AI SOLVER ×1</div><div class="si-desc">AI clears the board with animated moves (may not fully solve!)<br><span style="color:var(--accent);font-size:.6rem" id="si-ai-have"></span></div><div class="si-btns"><button class="si-buy bc" id="si-ai-cbtn" onclick="shopBuy('ai')">🪙 <span id="si-ai-cost">500</span></button><button class="si-buy ba ad-only" onclick="shopAd('ai')">📺 Watch Ad</button></div></div>
+    </div>
+    <div style="text-align:center;margin-bottom:4px">
+      <button style="background:rgba(255,82,82,.1);color:var(--red);border:1.5px solid rgba(255,82,82,.25);border-radius:20px;padding:5px 14px;font-family:Georgia,serif;font-size:.62rem;cursor:pointer;letter-spacing:1px" onclick="shopResetCosts()">🔄 Reset costs &amp; clear coins</button>
+    </div>
+    <div style="font-size:.55rem;color:var(--text3);text-align:center;margin-bottom:6px">Match 🪙 group = +10🪙/tile · Match 💎 group = +100🪙/tile · Match normal = +5🪙<br>Free per game/level: Undo/Hint/Shuffle/Bomb only top-up to their base values if at 0</div>
     <button class="popup-close" id="shop-close">✕ Close</button>
   </div>
 </div>
@@ -537,7 +540,7 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
     <div class="popup-row"><strong>💡 Hint</strong> — highlights a valid matching group. 3 free per game.</div>
     <div class="popup-row"><strong>🔀 Shuffle</strong> — reshuffles all remaining tiles into a brand new random layout, same emojis. 2 free per game.</div>
     <div class="popup-row"><strong>💣 Bomb</strong> — destroys a complete matching group, even buried ones (X-Ray!). 1 free per game.</div>
-    <div class="popup-row"><strong>🤖 AI Solver</strong> — lets the computer play for you. Buy in the 🛒 Shop. Tap again to stop it.</div>
+    <div class="popup-row"><strong>🤖 AI Solver</strong> — lets the computer play for you. Buy in the 🛒 Shop. Tap again to stop it. <em>Note: the AI may make mistakes and might not fully solve the board — it also earns only 50% of normal score and coins!</em></div>
     <div class="popup-row"><strong>⭐ Levels:</strong> Each level adds more tiles (starting ~36, capping at 144) and taller stacks (+1 layer every 3 levels, no ceiling!). At high levels expect towers 5-10 tiles tall. Your score always carries over.</div>
     <button class="popup-close" style="background:rgba(255,204,2,.15);color:var(--hot2);margin-bottom:6px" onclick="document.getElementById('help-popup').classList.add('hidden');if(G.name&&!G.over)resumeGame();openShop()">🛒 Open Shop</button>
     <button class="popup-close" id="help-close">✕ Close</button>
@@ -550,7 +553,7 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
     <div class="popup-title">🀄 ppEmoJong 🀄</div>
     <div class="popup-row"><strong>Version:</strong> 01.00 — March 2026</div>
     <div class="popup-row"><strong>Genre:</strong> Puzzle / Mahjong Solitaire</div>
-    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉: <a href="mailto:info@pistino.dev" style="color:var(--accent2)">info@pistino.dev</a></div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉: <a href="/cdn-cgi/l/email-protection#93fafdf5fcd3e3fae0e7fafdfcbdf7f6e5" style="color:var(--accent2)"><span class="__cf_email__" data-cfemail="88e1e6eee7c8f8e1fbfce1e6e7a6ecedfe">[email&#160;protected]</span></a></div>
     <div class="lic">
       <span class="lt">⚖ SOFTWARE LICENSE</span>
       <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
@@ -594,9 +597,7 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
   <div id="zoom-val">100%</div>
   <button class="zoom-btn" id="zoom-out" title="Zoom out">－</button>
 </div>
-<div id="cpbar"><span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppEmoJong v.01.00 — click for info &amp; license</span></div>
-
-<script>
+<div id="cpbar"><span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppEmoJong v.01.00 — click for info &amp; license</span></div><script>
 'use strict';
 
 /* ══════════════════════════════════════════════════════
@@ -613,11 +614,13 @@ body.light .tile-bottom{background:linear-gradient(to bottom,#a080d8,#7050b8,#4a
    AUDIO ENGINE — all sounds synthesised via Web Audio API
    ══════════════════════════════════════════════════════ */
 let _actx = null;
+let _sfxMuted = localStorage.getItem('ppej_mute') === '1';
 function getAC() {
   if (!_actx) try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   return _actx;
 }
 function tone(freq, dur, type='sine', vol=0.15) {
+  if (_sfxMuted) return;
   const ctx = getAC(); if (!ctx) return;
   try {
     const o = ctx.createOscillator(), g = ctx.createGain();
@@ -745,25 +748,66 @@ document.getElementById('ad-skip-btn').addEventListener('click', () => {
 /* ══════════════════════════════════════════════════════
    SHOP
    ══════════════════════════════════════════════════════ */
-const SHOP = {
-  undo:    { cost:100,  label:'↩ Undo ×3',     apply: () => { G.undos    = (G.undos||0)+3;    upPowers(); } },
-  hint:    { cost:150,  label:'💡 Hint ×3',     apply: () => { G.hints    = (G.hints||0)+3;    upPowers(); } },
-  shuffle: { cost:200,  label:'🔀 Shuffle ×2',  apply: () => { G.shuffles = (G.shuffles||0)+2; upPowers(); } },
-  bomb:    { cost:250,  label:'💣 Bomb ×1',     apply: () => { G.bombs    = (G.bombs||0)+1;    upPowers(); } },
-  ai:      { cost:500,  label:'🤖 AI Solver ×1',apply: () => { G.aiSolvers= (G.aiSolvers||0)+1;upPowers(); } },
+const SHOP_BASE = { undo:100, hint:150, shuffle:200, bomb:250, ai:500 };
+const SHOP_COSTS_KEY = 'ppej_shop_costs';
+function loadShopCosts() {
+  try { return JSON.parse(localStorage.getItem(SHOP_COSTS_KEY)||'null') || {...SHOP_BASE}; } catch { return {...SHOP_BASE}; }
+}
+function saveShopCosts(c) { try { localStorage.setItem(SHOP_COSTS_KEY,JSON.stringify(c)); } catch {} }
+let _shopCosts = loadShopCosts();
+const SHOP_LABELS = { undo:'↩ Undo ×3', hint:'💡 Hint ×3', shuffle:'🔀 Shuffle ×2', bomb:'💣 Bomb ×1', ai:'🤖 AI Solver ×1' };
+const SHOP_APPLY  = {
+  undo:    () => { G.undos    = (G.undos||0)+3;    upPowers(); },
+  hint:    () => { G.hints    = (G.hints||0)+3;    upPowers(); },
+  shuffle: () => { G.shuffles = (G.shuffles||0)+2; upPowers(); },
+  bomb:    () => { G.bombs    = (G.bombs||0)+1;    upPowers(); },
+  ai:      () => { G.aiSolvers=(G.aiSolvers||0)+1; upPowers(); },
 };
+function refreshShopUI() {
+  const keys = ['undo','hint','shuffle','bomb','ai'];
+  const have = { undo:G.undos||0, hint:G.hints||0, shuffle:G.shuffles||0, bomb:G.bombs||0, ai:G.aiSolvers||0 };
+  keys.forEach(k => {
+    const costEl = document.getElementById('si-'+k+'-cost');
+    const haveEl = document.getElementById('si-'+k+'-have');
+    if (costEl) costEl.textContent = _shopCosts[k];
+    if (haveEl) haveEl.textContent = 'You have: ' + have[k];
+  });
+}
 function shopBuy(key) {
   if (!G.name) { toast('Start a game first!'); return; }
-  const item = SHOP[key]; if (!item) return;
-  if (!spendCoins(item.cost)) { toast('🪙 Need ' + item.cost + ' coins!', 2500); return; }
-  item.apply(); toast('✅ ' + item.label + ' added!'); SFX.coin();
+  const cost = _shopCosts[key]; if (!cost) return;
+  if (!spendCoins(cost)) { toast('🪙 Need ' + cost + ' coins!', 2500); return; }
+  SHOP_APPLY[key]();
+  // Escalate cost by 25% each purchase (rounded to nearest 25)
+  _shopCosts[key] = Math.round(_shopCosts[key] * 1.25 / 25) * 25;
+  saveShopCosts(_shopCosts);
+  refreshShopUI();
+  toast('✅ ' + SHOP_LABELS[key] + ' added!'); SFX.coin();
 }
 function shopAd(key) {
-  const item = SHOP[key]; if (!item) return;
-  showAd(() => { item.apply(); toast('📺 Ad watched! ' + item.label + ' added!'); SFX.coin(); });
+  showAd(() => { SHOP_APPLY[key](); refreshShopUI(); toast('📺 Ad watched! ' + SHOP_LABELS[key] + ' added!'); SFX.coin(); });
 }
-function openShop() { refreshCoinsUI(); document.getElementById('shop-popup').classList.remove('hidden'); }
-document.getElementById('shop-close').addEventListener('click',   () => document.getElementById('shop-popup').classList.add('hidden'));
+function shopEarnCoins() {
+  showAd(() => {
+    const earned = 100 + Math.floor(Math.random() * 401); // 100–500
+    addCoins(earned);
+    toast('📺 Ad watched! +' + earned + '🪙 earned!', 2800); SFX.coin();
+  });
+}
+function shopResetCosts() {
+  conf2('🔄','Reset Shop','This will reset all prices AND clear ALL your coins. Are you sure?','Reset Everything', () => {
+    _shopCosts = {...SHOP_BASE};
+    saveShopCosts(_shopCosts);
+    setCoins(0); refreshCoinsUI(); refreshShopUI();
+    toast('🔄 Prices reset, coins cleared.', 2500);
+  });
+}
+function openShop() { refreshCoinsUI(); refreshShopUI(); document.getElementById('shop-popup').classList.remove('hidden'); }
+function closeShop() {
+  document.getElementById('shop-popup').classList.add('hidden');
+  if (G.name && !G.over) toast('▶ Back to game!', 1400);
+}
+document.getElementById('shop-close').addEventListener('click', closeShop);
 document.getElementById('shop-ss-btn').addEventListener('click',  openShop);
 document.getElementById('btn-shop-ig').addEventListener('click',  openShop);
 
@@ -817,19 +861,13 @@ function loadSave()  { try { return JSON.parse(localStorage.getItem(SAVE_KEY)||'
 function checkContBtn() {
   const sv = loadSave(), btn = document.getElementById('cont-btn');
   if (sv && sv.G && sv.G.name) {
-    btn.classList.remove('hidden');
-    btn.textContent = '▶ CONTINUE  (' + sv.G.name + ' · ' + (sv.G.score||0).toLocaleString('en') + ' pts)';
-  } else { btn.classList.add('hidden'); }
+    btn.disabled = false; btn.style.opacity = '';
+    btn.textContent = '▶ CONTINUE (' + sv.G.name + ' · ' + (sv.G.score||0).toLocaleString('en') + ' pts)';
+  } else { btn.disabled = true; btn.style.opacity = '0.35'; btn.textContent = '▶ CONTINUE'; }
 }
-function suspendGame() {
-  stopAI(); stopTimer(); saveGame();
-  document.getElementById('pause-overlay').classList.add('hidden');
-  hideAll(); document.getElementById('ss').classList.remove('hidden');
-  checkContBtn(); toast('💾 Game saved!', 3000); G = {};
-}
+
 document.getElementById('cont-btn').addEventListener('click', () => { const sv=loadSave(); if(sv) restoreGame(sv); });
-document.getElementById('suspend-btn').addEventListener('click', suspendGame);
-document.getElementById('resume-btn').addEventListener('click', resumeGame);
+// resume-btn removed (pause button eliminated)
 
 function restoreGame(sv) {
   hideAll(); document.getElementById('gs').classList.remove('hidden');
@@ -844,7 +882,6 @@ function restoreGame(sv) {
   });
   sizeBoardEl(sv.tileData.filter(t=>!t.removed));
   document.getElementById('timer-wrap').style.display = G.mode==='blitz' ? 'block' : 'none';
-  document.getElementById('pause-overlay').classList.add('hidden');
   updateHUD(); updateFree(); updateSelUI(); startTimer(); refreshCoinsUI();
   toast('Welcome back, ' + G.name + '! 🀄');
 }
@@ -881,10 +918,22 @@ function toast(msg, dur=2300) {
 function conf2(ico, title, text, yesTxt, cb) {
   document.getElementById('conf-ico').textContent = ico; document.getElementById('conf-t').textContent = title;
   document.getElementById('conf-tx').textContent = text; document.getElementById('conf-yes').textContent = yesTxt;
+  document.getElementById('conf-yes2').classList.add('hidden');
   document.getElementById('conf').classList.remove('hidden');
   const close = () => document.getElementById('conf').classList.add('hidden');
   document.getElementById('conf-yes').onclick = () => { close(); cb(); };
-  document.getElementById('conf-no').onclick = close;
+  document.getElementById('conf-no').onclick = () => { close(); if(G.name && !G.over) resumeGame(); };
+}
+function conf3(ico, title, text, yes1Txt, cb1, yes2Txt, cb2) {
+  document.getElementById('conf-ico').textContent = ico; document.getElementById('conf-t').textContent = title;
+  document.getElementById('conf-tx').textContent = text; document.getElementById('conf-yes').textContent = yes1Txt;
+  const btn2 = document.getElementById('conf-yes2');
+  btn2.textContent = yes2Txt; btn2.classList.remove('hidden');
+  document.getElementById('conf').classList.remove('hidden');
+  const close = () => document.getElementById('conf').classList.add('hidden');
+  document.getElementById('conf-yes').onclick = () => { close(); cb1(); };
+  btn2.onclick = () => { close(); cb2(); };
+  document.getElementById('conf-no').onclick = () => { close(); if(G.name && !G.over) resumeGame(); };
 }
 function showOverlay(emoji, stars, title, text, onAgain, onHist) {
   document.getElementById('oe').textContent = emoji;
@@ -910,7 +959,7 @@ function updateHUD() {
   document.getElementById('h-score').textContent  = (G.score||0).toLocaleString('en');
   document.getElementById('h-combo').textContent  = '×' + (G.combo||1);
   document.getElementById('h-mode-badge').textContent = (G.mode||'classic').toUpperCase();
-  refreshCoinsUI(); upPowers();
+  refreshCoinsUI(); upPowers(); updateTileCounter();
 }
 function upPowers() {
   const us = G.undoStack || [];
@@ -938,13 +987,19 @@ function upPowers() {
   }
 }
 
+function updateTileCounter() {
+  const el = document.getElementById('h-tiles'); if (!el) return;
+  const total   = tiles.length;
+  const current = tiles.filter(t => !t.removed).length;
+  el.textContent = current + '/' + total;
+}
 /* ══════════════════════════════════════════════════════
    TIMER
    ══════════════════════════════════════════════════════ */
 function startTimer() {
   stopTimer();
   G.timerID = setInterval(() => {
-    if (G.paused || G.over) return;
+    if (isGameBlocked()) return;
     G.elapsed = (G.elapsed||0) + 1;
     const m = Math.floor(G.elapsed/60), s = G.elapsed%60;
     document.getElementById('h-time').textContent = m + ':' + String(s).padStart(2,'0');
@@ -982,47 +1037,30 @@ function getElRect(el) {
   const r = el.getBoundingClientRect();
   return { cx: r.left + r.width*0.5, cy: r.top + r.height*0.5, w: r.width, h: r.height };
 }
+function isGameBlocked() {
+  if (G.over) return true;
+  if (G.aiRunning) return true;
+  const popups = ['shop-popup','nomoves-popup','conf',
+                  'hist-screen','help-popup','gs-overlay'];
+  return popups.some(id => {
+    const el = document.getElementById(id);
+    return el && !el.classList.contains('hidden');
+  });
+}
+
 function isFree(tile) {
-  if (tile.removed || !tile.el) return false;
-  const r = getElRect(tile.el);
-  if (!r) return false;
-  const myZ = parseInt(tile.el.style.zIndex) || 0;
-
-  // ── COVERED check ──────────────────────────────────
-  // Any alive tile that: (a) renders visually above us AND
-  // (b) its centre overlaps our centre by >55% in both axes.
-  // We detect "above" by z-index; for same-z tiles (like special
-  // tiles at z=0) we also check if they were inserted later in the DOM.
-  const myIdx = tile.el.parentNode ? Array.from(tile.el.parentNode.children).indexOf(tile.el) : -1;
-  for (const t of tiles) {
-    if (t.removed || t === tile || !t.el) continue;
-    const tZ = parseInt(t.el.style.zIndex) || 0;
-    const tIdx = t.el.parentNode ? Array.from(t.el.parentNode.children).indexOf(t.el) : -1;
-    // "above" = higher z-index, OR same z-index but later in DOM (paints on top)
-    const isAbove = (tZ > myZ) || (tZ === myZ && tIdx > myIdx);
-    if (!isAbove) continue;
-    const tr = getElRect(t.el);
-    if (!tr) continue;
-    const overlapX = Math.abs(tr.cx - r.cx) < r.w * 0.58;
-    const overlapY = Math.abs(tr.cy - r.cy) < r.h * 0.58;
-    if (overlapX && overlapY) return false; // definitively covered
-  }
-
-  // ── SIDE-BLOCKED check ─────────────────────────────
-  // Tiles at the same visual level blocking both left and right.
-  let hasLeft = false, hasRight = false;
-  for (const t of tiles) {
-    if (t.removed || t === tile || !t.el) continue;
-    const tZ = parseInt(t.el.style.zIndex) || 0;
-    if (Math.abs(tZ - myZ) > 8) continue; // not same level
-    const tr = getElRect(t.el);
-    if (!tr) continue;
-    const dx = tr.cx - r.cx;
-    const dy = Math.abs(tr.cy - r.cy);
-    if (dy > r.h * 0.80) continue; // not on same horizontal band
-    if (dx < -r.w * 0.25 && dx > -r.w * 1.65) hasLeft  = true;
-    if (dx >  r.w * 0.25 && dx <  r.w * 1.65) hasRight = true;
-  }
+  if (tile.removed) return false;
+  /* Use the same LOGICAL grid rules as simFreeOf — no DOM/pixel math.
+     This ensures the game and the solvability check always agree.
+     Scatter offsets (px/py) are purely cosmetic and do not affect
+     which tiles are accessible. */
+  const alive = tiles.filter(t => !t.removed);
+  // 1 — covered: any tile at same (x,y) with higher z?
+  if (alive.some(u => u !== tile && u.x === tile.x && u.y === tile.y && u.z > tile.z))
+    return false;
+  // 2 — side-blocked at same z, same y row
+  const hasLeft  = alive.some(u => u !== tile && u.z === tile.z && u.y === tile.y && u.x === tile.x - 1);
+  const hasRight = alive.some(u => u !== tile && u.z === tile.z && u.y === tile.y && u.x === tile.x + 1);
   return !(hasLeft && hasRight);
 }
 function getTW() { return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--tw'))||62; }
@@ -1160,76 +1198,107 @@ function targetTileCount(level, ms) {
 }
 
 function buildShangHaiLayout(level, ms) {
-  const target    = targetTileCount(level, ms);
-  const maxZ      = 1 + Math.floor((level-1) / 3);
-  const nClusters = Math.min(8, 2 + Math.floor(level / 2));
+  const target = targetTileCount(level, ms);
 
-  // ── HARD BOUNDING BOX — grid NEVER exceeds 5 cols × 13 rows ──
-  const GRID_W = 8, GRID_H = 10;  // 6 cols × 14 rows — hard limit
+  /* ═══════════════════════════════════════════════════════════════
+     8×8 GRID — random layout with guaranteed stacks
+     
+     Strategy:
+     1. Place N "stack seeds" randomly on the 8×8 grid
+     2. Each seed grows upward to a random height (proportional to level)
+     3. Fill remaining base slots randomly until we hit the target
+     4. All assignments are solvable via generateSolvableBoard
+  ════════════════════════════════════════════════════════════════ */
 
-  const seen   = new Set();
-  const slots  = [];
-  const tryAdd = (x, y, z, px, py, angle) => {
-    // Hard clip — reject anything outside the bounding box
-    if (x < 0 || y < 0 || x >= GRID_W || y >= GRID_H) return;
-    const k = `${x},${y},${z}`;
-    if (seen.has(k)) return;
-    seen.add(k);
-    slots.push({ x, y, z, px: px||0, py: py||0, scatterAngle: angle });
-  };
+  const GW = 8, GH = 8;
+  const maxZ   = 1 + Math.floor(level / 2);        // lv1→1, lv2→2, lv3→2, lv4→3 …
+  const minStacks = Math.max(2, Math.floor(level / 2)); // guaranteed tall stacks
+  const maxStacks = Math.min(12, 2 + level);
 
-  // Non-overlapping cluster anchors (anchored within safe area)
-  const anchors = [];
-  for (let att=0; att<120 && anchors.length<nClusters; att++) {
-    const ax = Math.floor(Math.random()*11);   // 0..10 → cluster (max w=4) fits in 0..13
-    const ay = Math.floor(Math.random()*4);    // 0..3  → cluster (max h=3) fits in 0..5
-    if (anchors.every(([bx,by]) => Math.abs(ax-bx)>3 || Math.abs(ay-by)>2))
-      anchors.push([ax,ay]);
+  const seen  = new Set();
+  const slots = [];
+
+  function key(x,y,z){ return `${x},${y},${z}`; }
+
+  function addSlot(x,y,z) {
+    if (x<0||y<0||x>=GW||y>=GH) return false;
+    if (z<0||z>maxZ) return false;
+    if (seen.has(key(x,y,z))) return false;
+    // require z-1 to exist for z>0
+    if (z>0 && !seen.has(key(x,y,z-1))) return false;
+    seen.add(key(x,y,z));
+    slots.push({x,y,z,
+      px:           (Math.random()-0.5)*6,
+      py:           (Math.random()-0.5)*6,
+      scatterAngle: (Math.random()-0.5)*5
+    });
+    return true;
   }
-  [[0,0],[5,0],[9,0],[2,2],[7,2],[0,2],[4,1],[9,2]].forEach(([fx,fy]) => {
-    if (anchors.length < nClusters) anchors.push([fx,fy]);
-  });
 
-  // Fill each cluster with stacked layers
-  anchors.forEach(([ax,ay]) => {
-    const w = 2 + Math.floor(Math.random()*3);   // 2–4
-    const h = 2 + Math.floor(Math.random()*2);   // 2–3
-    const stackRoll = Math.random();
-    const stackH = maxZ <= 1 ? 1 :
-      stackRoll < 0.35 ? 1 :
-      stackRoll < 0.65 ? 1 + Math.floor(maxZ * 0.4) :
-      1 + Math.floor(Math.random() * maxZ);
-    for (let z=0; z<stackH; z++) {
-      for (let y=ay+z; y<ay+h-z; y++)
-        for (let x=ax+z; x<ax+w-z; x++)
-          tryAdd(x, y, z, 0, 0, (Math.random()-0.5)*6);
+  // ── 1. Choose stack seed positions (well spread on the grid) ──
+  const numStacks = minStacks + Math.floor(Math.random()*(maxStacks-minStacks+1));
+  const seeds = [];
+  for (let att=0; att<400 && seeds.length<numStacks; att++) {
+    const sx = Math.floor(Math.random()*GW);
+    const sy = Math.floor(Math.random()*GH);
+    // Keep seeds at least 1 cell apart so stacks don't all merge
+    if (seeds.every(([bx,by]) => Math.abs(sx-bx)>1 || Math.abs(sy-by)>1)) {
+      seeds.push([sx,sy]);
+    }
+  }
+
+  // ── 2. Grow each seed into a pyramid cluster ──────────────────
+  seeds.forEach(([sx,sy], si) => {
+    // Cluster footprint: 1–3 wide, 1–3 tall at base
+    const cw = 1 + Math.floor(Math.random()*3);
+    const ch = 1 + Math.floor(Math.random()*3);
+    // Stack height for this cluster: first 2 seeds always get maxZ
+    const sh = (si < 2) ? maxZ : 1 + Math.floor(Math.random()*maxZ);
+
+    for (let z=0; z<sh; z++) {
+      for (let dy=0; dy<ch-z; dy++) {
+        for (let dx=0; dx<cw-z; dx++) {
+          addSlot(sx+dx, sy+dy, z);
+        }
+      }
     }
   });
 
-  // Scatter ring — stays strictly inside the bounding box
-  const scatterCount = Math.round(slots.length * Math.min(0.35, (level-1)*0.04));
-  for (let i=0; i<scatterCount*4 && slots.length<target+scatterCount; i++) {
-    const gx = Math.floor(Math.random() * GRID_W);
-    const gy = Math.floor(Math.random() * GRID_H);
-    const px  = (Math.random()-0.5) * Math.min(12, level*1.2);
-    const py  = (Math.random()-0.5) * Math.min(12, level*1.2);
-    const ang = (Math.random()-0.5) * Math.min(14, 4+level*0.7);
-    tryAdd(gx, gy, 0, px, py, ang);
+  // ── 3. Fill base layer (z=0) randomly until we reach target ──
+  let iter = 0;
+  while (slots.length < target && iter++ < 3000) {
+    // Random base cell
+    const rx = Math.floor(Math.random()*GW);
+    const ry = Math.floor(Math.random()*GH);
+    if (!addSlot(rx, ry, 0)) {
+      // Try stacking on an existing base tile instead
+      const base = slots.filter(s=>s.z===0);
+      if (base.length>0) {
+        const ref = base[Math.floor(Math.random()*base.length)];
+        for (let z=1; z<=maxZ; z++) {
+          if (addSlot(ref.x, ref.y, z)) break;
+        }
+      }
+    }
   }
 
-  // Pad if under target — only inside bounding box
-  for (let att=0; slots.length<target && att<600; att++) {
-    const ref = slots[Math.floor(Math.random()*slots.length)];
-    const dx  = Math.floor(Math.random()*3)-1;
-    const dy  = Math.floor(Math.random()*3)-1;
-    if (!dx && !dy) continue;
-    tryAdd(ref.x+dx, ref.y+dy, 0,
-      (Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*6);
+  // ── 4. Trim to exact ms multiple ─────────────────────────────
+  const finalN = Math.floor(Math.min(slots.length, target) / ms) * ms;
+
+  // If we have more than needed, remove from the top layers first
+  // then from z=0 perimeter — never leave a tile unsupported
+  let result = [...slots];
+  while (result.length > finalN) {
+    // Find highest z
+    const hz = Math.max(...result.map(s=>s.z));
+    const topLayer = result.filter(s=>s.z===hz);
+    // Remove one random top tile
+    const ri = Math.floor(Math.random()*topLayer.length);
+    const rem = topLayer[ri];
+    result = result.filter(s=>s!==rem);
   }
 
-  // Trim to exact ms multiple
-  const finalCount = Math.floor(Math.min(slots.length, target) / ms) * ms;
-  return slots.slice(0, finalCount);
+  return result;
 }
 
 function classicLayout() { return buildShangHaiLayout(1, 2); }
@@ -1238,12 +1307,25 @@ function classicLayout() { return buildShangHaiLayout(1, 2); }
    FREE-TILE SIMULATION (shared by build + shuffle)
    ══════════════════════════════════════════════════════ */
 function simFreeOf(st) {
-  return st.filter(t => {
-    if (t.removed) return false;
-    for (const u of st) if (!u.removed && u.z > t.z && u.x === t.x && u.y === t.y) return false;
-    let L=false, R=false;
-    for (const u of st) { if (u.removed||u.z!==t.z||u.y!==t.y) continue; if(u.x===t.x-1)L=true; if(u.x===t.x+1)R=true; }
-    return !(L && R);
+  /* Mirror the exact same rules as isFree() but using logical x,y,z
+     coordinates instead of DOM pixels — so generateSolvableBoard and
+     the actual game agree on which tiles are accessible.
+
+     Rules (matching isFree):
+     1. COVERED: no tile at same (x,y) with higher z
+     2. SIDE-BLOCKED: not blocked by tiles on BOTH left (x-1) AND right (x+1)
+        at the same z level, same y row.
+     Tiles at z=0 with a small scatter offset (px/py) are treated as if
+     they sit exactly on their grid cell — scatter is cosmetic only. */
+  const alive = st.filter(t => !t.removed);
+  return alive.filter(t => {
+    // 1 — covered check: any tile directly above?
+    if (alive.some(u => u !== t && u.x === t.x && u.y === t.y && u.z > t.z))
+      return false;
+    // 2 — side-blocked: tiles at same z, same y, x±1
+    const hasLeft  = alive.some(u => u !== t && u.z === t.z && u.y === t.y && u.x === t.x - 1);
+    const hasRight = alive.some(u => u !== t && u.z === t.z && u.y === t.y && u.x === t.x + 1);
+    return !(hasLeft && hasRight);
   });
 }
 
@@ -1255,28 +1337,78 @@ function simFreeOf(st) {
    ══════════════════════════════════════════════════════ */
 function generateSolvableBoard(L, ms, pool) {
   const pool18 = pool.slice(0, 18);
-  const proto = L.map(p => ({x:p.x, y:p.y, z:p.z, removed:true, emoji:null, special:null}));
-  // Randomise placement order for board variety
-  const order = [...proto];
-  for (let i=order.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
-  let unplaced = [...order];
-  let emojiIdx = 0, safety = 0;
-  while (unplaced.length >= ms && safety++ < 1000) {
-    // Un-remove unplaced temporarily to evaluate which are free
-    unplaced.forEach(t => t.removed = false);
-    const freeNow = simFreeOf(proto).filter(t => unplaced.includes(t));
-    unplaced.forEach(t => t.removed = true);
-    // Prefer free positions; fall back to any unplaced if not enough
-    const pool2 = freeNow.length >= ms ? freeNow : unplaced;
-    for (let i=pool2.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [pool2[i],pool2[j]]=[pool2[j],pool2[i]]; }
-    const pick = pool2.slice(0, ms);
-    const em = pool18[emojiIdx++ % pool18.length];
-    pick.forEach(t => { t.emoji = em; t.removed = false; });
-    unplaced = unplaced.filter(t => !pick.includes(t));
+
+  /* ═══════════════════════════════════════════════════════════
+     FORWARD SIMULATION — guaranteed solvable for ms=2,3,4
+     
+     Algorithm: start with ALL tiles present on the board.
+     At each step, find which tiles are currently FREE (accessible),
+     pick exactly ms of them at random, assign the same emoji,
+     then "remove" them (simulate a match). Repeat until empty.
+     
+     This guarantees the assignment is solvable because the removal
+     sequence we just constructed IS a valid solution.
+     
+     We retry up to 80 times with different random orders if we
+     get stuck (can happen with very constrained stacked layouts).
+  ═══════════════════════════════════════════════════════════ */
+
+  for (let attempt = 0; attempt < 80; attempt++) {
+    // Fresh state — all tiles present
+    const state = L.map(p => ({x:p.x, y:p.y, z:p.z, removed:false, emoji:null, special:null}));
+    const groups = [];   // [{emoji, tiles[]}]
+    let remaining = [...state];
+    let emojiIdx  = 0;
+    let stuck     = false;
+
+    while (remaining.length >= ms) {
+      // Find free tiles among the ones still on the board
+      const freeNow = simFreeOf(state).filter(t => remaining.includes(t));
+
+      if (freeNow.length < ms) { stuck = true; break; }
+
+      // Pick ms random free tiles, assign same emoji, mark removed
+      for (let i = freeNow.length-1; i > 0; i--) {
+        const j = Math.floor(Math.random()*(i+1));
+        [freeNow[i], freeNow[j]] = [freeNow[j], freeNow[i]];
+      }
+      const pick = freeNow.slice(0, ms);
+      const em   = pool18[emojiIdx++ % pool18.length];
+      groups.push({ em, pick });
+      pick.forEach(t => { t.removed = true; });
+      remaining = remaining.filter(t => !pick.includes(t));
+    }
+
+    if (!stuck && remaining.length === 0) {
+      // Restore: un-remove all, set emoji
+      state.forEach(t => { t.removed = false; });
+      groups.forEach(({ em, pick }) => pick.forEach(t => { t.emoji = em; }));
+      // Inject special tiles on a random complete group at z=0
+      injectSpecials(state, ms);
+      return state;
+    }
+    // else: retry with a different random order
   }
-  // Safety: assign any remaining (should be 0)
-  unplaced.forEach(t => { t.emoji = pool18[Math.floor(Math.random()*pool18.length)]; t.removed = false; });
-  return proto;
+
+  // Absolute fallback (should never reach here): naive assignment
+  const state = L.map(p => ({x:p.x, y:p.y, z:p.z, removed:false, emoji:null, special:null}));
+  state.forEach((t,i) => { t.emoji = pool18[Math.floor(i/ms) % pool18.length]; });
+  return state;
+}
+
+function injectSpecials(state, ms) {
+  // Find groups of ms tiles all at z=0, mark one group as 'coin' and one as 'diamond'
+  const byEmoji = {};
+  state.forEach(t => { if (!byEmoji[t.emoji]) byEmoji[t.emoji] = []; byEmoji[t.emoji].push(t); });
+  const groups = Object.values(byEmoji).filter(g => g.length === ms && g.every(t => t.z === 0));
+  if (groups.length > 0) {
+    const gi = Math.floor(Math.random() * groups.length);
+    groups[gi].forEach(t => t.special = 'coin');
+  }
+  if (groups.length > 1) {
+    let gi2; do { gi2 = Math.floor(Math.random() * groups.length); } while (gi2 === groups.length-1);
+    groups[gi2].forEach(t => t.special = 'diamond');
+  }
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1331,8 +1463,8 @@ function buildBoard() {
     if (i % 8 === 0) setTimeout(() => SFX.dropin(), i * 3);
   });
 
-  updateFree(); updateSelUI();
-  setTimeout(() => updateFree(), 700 + N * (400/N));
+  updateFree(); updateSelUI(); updateTileCounter();
+  setTimeout(() => { updateFree(); updateTileCounter(); }, 700 + N * (400/N));
 }
 
 function sizeBoardEl(posArr, includePx=false) {
@@ -1405,7 +1537,7 @@ function updateSelUI() {
    ══════════════════════════════════════════════════════ */
 function clickTile(tile) {
   // Block if not free, game over, paused or AI running
-  if (!isFree(tile) || G.over || G.paused || G.aiRunning) return;
+  if (!isFree(tile) || isGameBlocked()) return;
   SFX.click();
 
   // Special tiles match exactly like normal tiles (bonus awarded in doMatch)
@@ -1433,18 +1565,12 @@ function clickTile(tile) {
   if (allSame) {
     doMatch([...selected]);
   } else {
-    // Mismatch — shake and reset
-    const bad = [...selected];
+    // Mismatch — deselect + bad sound
+    selected.forEach(t => t.el.classList.remove('selected','t1','t2','t3'));
     selected = [];
-    bad.forEach(t => {
-      t.el.classList.remove('selected','t1','t2','t3');
-      t.el.classList.add('shake');
-      setTimeout(() => t.el && t.el.classList.remove('shake'), 280);
-    });
     G.combo = 1;
     document.getElementById('h-combo').textContent = '×1';
-    updateSelUI();
-    SFX.bad();
+    updateSelUI(); SFX.bad();
   }
 }
 
@@ -1459,19 +1585,20 @@ function doMatch(matched, silent=false) {
   G.combo = (since <= 4) ? Math.min((G.combo||1)+1, 10) : 1;
   G.lastMatchTime = now;
 
-  // Score & base coins
-  const pts = 100 * G.level * G.combo;
+  // Score & base coins — halved when AI is playing
+  const aiPenalty = G.aiRunning ? 0.5 : 1;
+  const pts = Math.floor(100 * G.level * G.combo * aiPenalty);
   G.score += pts;
-  let coinsEarned = 5 + Math.max(0, (G.combo-1)*3);
+  let coinsEarned = Math.floor((5 + Math.max(0, (G.combo-1)*3)) * aiPenalty);
 
   // ── Bonus for special groups ──
   // 🪙 coin group  → +10 coins per tile matched (ms × 10)
   // 💎 diamond group → +100 coins per tile matched (ms × 100)
   const specType = matched[0].special; // all tiles in a group share same emoji/special
-  if (specType === 'coin')    { const bonus = 10  * matched.length; coinsEarned += bonus; }
-  if (specType === 'diamond') { const bonus = 100 * matched.length; coinsEarned += bonus; }
+  if (specType === 'coin')    { const bonus = Math.floor(10  * matched.length * aiPenalty); coinsEarned += bonus; }
+  if (specType === 'diamond') { const bonus = Math.floor(100 * matched.length * aiPenalty); coinsEarned += bonus; }
 
-  addCoins(coinsEarned, matched[0].el);
+  addCoins(coinsEarned, matched[matched.length-1].el);
 
   document.getElementById('h-score').textContent = G.score.toLocaleString('en');
   document.getElementById('h-combo').textContent = '×' + G.combo;
@@ -1498,13 +1625,14 @@ function doMatch(matched, silent=false) {
     t.el.classList.add('removed'); // triggers CSS fade-out
   });
 
-  if (!silent) spawnParticles(matched[0].el, matched[0].emoji);
+  if (!silent) spawnParticles(matched[matched.length-1].el, matched[matched.length-1].emoji);
 
   // Reset selection
   selected = [];
   updateSelUI();
   updateFree();
   upPowers();
+  updateTileCounter();
 
   // Check win / no moves
   const alive = tiles.filter(t => !t.removed);
@@ -1528,36 +1656,32 @@ function anyMove() {
    NO MOVES POPUP
    ══════════════════════════════════════════════════════ */
 function showNoMoves() {
-  if (G.over || G.paused) return;
-  G.paused = true;
+  if (isGameBlocked()) return;
   const cnt = document.getElementById('nm-cnt');
   cnt.textContent = G.shuffles > 0 ? '(' + G.shuffles + ' left)' : '(0)';
   document.getElementById('nm-shuffle-btn').disabled = !(G.shuffles > 0);
   document.getElementById('nm-ads-btn').style.display = USE_ADS ? '' : 'none';
   document.getElementById('nomoves-popup').classList.remove('hidden');
 }
-document.getElementById('nm-shuffle-btn').addEventListener('click', () => {
+document.getElementById('nm-shop-btn').addEventListener('click', () => {
   document.getElementById('nomoves-popup').classList.add('hidden');
-  G.paused = false; doShuffle();
+  openShop();
 });
-document.getElementById('nm-ads-btn').addEventListener('click', () => {
+document.getElementById('nm-save-exit-btn').addEventListener('click', () => {
   document.getElementById('nomoves-popup').classList.add('hidden');
-  showAd(() => {
-    G.paused = false;
-    // Free shuffle (no counter consumed)
-    const alive = tiles.filter(t => !t.removed);
-    const emojis = alive.map(t => t.emoji);
-    for (let i=emojis.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [emojis[i],emojis[j]]=[emojis[j],emojis[i]]; }
-    alive.forEach((t,i) => { t.emoji=emojis[i]; if(t.el) t.el.textContent=t.emoji; });
-    selected=[]; tiles.forEach(t=>{ if(t.el) t.el.classList.remove('selected','hint-glow','t1','t2','t3'); });
-    updateSelUI(); updateFree(); SFX.shuffle(); toast('📺 Free Shuffle!');
-  });
-});
-document.getElementById('nm-quit-btn').addEventListener('click', () => {
-  document.getElementById('nomoves-popup').classList.add('hidden');
-  G.paused = false; stopAI(); stopTimer(); saveGame(); pushHistory('fail');
+  stopAI(); stopTimer(); saveGame(); pushHistory('fail');
   hideAll(); document.getElementById('ss').classList.remove('hidden');
-  checkContBtn(); toast('🚪 Game ended.'); G = {};
+  checkContBtn(); toast('💾 Progress saved.'); G = {};
+});
+document.getElementById('nm-exit-btn').addEventListener('click', () => {
+  document.getElementById('nomoves-popup').classList.add('hidden');
+  stopAI(); stopTimer(); clearSave(); pushHistory('fail');
+  hideAll(); document.getElementById('ss').classList.remove('hidden');
+  checkContBtn(); toast('🚪 Game abandoned.'); G = {};
+});
+document.getElementById('nm-cancel-btn').addEventListener('click', () => {
+  document.getElementById('nomoves-popup').classList.add('hidden');
+  toast('↩ Back to game!', 1500);
 });
 
 /* ══════════════════════════════════════════════════════
@@ -1579,7 +1703,14 @@ function showComboFlash(n) {
   const el = document.getElementById('combo-flash');
   // n can be a number (combo) or a pre-formatted string (special bonus)
   el.textContent = typeof n === 'string' ? n
-    : n>=6 ? '🌟 INSANE ×'+n+'!' : n>=4 ? '⚡ MEGA ×'+n+'!' : '🔥 COMBO ×'+n+'!';
+    : n>=9 ? '👑 GODLIKE ×'+n+'!'
+    : n>=8 ? '💎 ULTIMATE ×'+n+'!'
+    : n>=7 ? '🌀 INSANE ×'+n+'!'
+    : n>=6 ? '🌈 WONDER ×'+n+'!'
+    : n>=5 ? '🔥 AMAZING ×'+n+'!'
+    : n>=4 ? '🌟 MEGA ×'+n+'!'
+    : n>=3 ? '⚡ SUPER ×'+n+'!'
+    : '🤜 COMBO ×'+n+'!';
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 
@@ -1587,24 +1718,32 @@ function showComboFlash(n) {
    ARCADE SPAWN
    ══════════════════════════════════════════════════════ */
 function arcadeSpawn() {
-  const pool = THEMES[G.emojiTheme];
+  const pool  = THEMES[G.emojiTheme];
   const board = document.getElementById('board');
-  for (let i=0; i<2; i++) {
+  const GW = 8, GH = 8;
+  const occupied = new Set(tiles.filter(t=>!t.removed && t.z===0).map(t=>`${t.x},${t.y}`));
+  let spawned = 0;
+  for (let att=0; att<80 && spawned<4; att++) {
+    const x = Math.floor(Math.random()*GW);
+    const y = Math.floor(Math.random()*GH);
+    const key = `${x},${y}`;
+    if (occupied.has(key)) continue;
+    occupied.add(key);
     const emoji = pool[Math.floor(Math.random()*pool.length)];
-    const x = Math.floor(Math.random()*11);
-    [0,1].forEach(dy => {
-      const angle = (Math.random()-0.5)*8;
-      const tile = {emoji, x, y:dy, z:0, removed:false, special:null, angle, px:0, py:0};
-      tiles.push(tile);
-      // Use makeTileEl for correct 3D structure + animation
-      const el = makeTileEl(tile, true, 0, 1);
-      el.style.setProperty('--dl','0ms');
-      el.style.setProperty('--dd','0.4s');
-      board.appendChild(el);
-    });
+    const angle = (Math.random()-0.5)*12;
+    const px = (Math.random()-0.5)*8, py = (Math.random()-0.5)*8;
+    const tile = {emoji, x, y, z:0, removed:false, special:null, angle, px, py};
+    tiles.push(tile);
+    const el = makeTileEl(tile, true, 0, 1);
+    el.style.setProperty('--dl','0ms');
+    el.style.setProperty('--dd', (0.4+Math.random()*0.2)+'s');
+    board.appendChild(el);
+    spawned++;
   }
-  updateFree();
-  if (tiles.filter(t=>!t.removed).length > 100) gameLose();
+  setTimeout(() => {
+    updateFree(); updateTileCounter();
+    if (tiles.filter(t=>!t.removed).length > 100) gameLose();
+  }, 650);
 }
 
 /* ══════════════════════════════════════════════════════
@@ -1671,33 +1810,21 @@ function doShuffle(free=false) {
   }
   if (!L || L.length < ms) return;
 
-  // ── SAME EMOJIS, new positions: collect current emoji counts
-  // Build an emoji bag from alive tiles (preserve exact counts including specials)
-  const emojiList = [];
-  alive.forEach(t => emojiList.push({ emoji: t.emoji, special: t.special || null }));
-  // Shuffle the bag randomly
-  for (let i = emojiList.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [emojiList[i], emojiList[j]] = [emojiList[j], emojiList[i]];
-  }
-
-  // Assign shuffled emojis to new layout positions (proto is just positional skeleton)
-  const proto = L.map((slot, i) => ({
-    x: slot.x, y: slot.y, z: slot.z,
-    removed: false,
-    emoji:   emojiList[i] ? emojiList[i].emoji   : '❓',
-    special: emojiList[i] ? emojiList[i].special  : null,
-  }));
+  // ── SOLVABLE ASSIGNMENT: use forward-construction so result is always solvable
+  // (pool is already declared above)
+  const proto = generateSolvableBoard(L, ms, pool);
+  // Preserve special tiles that were alive (coin/diamond groups)
+  // by injecting them back into z=0 complete groups as in buildBoard
 
   // ── REBUILD DOM: remove all alive tiles, drop new ones in
   const board = document.getElementById('board');
   tiles.filter(t => !t.removed).forEach(t => { if(t.el) t.el.remove(); });
-  tiles = tiles.filter(t => t.removed); // keep only already-matched tiles (for history)
+  tiles = tiles.filter(t => t.removed);
 
   const N = proto.length;
   proto.forEach((p, i) => {
     const slot = L[i];
-    const tile = { ...p, angle: slot.scatterAngle, px: slot.px, py: slot.py };
+    const tile = { ...p, angle: slot.scatterAngle || (Math.random()-0.5)*6, px: slot.px||0, py: slot.py||0 };
     tiles.push(tile);
     const el = makeTileEl(tile, true, i, N);
     board.appendChild(el);
@@ -1705,9 +1832,10 @@ function doShuffle(free=false) {
   });
 
   sizeBoardEl(L, true);
-  updateFree(); updateSelUI();
-  setTimeout(() => { updateFree(); upPowers(); }, 700);
-  toast('🔀 New layout — different positions, always solvable!');
+  updateSelUI();
+  // Delay updateFree so drop-in animation completes — tiles are selectable after
+  setTimeout(() => { updateFree(); upPowers(); updateTileCounter(); }, 750);
+  toast('🔀 New layout — guaranteed solvable!');
 }
 
 function doBomb() {
@@ -1762,8 +1890,7 @@ function aiStep() {
   free.forEach(t => { if (!c[t.emoji]) c[t.emoji]=[]; c[t.emoji].push(t); });
   const group = Object.values(c).find(arr => arr.length >= G.matchSize);
   if (!group) {
-    if (G.shuffles > 0) { doShuffle(); aiTimer=setTimeout(aiStep, 950); return; }
-    stopAI(); toast('🤖 AI stuck — no moves left.', 3000); return;
+    stopAI(); toast('🤖 AI could not finish — no moves left!', 3000); return;
   }
   const pick = group.slice(0, G.matchSize);
   pick.forEach(t => { if (t.el) t.el.classList.add('ai-hl'); });
@@ -1790,19 +1917,13 @@ document.getElementById('btn-ai').addEventListener('click', doAISolve);
    ══════════════════════════════════════════════════════ */
 function pauseGame() {
   if (G.over || !G.name) return;
-  G.paused = true; stopAI(); saveGame();
-  document.getElementById('hud-pause').classList.add('pause-active');
-  document.getElementById('pause-overlay').classList.remove('hidden');
+  stopAI(); saveGame();
 }
 function resumeGame() {
-  G.paused = false;
-  document.getElementById('hud-pause').classList.remove('pause-active');
-  document.getElementById('pause-overlay').classList.add('hidden');
   toast('▶ Resumed!', 1500);
 }
-document.getElementById('hud-pause').addEventListener('click', () => G.paused ? resumeGame() : pauseGame());
 document.addEventListener('keydown', e => {
-  if ((e.key==='p'||e.key==='P') && G.name && !G.over) G.paused ? resumeGame() : pauseGame();
+  if ((e.key==='p'||e.key==='P') && G.name && !G.over) isGameBlocked() ? resumeGame() : pauseGame();
 });
 
 /* ══════════════════════════════════════════════════════
@@ -1810,14 +1931,31 @@ document.addEventListener('keydown', e => {
    ══════════════════════════════════════════════════════ */
 document.getElementById('hud-quit').addEventListener('click', () => {
   if (!G.name || G.over) return;
-  conf2('🚪','Quit Game','Quit and save progress?','Quit & Save', () => {
-    stopAI(); stopTimer(); saveGame(); pushHistory('fail');
-    hideAll(); document.getElementById('ss').classList.remove('hidden');
-    checkContBtn(); toast('💾 Progress saved.'); G = {};
-  });
+  pauseGame();
+  conf3('🚪','Quit Game','What do you want to do?',
+    '💾 Save & Exit', () => {
+      stopAI(); stopTimer(); saveGame(); pushHistory('fail');
+      hideAll(); document.getElementById('ss').classList.remove('hidden');
+      checkContBtn(); toast('💾 Progress saved.'); G = {};
+    },
+    '🚪 Exit (no save)', () => {
+      stopAI(); stopTimer(); clearSave(); pushHistory('fail');
+      hideAll(); document.getElementById('ss').classList.remove('hidden');
+      checkContBtn(); toast('🚪 Game abandoned.'); G = {};
+    }
+  );
 });
 document.getElementById('hud-hist').addEventListener('click', () => { if (!G.name) return; pauseGame(); showHistScreen('gs'); });
 document.getElementById('hud-help').addEventListener('click', () => { pauseGame(); document.getElementById('help-popup').classList.remove('hidden'); });
+document.getElementById('hud-mute').addEventListener('click', () => {
+  _sfxMuted = !_sfxMuted;
+  localStorage.setItem('ppej_mute', _sfxMuted ? '1' : '0');
+  const b = document.getElementById('hud-mute');
+  b.textContent = _sfxMuted ? '🔇' : '🔊';
+  b.style.borderColor = _sfxMuted ? 'var(--red)' : '';
+  toast(_sfxMuted ? '🔇 Sound off' : '🔊 Sound on', 1500);
+});
+(function(){ const b=document.getElementById('hud-mute'); b.textContent=_sfxMuted?'🔇':'🔊'; if(_sfxMuted)b.style.borderColor='var(--red)'; })();
 
 /* ══════════════════════════════════════════════════════
    POPUPS
@@ -1891,13 +2029,13 @@ function startGame(name, avatarKey) {
     startTime:Date.now(), elapsed:0, timerID:null,
     mode:selectedMode, emojiTheme:selectedTheme,
     matchSize:cfg.matchSize, combo:1, lastMatchTime:0,
+    // aiSolvers start at 0; other powers start at base (3/3/2/1)
     undos:3, hints:3, shuffles:2, bombs:1, aiSolvers:0,
     aiRunning:false, undoStack:[],
   };
   document.getElementById('timer-wrap').style.display = selectedMode==='blitz' ? 'block' : 'none';
   document.getElementById('timer-bar').style.width = '100%';
   document.getElementById('timer-bar').classList.remove('warn');
-  document.getElementById('pause-overlay').classList.add('hidden');
   document.getElementById('ov').classList.add('hidden');
   updateHUD(); buildBoard(); startTimer();
   clearSave(); checkContBtn();
@@ -2013,9 +2151,13 @@ document.getElementById('lu-save').addEventListener('click', () => {
 function nextLevel() {
   // Keep player, mode, coins — increment level, reset board state
   G.level++;
-  G.over = false; G.paused = false;
+  G.over = false;
   G.elapsed = 0; G.combo = 1; G.lastMatchTime = 0;
-  G.undos = 3; G.hints = 3; G.shuffles = 2; G.bombs = 1;
+  // Only top-up resources that are at 0 (keep surplus from shop)
+  if (!G.undos)    G.undos    = 3;
+  if (!G.hints)    G.hints    = 3;
+  if (!G.shuffles) G.shuffles = 2;
+  if (!G.bombs)    G.bombs    = 1;
   G.undoStack = []; G.aiRunning = false;
   // Keep aiSolvers (earned in shop)
   tiles = []; selected = [];
