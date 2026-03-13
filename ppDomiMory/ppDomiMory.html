@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -216,7 +216,7 @@ body.light #theme-knob{transform:translateX(15px);background:linear-gradient(135
 .domtile.emoji-tile .pip{display:none}
 .domtile.emoji-tile .ehalf{font-size:1.2rem;line-height:1;flex:1;display:flex;
   align-items:center;justify-content:center;width:100%}
-/* board tile — tessera orizzontale (80×44), si wrappa a capo ogni 6 */
+/* board tile — horizontal tile (80×44), wraps every 6 */
 .domtile.board-tile{
   width:80px;height:44px;flex-shrink:0;
   cursor:default;pointer-events:none;
@@ -260,6 +260,7 @@ body.light #theme-knob{transform:translateX(15px);background:linear-gradient(135
   letter-spacing:3px;text-align:center}
 .mem-sub{font-size:.62rem;color:var(--text3);text-align:center;letter-spacing:1px}
 #mem-progress{display:flex;align-items:center;gap:6px;justify-content:center}
+#mem-arc-fill.urgent{animation:timerUrgent .4s ease-in-out infinite}
 .mp-bar{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
 .mp-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));
   border-radius:3px;transition:width .4s ease}
@@ -323,7 +324,7 @@ body.light #theme-knob{transform:translateX(15px);background:linear-gradient(135
 .mcard .sm-emoji{
   flex:1;width:100%;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.05rem;line-height:1}
+  font-size:1.2rem;line-height:1}
 
 /* Memory help buttons */
 #mem-helps{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
@@ -515,6 +516,45 @@ body.light .sinp{background:rgba(0,0,0,.03)}
 .hs-del{background:rgba(255,82,82,.07);color:var(--red);border-color:rgba(255,82,82,.2)}
 .hs-del:hover{background:rgba(255,82,82,.15)}
 
+
+/* ═══════════════════════════════════════════
+   ARCADE TIMER BAR
+═══════════════════════════════════════════ */
+#arcade-timer-bar{position:fixed;top:var(--hud-h);left:0;right:0;height:5px;
+  z-index:490;background:rgba(255,255,255,.06);display:none}
+body.gs-active.arcade-on #arcade-timer-bar{display:block}
+#arcade-timer-fill{height:100%;width:100%;
+  background:linear-gradient(90deg,var(--green),var(--hot),var(--red));
+  transition:width .2s linear;transform-origin:left}
+#arcade-timer-fill.urgent{animation:timerUrgent .4s ease-in-out infinite}
+@keyframes timerUrgent{0%,100%{opacity:1}50%{opacity:.4}}
+#arcade-badge{position:fixed;top:calc(var(--hud-h) + 7px);right:50px;z-index:491;
+  font-size:.52rem;font-weight:700;letter-spacing:2px;color:var(--hot2);
+  display:none;text-transform:uppercase;text-shadow:0 0 8px rgba(255,157,61,.6)}
+body.gs-active.arcade-on #arcade-badge{display:block}
+
+/* Arcade toggle in start screen */
+.arcade-row{display:flex;align-items:center;justify-content:space-between;
+  background:rgba(255,157,61,.06);border:1.5px solid rgba(255,157,61,.2);
+  border-radius:9px;padding:8px 12px;margin-bottom:10px;cursor:pointer;gap:8px}
+.arcade-row:hover{border-color:var(--hot);background:rgba(255,157,61,.1)}
+.arcade-lbl{font-size:.68rem;font-weight:700;color:var(--hot);letter-spacing:1px}
+.arcade-sub{font-size:.55rem;color:var(--text3);margin-top:2px}
+.arcade-toggle{width:36px;height:20px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--panel2);cursor:pointer;display:flex;align-items:center;padding:2px;
+  transition:all .3s;flex-shrink:0}
+.arcade-toggle.on{background:var(--hot);border-color:var(--hot2)}
+.arcade-knob{width:13px;height:13px;border-radius:50%;background:#fff;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.arcade-toggle.on .arcade-knob{transform:translateX(15px)}
+
+/* ═══════════════════════════════════════════
+   INFO ROW (board center messages)
+═══════════════════════════════════════════ */
+#info-row{display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:18px;padding:2px 8px;flex-wrap:wrap;text-align:center}
+#ai-log-disp{font-size:.6rem;color:var(--text3);letter-spacing:.5px;font-style:italic}
+#phase-hint-disp{font-size:.62rem;color:var(--accent2);font-weight:600;letter-spacing:.5px}
 /* ═══════════════════════════════════════════
    DEBUG BAR
 ═══════════════════════════════════════════ */
@@ -538,47 +578,56 @@ body.light .sinp{background:rgba(0,0,0,.03)}
      START SCREEN
 ═══════════════════════════════ -->
 <div id="ss" class="screen">
-  <div class="logo">ppDomiMory</div>
+  <div class="logo"><span style="-webkit-text-fill-color:initial;background:none;font-size:inherit">🎲</span> ppDomiMory <span style="-webkit-text-fill-color:initial;background:none;font-size:inherit">🎲</span></div>
   <div class="tagline">Memory · Domino · Strategy ✦</div>
 
   <div class="scard">
-    <span class="slbl">Il tuo nome</span>
-    <input id="pname" class="sinp" type="text" placeholder="es. Marco…" maxlength="14" autocomplete="off">
+    <span class="slbl">Your name</span>
+    <input id="pname" class="sinp" type="text" placeholder="e.g. Paolo…" maxlength="14" autocomplete="off">
 
     <span class="slbl">Avatar</span>
     <div class="avatar-grid" id="avatar-grid"></div>
 
-    <span class="slbl">Difficoltà AI</span>
+    <span class="slbl">AI Difficulty</span>
     <div class="diff-row">
       <button class="diffbtn active" data-diff="easy">🟢 Easy</button>
       <button class="diffbtn" data-diff="medium">🟡 Medium</button>
       <button class="diffbtn" data-diff="hard">🔴 Hard</button>
     </div>
 
-    <span class="slbl">Tipo tessere</span>
+    <span class="slbl">Tile type</span>
     <div class="tile-type-row">
       <button class="ttbtn active" data-type="classic">
-        <span class="tt-icon">⚫</span><span class="tt-lbl">Classico</span>
+        <span class="tt-icon">⚫</span><span class="tt-lbl">Classic</span>
       </button>
       <button class="ttbtn" data-type="emoji">
         <span class="tt-icon">🐶</span><span class="tt-lbl">Emoji</span>
       </button>
     </div>
+    <span class="slbl" style="margin-top:8px">Mode</span>
+    <div class="arcade-row" id="arcade-row-toggle">
+      <div>
+        <div class="arcade-lbl">⚡ Arcade Mode</div>
+        <div class="arcade-sub">Turn timer · Power-ups active</div>
+      </div>
+      <div class="arcade-toggle" id="arcade-toggle-btn"><div class="arcade-knob"></div></div>
+    </div>
   </div>
 
-  <button class="playbtn" id="pbtn">🎲 GIOCA!</button>
-  <button class="secbtn" id="hist-btn">🏆 Storico</button>
-  <button class="secbtn" id="help-ss-btn">❓ Come si gioca</button>
+  <button class="playbtn" id="pbtn">🎲 PLAY!</button>
+  <button class="secbtn" id="hist-btn">🏆 History</button>
+  <button class="secbtn" id="help-ss-btn">❓ How to play</button>
+  <button class="secbtn" id="ss-shop-btn" style="border-color:var(--gold2);color:var(--gold)">🛒 Shop</button>
 </div>
 
 <!-- HISTORY -->
 <div id="hs-screen" class="screen hidden">
-  <div class="hs-title">🏆 Storico</div>
-  <div class="hs-sub">Le tue partite ppDomiMory</div>
+  <div class="hs-title">🏆 History</div>
+  <div class="hs-sub">Your ppDomiMory game history</div>
   <div id="hs-list"></div>
   <div class="hs-acts">
-    <button class="hs-back" id="hs-back">← Indietro</button>
-    <button class="hs-del" id="hs-del">🗑 Cancella tutto</button>
+    <button class="hs-back" id="hs-back">← Back</button>
+    <button class="hs-del" id="hs-del">🗑 Delete all</button>
   </div>
 </div>
 
@@ -599,13 +648,16 @@ body.light .sinp{background:rgba(0,0,0,.03)}
       <span class="hl">COMBO</span><span class="hv" id="h-combo" style="color:var(--hot2)">x1</span>
     </div>
     <button class="hbtn shop" id="hud-shop" style="margin-left:auto">🛒</button>
-    <button class="hbtn" id="hud-autopilot" title="Auto-Pilota">🕹️</button>
-    <button class="hbtn" id="hud-aiplay" title="AI un turno">🤖</button>
+    <button class="hbtn" id="hud-autopilot" title="Auto-Pilot">🕹️</button>
     <button class="hbtn" id="hud-sound">🔊</button>
     <button class="hbtn" id="hud-hist">🏆</button>
     <button class="hbtn" id="hud-help">❓</button>
     <button class="hbtn danger" id="hud-quit" style="margin-right:42px">🚪</button>
   </div>
+
+  <!-- Arcade timer bar -->
+  <div id="arcade-timer-bar"><div id="arcade-timer-fill"></div></div>
+  <div id="arcade-badge">⚡ ARCADE</div>
 
   <!-- Game body: AI row / board / player row -->
   <div id="game-body">
@@ -615,17 +667,18 @@ body.light .sinp{background:rgba(0,0,0,.03)}
       <div class="row-hdr">
         <span>🤖 AI</span>
         <span id="ai-tiles-count" style="color:var(--text3);font-size:.5rem"></span>
-        <span id="ai-log-inline">in attesa…</span>
+        <span id="ai-log-inline" style="display:none"></span>
       </div>
       <div class="row-tiles" id="ai-hand"></div>
     </div>
 
     <!-- Board -->
     <div id="board-row-wrap">
-      <div class="board-lbl">— TAVOLO —</div>
+      <div class="board-lbl">— BOARD —</div>
+      <div id="info-row"><span id="ai-log-disp"></span><span id="phase-hint-disp"></span></div>
       <div id="board-scroll">
         <div id="board-chain">
-          <div class="board-empty">Gioca la prima tessera!</div>
+          <div class="board-empty">Play the first tile!</div>
         </div>
       </div>
     </div>
@@ -634,13 +687,14 @@ body.light .sinp{background:rgba(0,0,0,.03)}
     <div id="player-row">
       <div class="row-hdr">
         <span id="p-av">🎮</span>
-        <span id="p-name">TU</span>
+        <span id="p-name">YOU</span>
         <span id="p-tiles-count" style="color:var(--text3);font-size:.5rem;margin-left:4px"></span>
       </div>
       <div class="row-tiles" id="player-hand"></div>
       <div id="action-bar">
-        <button class="act-btn hidden" id="btn-pass">⏭ Passa</button>
-        <span id="phase-hint"></span>
+        <button class="act-btn hidden" id="btn-pass">⏭ Pass</button>
+        <span id="phase-hint" style="display:none"></span>
+        <div id="domino-powerups" style="display:flex;gap:4px;margin-left:auto"></div>
       </div>
     </div>
 
@@ -653,8 +707,10 @@ body.light .sinp{background:rgba(0,0,0,.03)}
 ═══════════════════════════════ -->
 <div id="mem-popup" class="hidden">
   <div id="mem-box">
-    <div class="mem-title" id="mem-title">🧩 MEMORY — Pesca tessere</div>
-    <div class="mem-sub" id="mem-sub">Trova le coppie identiche!</div>
+    <div id="mem-arc-bar" style="display:none;width:100%;height:5px;border-radius:3px;overflow:hidden;margin-bottom:4px;background:rgba(255,255,255,.08)"><div id="mem-arc-fill" style="height:100%;width:100%;background:linear-gradient(90deg,var(--green),var(--hot),var(--red));transition:width .2s linear"></div></div>
+    <div class="mem-title" id="mem-title">🧩 MEMORY — Draw tiles</div>
+    <div class="mem-sub" id="mem-sub">Find the matching pairs!</div>
+    <div id="mem-board-ends" class="hidden" style="text-align:center;font-size:.68rem;background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:8px;padding:5px 10px;margin-bottom:4px;color:var(--gold2)"></div>
     <div id="mem-progress">
       <div class="mp-bar"><div class="mp-fill" id="mp-fill" style="width:0%"></div></div>
       <div class="mp-txt" id="mp-txt">0/7</div>
@@ -668,9 +724,10 @@ body.light .sinp{background:rgba(0,0,0,.03)}
 <div id="shop-popup" class="hidden">
   <div class="shop-box">
     <div class="shop-title">🛒 SHOP</div>
-    <div class="shop-coins">Le tue monete: <span id="shop-coins-val" style="color:var(--gold);font-weight:700">0</span> 🪙</div>
+    <div class="shop-coins">Your coins: <span id="shop-coins-val" style="color:var(--gold);font-weight:700">0</span> 🪙</div>
     <div class="shop-items" id="shop-items"></div>
-    <button class="shop-close" id="shop-close">✕ Chiudi</button>
+    <button class="shop-close" id="shop-close">✕ Close</button>
+    <button class="shop-close" id="shop-reset" style="margin-top:6px;background:rgba(255,82,82,.1);border:1.5px solid rgba(255,82,82,.3);color:var(--red);font-size:.65rem">🗑 Reset coins &amp; costs</button>
   </div>
 </div>
 
@@ -692,7 +749,7 @@ body.light .sinp{background:rgba(0,0,0,.03)}
     <div class="conf-t" id="conf-t">—</div>
     <div class="conf-tx" id="conf-tx">—</div>
     <div class="conf-btns">
-      <button class="conf-no" id="conf-no">Annulla</button>
+      <button class="conf-no" id="conf-no">Cancel</button>
       <button class="conf-yes" id="conf-yes">Conferma</button>
     </div>
   </div>
@@ -700,17 +757,58 @@ body.light .sinp{background:rgba(0,0,0,.03)}
 
 <!-- HELP POPUP -->
 <div id="help-popup" class="popup-bg hidden">
-  <div class="popup-box">
-    <div class="popup-title">🎲 ppDomiMory v01.00</div>
-    <div class="popup-row"><strong>🧩 Fase MEMORY:</strong> Si apre un pannello con tutte le tessere capovolte (in doppia copia). Trova le coppie identiche per aggiungere quelle tessere alla tua mano (7 tessere per iniziare). Ogni coppia trovata = tessera guadagnata + monete!</div>
-    <div class="popup-row"><strong>🎲 Fase DOMINO:</strong> Seleziona una tessera evidenziata (verde = giocabile). La tessera si posiziona automaticamente sul tavolo. Se nessuna tessera è giocabile → torna alla fase Memory per pescarne una nuova.</div>
-    <div class="popup-row"><strong>🪙 Monete & Shop:</strong> Guadagni monete giocando. Usale per comprare aiuti utili nel Memory.</div>
-    <div class="popup-row"><strong>🆘 Aiuti Memory:</strong><br>
-      🎯 Reveal — scopre 2 celle per 2s<br>
-      🔍 Trasparenza — vedi tutte per 5s sbiadite<br>
-      ⚡ Auto-match — trova automaticamente una coppia</div>
-    <div class="popup-row"><strong>🏆 Punti:</strong> tessera giocata = (a+b)×10 · coppia memory = +15 · vincita = pip avversario × 5</div>
-    <button class="popup-close" id="help-close">✕ Chiudi</button>
+  <div class="popup-box" style="max-width:460px">
+    <div class="popup-title">❓ How to Play — ppDomiMory</div>
+
+    <div class="popup-row"><strong>🎯 Goal</strong><br>
+      Be the first to play all your tiles on the Domino board. You start by earning <strong>7 tiles</strong> through the Memory phase. The AI starts with 7 tiles already dealt.</div>
+
+    <div class="popup-row"><strong>🧩 MEMORY Phase</strong><br>
+      A grid of face-down tiles appears (every tile has a duplicate). Flip two at a time — a match earns you that tile (+15 pts, +10 🪙). You need <strong>7 pairs</strong> to start the game. During play, if you have no playable tile, you return here to find 1 new pair. The banner shows the board ends you need to match.</div>
+
+    <div class="popup-row"><strong>🎲 DOMINO Phase</strong><br>
+      Tap a <span style="color:var(--green)">green</span> tile from your hand, then tap <strong>◀ L</strong> or <strong>R ▶</strong> to place it on the board. Each tile end must match the open board end. No match? → back to Memory to draw.</div>
+
+    <div class="popup-row"><strong>🏆 Scoring</strong><br>
+      Tile played: <strong>(a+b)×10 pts</strong> · Memory pair: <strong>+15 pts +10🪙</strong><br>
+      Win bonus: opponent pips <strong>×5 pts</strong> · Block win: fewer pips = you win</div>
+
+    <div class="popup-row"><strong>🪙 Coins &amp; Shop 🛒</strong><br>
+      Earn coins playing and matching. Spend them in the Shop — available from the Start Screen <em>and</em> the HUD during play. <strong>Helps carry over between games</strong> — unused items are saved automatically.</div>
+
+    <div class="popup-row"><strong>🆘 Memory Helps</strong><br>
+      🎯 <strong>Reveal</strong> — flips 4 random cards for 2 s<br>
+      🔍 <strong>X-Ray</strong> — all cards faintly visible for 5 s<br>
+      ⚡ <strong>Auto-Match</strong> — auto-finds and flips any pair<br>
+      🎲 <strong>Board Match</strong> — finds a pair matching the board ends<br>
+      🕹️ <strong>Auto-Pilot</strong> — AI plays Memory for you (uses Board Match logic)</div>
+
+    <div class="popup-row"><strong>💥 Domino Power-ups</strong><br>
+      💣 <strong>Bomb</strong> — forces AI to draw 2 extra tiles on its next turn<br>
+      🛡️ <strong>Shield</strong> — reduces your pip penalty when the game is blocked<br>
+      ⏳ <strong>Slow-Mo</strong> — doubles the Arcade timer for your next turn</div>
+
+    <div class="popup-row"><strong>⚡ Arcade Mode</strong><br>
+      Toggle on the Start Screen. A visible countdown bar runs during every turn — inside the game <em>and</em> inside the Memory panel.<br>
+      🟢 Easy 30 s · 🟡 Medium 20 s · 🔴 Hard 12 s<br>
+      <strong>Timer expired in Memory (initial draw):</strong> you exit with 9 tiles instead of 7.<br>
+      <strong>Timer expired in Memory (mid-game draw):</strong> 2 extra tiles are added to your hand.<br>
+      <strong>Timer expired in Domino:</strong> your turn is skipped.<br>
+      A <strong>match in Memory resets the timer</strong>. Use <strong>Slow-Mo</strong> to double it!</div>
+
+    <div class="popup-row"><strong>🏁 After Each Game</strong><br>
+      <strong>▶ Continue</strong> — start the next game immediately (Arcade: timer −2 s, min 6 s)<br>
+      <strong>↺ Retry</strong> — replay at the same level (Arcade loss only)<br>
+      <strong>✕ Quit to Menu</strong> — return to the Start Screen<br>
+      Your coins and unused helps are always saved.</div>
+
+    <div class="popup-row"><strong>🤖 AI Difficulty</strong><br>
+      🟢 Easy — random play · 🟡 Medium — prefers high pips · 🔴 Hard — strategic</div>
+
+    <div class="popup-row"><strong>🃏 Tile Types</strong><br>
+      ⚫ <strong>Classic</strong> — pip tiles (0–6) · 🐶 <strong>Emoji</strong> — 🐶🐱🦁🐸🦋🐹🦉</div>
+
+    <button class="popup-close" id="help-close">✕ Close</button>
   </div>
 </div>
 
@@ -720,18 +818,19 @@ body.light .sinp{background:rgba(0,0,0,.03)}
     <div class="popup-title">🎲 ppDomiMory</div>
     <div class="popup-row"><strong>Version:</strong> 01.00 — March 2026</div>
     <div class="popup-row"><strong>Genre:</strong> Memory + Classic Domino Hybrid</div>
-    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉: paolo@pistino.dev</div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1262737d7e7d52627b61667b7c7d3c767764">[email&#160;protected]</a></div>
     <div class="popup-row"><strong>Platform:</strong> Single-file HTML5</div>
     <div class="lic">
       <span class="lt">⚖ SOFTWARE LICENSE</span>
-      <p>1. LICENSE GRANT: Personal, non-commercial use only.</p>
-      <p>2. COMMERCIAL USE: Requires prior written authorization.</p>
-      <p>3. MODIFICATION: Prohibited without explicit written consent.</p>
-      <p>4. OWNERSHIP: All rights remain exclusively with the author.</p>
-      <p>5. DISCLAIMER: Provided "AS IS", without warranty of any kind.</p>
-      <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
+        <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
+        <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
+        <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
+        <p>4. OWNERSHIP:All rights, title, and interest in the software remain exclusively with the author.</p>
+        <p>5. DISCLAIMER: The software is provided "AS IS", without warranty of any kind. The author shall not be liable for any damages or claims.</p>
+        <p>By accessing or using this software, you agree to these terms.</p>
+        <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
     </div>
-    <button class="popup-close" id="about-close">✕ Chiudi</button>
+    <button class="popup-close" id="about-close">✕ Close</button>
   </div>
 </div>
 
@@ -823,7 +922,7 @@ document.getElementById('hud-sound').addEventListener('click',()=>{
   soundOn=!soundOn;
   document.getElementById('hud-sound').textContent = soundOn?'🔊':'🔇';
   document.getElementById('hud-sound').classList.toggle('muted',!soundOn);
-  toast(soundOn?'🔊 Audio attivo':'🔇 Audio disattivato');
+  toast(soundOn?'🔊 Sound on':'🔇 Sound off');
 });
 
 /* ═══════════════════════════════════════════
@@ -836,7 +935,7 @@ const AVATARS={
 };
 
 // Emoji values for emoji tile type (index 0-6 → emoji)
-const EMOJI_SET = ['🐶','🐱','🦊','🐸','🦋','🌸','🍕'];
+const EMOJI_SET = ['🐶','🐱','🦁','🐸','🦋','🐹','🦉'];
 // classic: numbers 0-6, emoji: emojis 0-6
 
 function valLabel(v, tileType){
@@ -867,14 +966,14 @@ function addHist(result){
 }
 function renderHist(){
   const h=loadHist(), el=document.getElementById('hs-list');
-  if(!h.length){el.innerHTML='<div class="hs-empty">✦ Nessuna partita ancora…</div>';return;}
+  if(!h.length){el.innerHTML='<div class="hs-empty">✦ No games yet…</div>';return;}
   const M=['🥇','🥈','🥉'];
   el.innerHTML=h.map((e,i)=>`
     <div class="hi ${e.result==='win'?'win':'fail'}">
       <div class="hi-rank">${M[i]||`<span style="font-size:.75rem;color:var(--text3)">${i+1}</span>`}</div>
       <div>
         <div class="hi-name">${e.avatar} ${e.name} <span style="font-size:.58rem;color:var(--text3)">${e.difficulty||''} ${e.tileType||''}</span></div>
-        <div class="hi-detail">⏱ ${e.duration} · ${e.date} · ${e.result==='win'?'<span style="color:var(--green)">✓ Vinto</span>':'<span style="color:var(--red)">✗ Perso</span>'}</div>
+        <div class="hi-detail">⏱ ${e.duration} · ${e.date} · ${e.result==='win'?'<span style="color:var(--green)">✓ Won</span>':'<span style="color:var(--red)">✗ Lost</span>'}</div>
       </div>
       <div class="hi-score">${(e.score||0).toLocaleString('it')}<br><span style="font-size:.52rem;color:var(--text3)">pts</span></div>
     </div>`).join('');
@@ -890,19 +989,41 @@ function showHist(back='ss'){
 }
 document.getElementById('hist-btn').addEventListener('click',()=>showHist('ss'));
 document.getElementById('hs-del').addEventListener('click',()=>{
-  confirm2('🗑','Storico','Eliminare tutte le partite?','Elimina',()=>{saveHist([]);renderHist();toast('🗑 Cancellato!');});
+  confirm2('🗑','History','Delete all games?','Delete',()=>{saveHist([]);renderHist();toast('🗑 Deleted!');});
 });
+
+/* ═══════════════════════════════════════════
+   WALLET PERSISTENTE (coins + costi shop)
+═══════════════════════════════════════════ */
+const WK='ppdm_wallet';
+function loadWallet(){
+  try{ return JSON.parse(localStorage.getItem(WK)||'null'); }catch{ return null; }
+}
+function saveWallet(){
+  try{
+    localStorage.setItem(WK, JSON.stringify({
+      coins: G.coins||0,
+      helpsPurchased: G.helpsPurchased||{},
+      helps: G.helps||{}
+    }));
+  }catch{}
+}
+function resetWallet(){
+  try{ localStorage.removeItem(WK); }catch{}
+}
 
 /* ═══════════════════════════════════════════
    SHOP DATA
 ═══════════════════════════════════════════ */
 const SHOP_ITEMS = [
-  { id:'reveal',     icon:'🎯', name:'Reveal',          desc:'Scopre 4 celle per 2 secondi', baseCost:50  },
-  { id:'xray',       icon:'🔍', name:'Trasparenza',     desc:'Vedi tutte le celle per 5s sbiadite', baseCost:80 },
-  { id:'automatch',  icon:'⚡', name:'Auto-Match',      desc:'Trova automaticamente una coppia nel Memory', baseCost:150 },
-  { id:'boardmatch', icon:'🎲', name:'Match Tavolo',    desc:'Pesca in automatico la tessera che si adatta al tavolo', baseCost:220 },
-  { id:'autopilot',  icon:'🕹️', name:'Auto-Pilota',    desc:'L\'AI gioca al tuo posto fino alla fine della partita (toccala di nuovo per fermarla)', baseCost:300 },
-  { id:'aiplay',     icon:'🤖', name:'AI un turno',     desc:'L\'AI gioca un singolo turno al posto tuo', baseCost:200 },
+  { id:'reveal',     icon:'🎯', name:'Reveal',          desc:'Reveals 4 cells for 2 seconds', baseCost:50  },
+  { id:'xray',       icon:'🔍', name:'X-Ray',     desc:'See all cells faded for 5s', baseCost:80 },
+  { id:'automatch',  icon:'⚡', name:'Auto-Match',      desc:'Automatically finds a pair in Memory', baseCost:150 },
+  { id:'boardmatch', icon:'🎲', name:'Board Match',    desc:'Auto-draws the tile that fits the board', baseCost:220 },
+  { id:'autopilot',  icon:'🕹️', name:'Auto-Pilot',    desc:'AI plays for you until end of game (tap again to stop)', baseCost:300 },
+  { id:'bomb',        icon:'💣', name:'Bomb Tile',      desc:'Next opponent must skip a turn or draw extra tiles', baseCost:180 },
+  { id:'shield',      icon:'🛡️', name:'Shield',         desc:'Protects you from the next attack or block', baseCost:160 },
+  { id:'slowmo',      icon:'⏳', name:'Slow-Mo',        desc:'Freezes the timer for your next turn — think calmly', baseCost:200 },
 ];
 
 /* ═══════════════════════════════════════════
@@ -942,6 +1063,127 @@ function showOverlay(em,t,tx,b1,cb1,b2,cb2){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 function pipSum(tiles){return tiles.reduce((s,t)=>s+t.a+t.b,0);}
+
+
+/* ═══════════════════════════════════════════
+   ARCADE MODE
+═══════════════════════════════════════════ */
+let selArcade = false;
+const arcadeTimes = {easy:30, medium:20, hard:12}; // seconds per turn
+let _arcadeTimer = null;
+
+document.getElementById('arcade-row-toggle').addEventListener('click',()=>{
+  selArcade=!selArcade;
+  const btn=document.getElementById('arcade-toggle-btn');
+  btn.classList.toggle('on',selArcade);
+  sndClick();
+});
+
+function startArcadeTimer(remainingOverride){
+  stopArcadeTimer();
+  if(!G.arcadeMode||G.over||G.paused) return;
+  const secs = G.slowmoPending ? G.timerSeconds*2 : G.timerSeconds;
+  if(remainingOverride===undefined) G.slowmoPending=false;
+  let remaining = (remainingOverride!==undefined) ? remainingOverride : secs;
+  G._arcadeRemaining = remaining;
+  G._arcadeSecs = secs;
+  // Main game bar
+  const fill=document.getElementById('arcade-timer-fill');
+  if(fill) fill.style.width=(remaining/secs*100)+'%';
+  // Memory panel bar
+  const mFill=document.getElementById('mem-arc-fill');
+  const mBar=document.getElementById('mem-arc-bar');
+  if(mBar) mBar.style.display='block';
+  if(mFill) mFill.style.width=(remaining/secs*100)+'%';
+  document.body.classList.add('arcade-on');
+
+  _arcadeTimer=setInterval(()=>{
+    if(G.over||G.paused){ stopArcadeTimer(); return; }
+    remaining-=0.2;
+    G._arcadeRemaining=remaining;
+    const pct=Math.max(0,remaining/secs*100);
+    if(fill) fill.style.width=pct+'%';
+    if(fill){ fill.classList.toggle('urgent',pct<25); }
+    if(mFill){ mFill.style.width=pct+'%'; mFill.classList.toggle('urgent',pct<25); }
+    if(remaining<=0){
+      stopArcadeTimer();
+      const memOpen=!document.getElementById('mem-popup').classList.contains('hidden');
+      if(memOpen){
+        sndWrong();
+        arcadeMemoryTimeout();
+      } else {
+        toast('⏰ Time out! Turn skipped!');
+        sndWrong();
+        endPlayerTurn(false);
+      }
+    }
+  },200);
+}
+
+function arcadeMemoryTimeout(){
+  const allTiles=buildDominoSet();
+  const usedIds=new Set([
+    ...G.playerHand.map(t=>t.id),
+    ...G.aiHand.map(t=>t.id),
+    ...G.board.map(t=>t.id),
+  ]);
+  const available=shuffle(allTiles.filter(t=>!usedIds.has(t.id)));
+  const isInitialPhase = (G.phase==='memory_initial' || MEM.needed===7 || MEM.isInitial);
+
+  if(isInitialPhase){
+    // Initial draw (7 tiles needed): exit with 9 tiles as penalty (7 found so far + 2 random)
+    const alreadyFound = G.playerHand.length;
+    const stillNeeded = Math.max(0, 9 - alreadyFound);
+    const toAdd=available.slice(0, stillNeeded);
+    toAdd.forEach(t=>G.playerHand.push({...t,state:'playable'}));
+    toast(`⏰ Time out! ${toAdd.length} tiles assigned — total 9!`);
+  } else {
+    // Mid-game draw (1 tile needed): place 2 extra tiles directly on board, not in hand
+    // Actually add 2 random tiles to player hand (they were supposed to find 1 via memory)
+    const toAdd=available.slice(0,2);
+    toAdd.forEach(t=>G.playerHand.push({...t,state:'playable'}));
+    toast('⏰ Time out! 2 extra tiles added to your hand!');
+  }
+
+  document.getElementById('mem-popup').classList.add('hidden');
+  if(MEM.xrayTimer) clearTimeout(MEM.xrayTimer);
+  MEM={};
+  G.phase='domino';
+  G.isPlayerTurn=true;
+  renderAll();
+  const playable=getPlayableTiles();
+  setPhaseHint(playable.length>0?'Select a green tile → then ◀L or R▶':'');
+  document.getElementById('btn-pass').classList.remove('hidden');
+  startArcadeTimer();
+}
+
+function stopArcadeTimer(pause){
+  if(_arcadeTimer){ clearInterval(_arcadeTimer); _arcadeTimer=null; }
+  if(!pause){
+    const fill=document.getElementById('arcade-timer-fill');
+    if(fill){ fill.style.width='100%'; fill.classList.remove('urgent'); }
+    const mFill=document.getElementById('mem-arc-fill');
+    const mBar=document.getElementById('mem-arc-bar');
+    if(mFill){ mFill.style.width='100%'; mFill.classList.remove('urgent'); }
+    if(mBar) mBar.style.display='none';
+    if(G) G._arcadeRemaining=0;
+  }
+}
+
+function applyBombToAI(){
+  if(!G.bombPending) return;
+  G.bombPending=false;
+  // AI draws 2 extra tiles from stock
+  let drawn=0;
+  while(G.stock.length>0 && drawn<2){
+    const t={...G.stock.pop(),state:'playable'};
+    G.aiHand.push(t); drawn++;
+  }
+  if(drawn>0){
+    toast(`💣 Bomb! AI drew ${drawn} extra tiles!`);
+    renderAIHand();
+  }
+}
 
 /* ═══════════════════════════════════════════
    AVATAR GRID
@@ -1062,54 +1304,101 @@ function getHelpCost(id){
   return Math.floor(base * Math.pow(1.5, purchased));
 }
 function openShop(){
-  document.getElementById('shop-coins-val').textContent = G.coins;
+  const inGame = G && G.name;
+  const shopCoins = inGame ? G.coins : (loadWallet()?.coins ?? 50);
+  const shopPurchased = inGame ? (G.helpsPurchased||{}) : (loadWallet()?.helpsPurchased||{});
+  const shopOwned = inGame ? (G.helps||{}) : (()=>{
+    const w=loadWallet()||{}; const ph=JSON.parse(localStorage.getItem('ppdm_pregame_helps')||'{}');
+    const base={reveal:0,xray:0,automatch:0,boardmatch:0,autopilot:0,bomb:0,shield:0,slowmo:0};
+    Object.keys(base).forEach(k=>{ base[k]=(w.helps?.[k]||0)+(ph[k]||0); });
+    return base;
+  })();
+  document.getElementById('shop-coins-val').textContent = shopCoins;
   const cont = document.getElementById('shop-items'); cont.innerHTML='';
   SHOP_ITEMS.forEach(item=>{
-    const cost = getHelpCost(item.id);
-    const owned = G.helps?.[item.id] || 0;
-    const canAfford = G.coins >= cost;
+    const purchased = shopPurchased[item.id]||0;
+    const cost = Math.floor((SHOP_ITEMS.find(x=>x.id===item.id)?.baseCost||100)*Math.pow(1.5,purchased));
+    const owned = shopOwned[item.id]||0;
+    const canAfford = shopCoins >= cost;
     const div=document.createElement('div'); div.className='shop-item';
     div.innerHTML=`
       <div class="si-icon">${item.icon}</div>
       <div class="si-info">
         <div class="si-name">${item.name}</div>
         <div class="si-desc">${item.desc}</div>
-        <div class="si-owned">In possesso: ${owned}</div>
+        <div class="si-owned">Owned: ${owned} · Cost: ${cost}🪙</div>
       </div>`;
     const buyBtn=document.createElement('button');
-    buyBtn.className='si-buy'+(USE_ADS&&!canAfford?' ads':'');
-    buyBtn.textContent = USE_ADS&&!canAfford ? '📺 Guarda pub' : `${cost} 🪙`;
+    buyBtn.className='si-buy'+(USE_ADS?' ads':'');
     buyBtn.disabled = !canAfford && !USE_ADS;
-    buyBtn.addEventListener('click',()=>{
-      if(USE_ADS && !canAfford){
-        toast('📺 (Simulazione pubblicità…)');
+    if(USE_ADS){
+      buyBtn.textContent='📺 Watch ad (free)';
+      buyBtn.addEventListener('click',()=>{
+        toast('📺 (Ad simulation…)');
         setTimeout(()=>{ purchaseHelp(item.id, cost, true); openShop(); },1500);
-      } else {
-        purchaseHelp(item.id, cost, false); openShop();
+      });
+      if(canAfford){
+        const buyCoinsBtn=document.createElement('button');
+        buyCoinsBtn.className='si-buy';
+        buyCoinsBtn.textContent=`${cost} 🪙`;
+        buyCoinsBtn.addEventListener('click',()=>{ purchaseHelp(item.id, cost, false); openShop(); });
+        div.appendChild(buyCoinsBtn);
       }
-    });
+    } else {
+      buyBtn.textContent=`${cost} 🪙`;
+      buyBtn.addEventListener('click',()=>{ purchaseHelp(item.id, cost, false); openShop(); });
+    }
     div.appendChild(buyBtn); cont.appendChild(div);
   });
   document.getElementById('shop-popup').classList.remove('hidden');
 }
 function purchaseHelp(id, cost, fromAd){
+  // Pre-game shop: G may not be initialised yet — work on wallet directly
+  const inGame = G && G.name;
+  if(!inGame){
+    const w = loadWallet() || {coins:50, helpsPurchased:{}};
+    if(!fromAd){
+      if(w.coins < cost){ toast('🪙 Not enough coins!'); return; }
+      w.coins -= cost;
+    }
+    w.helpsPurchased = w.helpsPurchased||{};
+    w.helpsPurchased[id] = (w.helpsPurchased[id]||0)+1;
+    localStorage.setItem('ppdm_wallet', JSON.stringify(w));
+    // Store units separately so startGame can load them
+    try{
+      const ph=JSON.parse(localStorage.getItem('ppdm_pregame_helps')||'{}');
+      ph[id]=(ph[id]||0)+1;
+      localStorage.setItem('ppdm_pregame_helps',JSON.stringify(ph));
+    }catch{}
+    sndCoin(); toast(`✅ ${id} purchased! (ready for next game)`);
+    openShop(); // refresh display
+    return;
+  }
   if(!fromAd){
-    if(G.coins < cost){ toast('🪙 Monete insufficienti!'); return; }
+    if(G.coins < cost){ toast('🪙 Not enough coins!'); return; }
     G.coins -= cost;
   }
   G.helps = G.helps||{};
   G.helps[id] = (G.helps[id]||0) + 1;
   G.helpsPurchased = G.helpsPurchased||{};
   G.helpsPurchased[id] = (G.helpsPurchased[id]||0) + 1;
-  sndCoin(); toast(`✅ ${id} acquistato!`); updHUD();
+  sndCoin(); toast(`✅ ${id} purchased!`); updHUD();
+  saveWallet();
   updateAutopilotBtn();
-  // Aggiorna aiuti nel pannello memory se aperto
   if(!document.getElementById('mem-popup').classList.contains('hidden')) renderMemHelps();
 }
 document.getElementById('shop-close').addEventListener('click',()=>{
   document.getElementById('shop-popup').classList.add('hidden');
 });
+document.getElementById('shop-reset').addEventListener('click',()=>{
+  confirm2('🗑','Reset Wallet','Reset coins and shop costs?\n(Coins will return to 50 at next game)','Reset',()=>{
+    resetWallet();
+    if(G.name){ G.coins=50; G.helpsPurchased={}; updHUD(); openShop(); }
+    toast('🗑 Wallet reset!');
+  });
+});
 document.getElementById('hud-shop').addEventListener('click',()=>{ if(G.name) openShop(); });
+document.getElementById('ss-shop-btn').addEventListener('click',()=>{ openShop(); });
 
 /* ═══════════════════════════════════════════
    MEMORY PHASE
@@ -1117,17 +1406,37 @@ document.getElementById('hud-shop').addEventListener('click',()=>{ if(G.name) op
 let MEM = {}; // memory state
 
 function startMemoryPhase(isInitial, onDone){
-  // Build the pool: all 28 tiles × 2 copies, shuffle, lay face down
-  // If not initial (picking 1 new tile), still show full grid but only need to find 1 pair
   const needed = isInitial ? 7 : 1;
   const allTiles = buildDominoSet();
-  // Remove tiles already in player's hand or on board
   const usedIds = new Set([
     ...G.playerHand.map(t=>t.id),
     ...G.aiHand.map(t=>t.id),
     ...G.board.map(t=>t.id),
   ]);
   const available = allTiles.filter(t=>!usedIds.has(t.id));
+
+  // ── EMPTY GRID HANDLING ──────────────────────────────────────
+  // If mid-game and no tiles available for Memory grid
+  if(!isInitial && available.length < 1){
+    if(G.stock && G.stock.length > 0){
+      // Draw 1 tile directly from stock, bypass Memory popup
+      const drawn = {...G.stock.pop(), state:'playable'};
+      G.playerHand.push(drawn);
+      toast('📦 Memory empty — tile drawn from stock!');
+      setTimeout(()=>{ onDone && onDone(); }, 700);
+    } else {
+      // Stock also empty — forced pass
+      toast('⛔ No tiles anywhere — forced pass!');
+      setTimeout(()=>{
+        if(G.over) return;
+        G.consecutivePasses = (G.consecutivePasses||0) + 1;
+        if(G.consecutivePasses >= 6){ endByBlocking(); return; }
+        endPlayerTurn(false);
+      }, 700);
+    }
+    return; // skip Memory popup entirely
+  }
+  // ────────────────────────────────────────────────────────────
   // Duplicate each, shuffle
   const pool = shuffle([...available, ...available.map(t=>({...t,_copy:true}))]);
   // Take first N*2 pairs for display (show 14 pairs = 28 cards, or fewer if available)
@@ -1144,7 +1453,7 @@ function startMemoryPhase(isInitial, onDone){
     needed,
     onDone,
     locked:false,
-    helpBusy:false,   // blocca i pulsanti aiuto durante animazioni
+    helpBusy:false,   // blocca i pulsanti help durante animazioni
     xrayActive:false,
     xrayTimer:null,
   };
@@ -1154,10 +1463,23 @@ function startMemoryPhase(isInitial, onDone){
   renderMemHelps();
 
   document.getElementById('mem-title').textContent = isInitial
-    ? '🧩 PESCA LE TESSERE — Memory!'
-    : '🧩 PESCA UNA TESSERA';
+    ? '🧩 DRAW TILES — Memory!'
+    : '🧩 DRAW A TILE';
   document.getElementById('mem-sub').textContent =
-    `Trova ${needed} copp${needed>1?'ie':'ia'} per ottenere le tue tessere`;
+    `Find ${needed} pair${needed>1?'s':''} to get your tiles`;
+  const endsEl = document.getElementById('mem-board-ends');
+  if(!isInitial && G.board.length > 0){
+    const lbl = v => G.tileType==='emoji' ? EMOJI_SET[v] : String(v);
+    endsEl.innerHTML = `🎲 Board — look for a tile with: <strong style="color:var(--gold)">◀ ${lbl(G.leftEnd)}</strong> &nbsp;or&nbsp; <strong style="color:var(--gold)">${lbl(G.rightEnd)} ▶</strong>`;
+    endsEl.classList.remove('hidden');
+  } else {
+    endsEl.classList.add('hidden');
+  }
+  // Arcade: timer runs only during mid-game memory (not initial 7-tile draw)
+  MEM.isInitial = isInitial;
+  const memArcBar=document.getElementById('mem-arc-bar');
+  if(memArcBar) memArcBar.style.display=(G.arcadeMode&&!isInitial)?'block':'none';
+  if(G.arcadeMode && !isInitial) startArcadeTimer();
   document.getElementById('mem-popup').classList.remove('hidden');
 }
 
@@ -1228,8 +1550,10 @@ function flipCard(idx){
         const copy = {...c1, id:c1.id+100+Math.random(), state:'playable'};
         G.playerHand.push(newTile); // fallback
       }
-      G.score += 15; G.coins += 10; sndCoin();
-      toast(`✅ Coppia trovata! +15pts +10🪙`);
+      G.score += 15; G.coins += 10; sndCoin(); saveWallet();
+      toast(`✅ Pair found! +15pts +10🪙`);
+      // Arcade: reset timer on match
+      if(G.arcadeMode) startArcadeTimer();
       updateMemProgress();
       renderMemGrid();
       if(MEM.found >= MEM.needed){
@@ -1278,13 +1602,52 @@ function renderMemHelps(){
     btn.addEventListener('click',()=>{ if(!btn.disabled) useHelp(item.id); });
     cont.appendChild(btn);
   });
+  // Auto-Pilot button — same row as other helps
+  const ownedAP=(G.helps&&G.helps['autopilot'])||0;
+  const apBtn=document.createElement('button');
+  apBtn.className='help-btn';
+  if(G.autopilot){
+    apBtn.innerHTML='🛑 Stop Auto-Pilot';
+    apBtn.style.borderColor='var(--red)'; apBtn.style.color='var(--red)';
+    apBtn.style.opacity='1';
+    apBtn.addEventListener('click',()=>{ G.autopilot=false; updateAutopilotBtn(); renderMemHelps(); toast('🕹️ Auto-Pilot STOPPED'); });
+  } else {
+    apBtn.innerHTML=`🕹️ Auto-Pilot <span class="hcost">(${ownedAP})</span>`;
+    const disabled = ownedAP<=0 || busy;
+    apBtn.disabled=disabled; apBtn.style.opacity=disabled?'.4':'1';
+    apBtn.style.cursor=disabled?'not-allowed':'';
+    apBtn.addEventListener('click',()=>{ if(!apBtn.disabled){ useHelp('autopilot'); renderMemHelps(); } });
+  }
+  cont.appendChild(apBtn);
 }
 
 function useHelp(id){
-  if(id==='autopilot'){ toggleAutopilot(); return; }
-  // Blocco hard: nessun aiuto se animazione in corso
-  if(MEM.helpBusy || MEM.locked){ toast('⏳ Attendi la fine dell\'animazione…'); return; }
-  if(!G.helps||!G.helps[id]||G.helps[id]<=0){ toast('Non hai questo aiuto!'); return; }
+  if(id==='autopilot'){ toggleAutopilot(); renderMemHelps(); return; }
+  // Domino-phase power-ups (usable from action bar, not memory)
+  if(id==='bomb'){
+    if(!G.helps||!G.helps.bomb||G.helps.bomb<=0){ toast('Buy Bomb Tile in Shop first!'); return; }
+    G.helps.bomb--;
+    G.bombPending=true;
+    toast('💣 Bomb set! AI will draw extra tiles next turn!');
+    renderDominoHelps(); return;
+  }
+  if(id==='shield'){
+    if(!G.helps||!G.helps.shield||G.helps.shield<=0){ toast('Buy Shield in Shop first!'); return; }
+    G.helps.shield--;
+    G.shieldActive=true;
+    toast('🛡️ Shield active! You are protected from next attack!');
+    renderDominoHelps(); return;
+  }
+  if(id==='slowmo'){
+    if(!G.helps||!G.helps.slowmo||G.helps.slowmo<=0){ toast('Buy Slow-Mo in Shop first!'); return; }
+    G.helps.slowmo--;
+    G.slowmoPending=true;
+    toast('⏳ Slow-Mo ready! Your next turn timer will be doubled!');
+    renderDominoHelps(); return;
+  }
+  // Hard block: no help while animation is running
+  if(MEM.helpBusy || MEM.locked){ toast('⏳ Wait for the animation to finish…'); return; }
+  if(!G.helps||!G.helps[id]||G.helps[id]<=0){ toast('You don\'t have this help!'); return; }
 
   // Consuma subito e blocca
   G.helps[id]--;
@@ -1302,7 +1665,7 @@ function useHelp(id){
       const el=document.querySelector(`.mcard[data-idx="${i}"]`);
       if(el){el.classList.add('flipped'); sndFlip();}
     });
-    toast('🎯 Reveal attivato per 2s!');
+    toast('🎯 Reveal activated for 2s!');
     setTimeout(()=>{
       picks.forEach(i=>{
         if(!MEM.matched.has(i)&&!MEM.flipped.includes(i)){
@@ -1315,7 +1678,7 @@ function useHelp(id){
 
   } else if(id==='xray'){
     MEM.xrayActive=true; renderMemGrid();
-    toast('🔍 Trasparenza per 5s!');
+    toast('🔍 X-Ray for 5s!');
     if(MEM.xrayTimer) clearTimeout(MEM.xrayTimer);
     // xray non blocca tutta la UI, rilascia subito ma mantiene xray attivo
     release();
@@ -1326,7 +1689,7 @@ function useHelp(id){
 
   } else if(id==='boardmatch'){
     if(G.board.length===0){
-      toast('🎲 Match Tavolo: tessera pescata!');
+      toast('🎲 Board Match: tile drawn!');
       doAutoMatch(null, release);
     } else {
       const ends=new Set([G.leftEnd, G.rightEnd]);
@@ -1343,28 +1706,17 @@ function useHelp(id){
         return ends.has(a)||ends.has(b);
       });
       if(boardPair){
-        toast('🎲 Trovata tessera compatibile col tavolo!');
+        toast('🎲 Found a tile compatible with the board!');
         doAutoMatch(boardPair[1].slice(0,2), release);
       } else {
-        toast('🎲 Nessuna compatibile — auto-match generico');
+        toast('🎲 None compatible — generic auto-match');
         doAutoMatch(null, release);
       }
     }
-
-  } else if(id==='aiplay'){
-    if(!G.isPlayerTurn||G.phase!=='domino'){
-      toast('Non è il tuo turno!');
-      G.helps[id]++; // rimborso
-      release(); return;
-    }
-    toast('🤖 AI gioca un turno per te!');
-    document.getElementById('mem-popup').classList.add('hidden');
-    release();
-    endPlayerTurn(false);
-  }
+}
 }
 
-// Helper: esegui un auto-match con una coppia specifica [i0,i1] o qualsiasi.
+// Helper: esegui un auto-match con una pair specifica [i0,i1] o qualsiasi.
 // onDone() viene chiamato al termine dell'animazione completa.
 function doAutoMatch(pair, onDone){
   if(!pair){
@@ -1377,7 +1729,7 @@ function doAutoMatch(pair, onDone){
     });
     const found=Object.values(counts).find(v=>v.length>=2);
     if(!found){
-      toast('Nessuna coppia disponibile!');
+      toast('No pairs available!');
       G.helps['automatch']=(G.helps['automatch']||0)+1; // rimborso
       onDone&&onDone(); return;
     }
@@ -1394,6 +1746,7 @@ function doAutoMatch(pair, onDone){
       const t=MEM.cards[i0];
       G.playerHand.push({...t,state:'playable'});
       G.score+=15; G.coins+=10;
+      saveWallet();
       MEM.locked=false;
       updateMemProgress(); renderMemGrid(); updHUD();
       onDone&&onDone(); // rilascia helpBusy
@@ -1405,6 +1758,29 @@ function doAutoMatch(pair, onDone){
       }
     },500);
   },350);
+}
+
+function renderDominoHelps(){
+  const bar=document.getElementById('domino-powerups');
+  if(!bar) return;
+  bar.innerHTML='';
+  const items=[
+    {id:'bomb',icon:'💣',label:'Bomb'},
+    {id:'shield',icon:'🛡️',label:'Shield'},
+    {id:'slowmo',icon:'⏳',label:'Slow-Mo'},
+  ];
+  items.forEach(({id,icon,label})=>{
+    const owned=(G.helps&&G.helps[id])||0;
+    const active=(id==='bomb'&&G.bombPending)||(id==='shield'&&G.shieldActive)||(id==='slowmo'&&G.slowmoPending);
+    const btn=document.createElement('button');
+    btn.className='act-btn';
+    btn.innerHTML=`${icon} ${label} <span style="font-size:.55rem;opacity:.7">(${owned})</span>`;
+    if(active){ btn.style.borderColor='var(--hot)'; btn.style.color='var(--hot)'; btn.style.background='rgba(255,157,61,.15)'; }
+    btn.disabled=owned<=0&&!active;
+    btn.style.opacity=btn.disabled?'.3':'1';
+    btn.addEventListener('click',()=>{ if(!btn.disabled) useHelp(id); });
+    bar.appendChild(btn);
+  });
 }
 
 /* ═══════════════════════════════════════════
@@ -1432,6 +1808,7 @@ function placeOnBoard(tile, side){
   else if(tile.b===endVal) flip=true;
   else return false;
   tile.flipped=flip;
+  tile.boardSide=side;
   const outVal=flip?tile.a:tile.b;
   if(side==='left'){ G.board.unshift(tile); G.leftEnd=tile.double?endVal:outVal; }
   else { G.board.push(tile); G.rightEnd=tile.double?endVal:outVal; }
@@ -1441,7 +1818,7 @@ function placeOnBoard(tile, side){
 /* ═══════════════════════════════════════════
    RENDER
 ═══════════════════════════════════════════ */
-function renderAll(){ renderBoard(); renderPlayerHand(); renderAIHand(); updHUD(); updateDebug(); }
+function renderAll(){ renderBoard(); renderPlayerHand(); renderAIHand(); updHUD(); updateDebug(); renderDominoHelps(); }
 
 function renderBoard(){
   const chain=document.getElementById('board-chain'); chain.innerHTML='';
@@ -1450,12 +1827,12 @@ function renderBoard(){
   if(!G.board||G.board.length===0){
     if(lit){
       const lb=makeEndBtnEl('left',null,true);
-      lb.querySelector('.end-sub').textContent='◀ SX / DX ▶';
+      lb.querySelector('.end-sub').textContent='◀ L / R ▶';
       lb.style.minWidth='60px';
       chain.appendChild(lb);
     } else {
       const e=document.createElement('div'); e.className='board-empty';
-      e.textContent='Seleziona una tessera per iniziare!'; chain.appendChild(e);
+      e.textContent='Select a tile to start!'; chain.appendChild(e);
     }
     return;
   }
@@ -1463,7 +1840,9 @@ function renderBoard(){
   // Tessere orizzontali, flex-wrap va a capo automaticamente
   chain.appendChild(makeEndBtnEl('left',G.leftEnd,lit));
   G.board.forEach(t=>{
-    const d=t.flipped?{a:t.b,b:t.a}:{a:t.a,b:t.b};
+    let d=t.flipped?{a:t.b,b:t.a}:{a:t.a,b:t.b};
+    // Left-side tiles: rotate 180° so the matching end faces right (towards center)
+    if(t.boardSide==='left') d={a:d.b,b:d.a};
     chain.appendChild(makeBoardTileEl(d.a,d.b,G.tileType));
   });
   chain.appendChild(makeEndBtnEl('right',G.rightEnd,lit));
@@ -1476,7 +1855,7 @@ function makeEndBtnEl(side,val,lit){
   else if(lit) cls+=' lit';
   const b=document.createElement('div'); b.className=cls;
   b.innerHTML=`<div class="end-val">${val!==null?valLabel(val,G.tileType):'?'}</div>
-    <div class="end-sub">${side==='left'?'◀ SX':'DX ▶'}</div>`;
+    <div class="end-sub">${side==='left'?'◀ L':'R ▶'}</div>`;
   b.addEventListener('click',()=>tryPlace(side));
   return b;
 }
@@ -1485,38 +1864,39 @@ function renderPlayerHand(){
   const ph=document.getElementById('player-hand'); ph.innerHTML='';
   const playable=getPlayableTiles().map(t=>t.id);
   G.playerHand.forEach((t,i)=>{
+    if(t.state==='played') return; // nascondi tessere già playte
     const isPlayable=playable.includes(t.id);
     const isSel=G.selTile===i;
-    const isPlayed=t.state==='played';
     const el=makeTileEl(t.a,t.b,{
-      played:isPlayed,
+      played:false,
       sel:isSel,
       armed:false,
       canPlay:isPlayable&&G.phase==='domino'&&G.isPlayerTurn&&!isSel,
       tileType:G.tileType,
     });
-    if(!isPlayed&&G.phase==='domino'&&G.isPlayerTurn){
+    if(G.phase==='domino'&&G.isPlayerTurn){
       el.addEventListener('click',()=>{ sndClick(); selectTile(i); });
     }
     ph.appendChild(el);
   });
   const alive=G.playerHand.filter(t=>t.state!=='played').length;
-  document.getElementById('p-tiles-count').textContent=`(${alive} rimaste)`;
+  document.getElementById('p-tiles-count').textContent=`(${alive} left)`;
 }
 
 function renderAIHand(){
   const ah=document.getElementById('ai-hand'); ah.innerHTML='';
   G.aiHand.forEach(t=>{
+    if(t.state==='played') return; // nascondi tessere già playte
     const el=makeTileEl(t.a,t.b,{
-      faceDown:t.state!=='played',
-      played:t.state==='played',
+      faceDown:true,
+      played:false,
       tileType:G.tileType,
     });
     el.id=`ai-t-${t.id}`; el.style.cursor='default';
     ah.appendChild(el);
   });
   const alive=G.aiHand.filter(t=>t.state!=='played').length;
-  document.getElementById('ai-tiles-count').textContent=`(${alive} rimaste)`;
+  document.getElementById('ai-tiles-count').textContent=`(${alive} left)`;
 }
 
 function updHUD(){
@@ -1529,8 +1909,16 @@ function updHUD(){
   if(G.combo>1){c.style.display='flex';document.getElementById('h-combo').textContent=`x${G.combo}`;}
   else c.style.display='none';
 }
-function setAILog(m){ document.getElementById('ai-log-inline').textContent='🤖 '+m; }
-function setPhaseHint(m){ document.getElementById('phase-hint').textContent=m; }
+function setAILog(m){
+  document.getElementById('ai-log-inline').textContent='🤖 '+m;
+  const d=document.getElementById('ai-log-disp');
+  if(d) d.textContent=m&&m!=='—'?'🤖 '+m:'';
+}
+function setPhaseHint(m){
+  document.getElementById('phase-hint').textContent=m;
+  const d=document.getElementById('phase-hint-disp');
+  if(d) d.textContent=m||'';
+}
 
 /* ═══════════════════════════════════════════
    PLAYER DOMINO ACTIONS
@@ -1551,7 +1939,7 @@ function selectTile(idx){
   renderBoard(); renderPlayerHand();
   if(G.selTile!==null){
     const t=G.playerHand[idx];
-    toast(`[${valLabel(t.a,G.tileType)}|${valLabel(t.b,G.tileType)}] — tocca ◀SX o DX▶`);
+    toast(`[${valLabel(t.a,G.tileType)}|${valLabel(t.b,G.tileType)}] — tap ◀L or R▶`);
   }
 }
 
@@ -1559,43 +1947,46 @@ function tryPlace(side){
   if(G.over||G.paused||G.phase!=='domino'||!G.isPlayerTurn) return;
   const effectiveSide=G.board.length===0?'right':side;
 
-  // FLUSSO A: tessera già selezionata → piazza subito
+  // FLUSSO A: tile già selezionata → piazza subito
   if(G.selTile!==null){
     const t=G.playerHand[G.selTile];
     if(G.board.length>0){
       const endVal=effectiveSide==='left'?G.leftEnd:G.rightEnd;
       if(t.a!==endVal && t.b!==endVal){
-        toast(`❌ Non si adatta! Serve ${valLabel(endVal,G.tileType)}`);
+        toast(`❌ Doesn't fit! Need ${valLabel(endVal,G.tileType)}`);
         sndWrong(); G.selTile=null; G.pendingSide=null;
         renderBoard(); renderPlayerHand(); return;
       }
     }
-    if(!placeOnBoard(t,effectiveSide)){ toast('❌ Errore!'); sndWrong(); return; }
+    if(!placeOnBoard(t,effectiveSide)){ toast('❌ Error!'); sndWrong(); return; }
     sndPlay(); t.state='played';
     const pts=(t.a+t.b)*10;
     G.score+=pts; G.coins+=Math.ceil(pts/10);
     G.combo=Math.min(G.combo+1,5);
-    toast(`✅ Giocata! +${pts}pts`);
+    toast(`✅ Played! +${pts}pts`);
     G.selTile=null; G.pendingSide=null;
+    saveWallet();
     checkWin('player');
     if(!G.over) endPlayerTurn(true); else renderAll();
     return;
   }
 
-  // FLUSSO B: nessuna tessera selezionata → memorizza il lato, aspetta la tessera
+  // FLUSSO B: none tile selezionata → memorizza il lato, aspetta la tile
   G.pendingSide = G.pendingSide===effectiveSide ? null : effectiveSide;
   if(G.pendingSide){
     const endVal=effectiveSide==='left'?G.leftEnd:G.rightEnd;
-    toast(`${effectiveSide==='left'?'◀ SX':'DX ▶'} selezionato (${valLabel(endVal,G.tileType)}) — ora scegli la tessera`);
+    toast(`${effectiveSide==='left'?'◀ L':'R ▶'} selected (${valLabel(endVal,G.tileType)}) — now choose a tile`);
   }
   renderBoard(); renderPlayerHand();
 }
 
 function endPlayerTurn(played){
   if(G.over) return;
+  stopArcadeTimer();
   if(!played) G.combo=1;
   G.isPlayerTurn=false;
   G.phase='ai';
+  saveWallet(); // persist helps after every turn
   document.getElementById('btn-pass').classList.add('hidden');
   renderAll();
   setTimeout(doAITurn,400);
@@ -1607,23 +1998,23 @@ function endPlayerTurn(played){
 async function doAITurn(){
   if(G.over||G.paused) return;
 
-  // Controlla tessere giocabili
+  // Controlla tessere playbili
   const getAIPlayable=()=>G.aiHand.filter(t=>
     t.state==='playable'&&(G.board.length===0||canPlace(t,G.leftEnd)||canPlace(t,G.rightEnd))
   );
 
   let playable=getAIPlayable();
 
-  // Se nessuna giocabile → pesca dal mazzo finché ne trova una (max 3 pescate)
+  // Se none playbile → draw from the stock finché ne trova una (max 3 drawn)
   if(playable.length===0){
     let drawn=0;
     while(playable.length===0 && G.stock.length>0 && drawn<3){
-      setAILog('Nessuna tessera giocabile, pesco…');
+      setAILog('No playable tile, drawing…');
       await sleep(300);
       const t={...G.stock.pop(),state:'playable'};
       G.aiHand.push(t);
       renderAIHand();
-      setAILog(`Pescata [${valLabel(t.a,G.tileType)}|${valLabel(t.b,G.tileType)}]!`);
+      setAILog(`Drawn [${valLabel(t.a,G.tileType)}|${valLabel(t.b,G.tileType)}]!`);
       await sleep(250);
       playable=getAIPlayable();
       drawn++;
@@ -1632,7 +2023,7 @@ async function doAITurn(){
 
   if(playable.length>0){
     const best=playable.reduce((b,t)=>t.a+t.b>b.a+b.b?t:b);
-    setAILog(`Gioco [${valLabel(best.a,G.tileType)}|${valLabel(best.b,G.tileType)}]…`);
+    setAILog(`Playing [${valLabel(best.a,G.tileType)}|${valLabel(best.b,G.tileType)}]…`);
     await sleep(300);
     const side = G.board.length===0?'right':
       (canPlace(best,G.rightEnd)?'right':'left');
@@ -1649,9 +2040,9 @@ async function doAITurn(){
     checkWin('ai');
     if(!G.over){ endAITurn(true); } else renderAll();
   } else {
-    // Mazzo esaurito e nessuna tessera giocabile
+    // Stock esaurito e none tile playbile
     G.consecutivePasses=(G.consecutivePasses||0)+1;
-    setAILog('Passo (nessuna mossa)!');
+    setAILog('Pass (no move)!');
     if(G.consecutivePasses>=6){ endByBlocking(); return; }
     endAITurn(false);
   }
@@ -1661,33 +2052,43 @@ function endAITurn(played){
   if(G.over) return;
   G.isPlayerTurn=true;
   G.phase='domino';
+  applyBombToAI(); // apply bomb effect if pending
   renderAll();
   const playable=getPlayableTiles();
   if(playable.length>0){
-    setPhaseHint('Seleziona una tessera verde → poi ◀SX o DX▶');
+    setPhaseHint('Select a green tile → then ◀L or R▶');
     document.getElementById('btn-pass').classList.remove('hidden');
     setAILog('—');
-    if(!G.autopilot) toast(`Turno tuo, ${G.name}! 🎲`);
+    if(!G.autopilot) toast(`Your turn, ${G.name}! 🎲`);
     if(G.autopilot && !G.over) runAutopilot();
+    else startArcadeTimer();
   } else {
-    setPhaseHint('Nessuna tessera giocabile → pesca!');
+    setPhaseHint('No playable tile → draw!');
     document.getElementById('btn-pass').classList.add('hidden');
     setAILog('—');
-    if(!G.autopilot) toast('Nessuna tessera giocabile — pesca dal Memory!');
+    if(!G.autopilot) toast('No playable tile — draw from Memory!');
     setTimeout(()=>{
       startMemoryPhase(false,()=>{
         G.phase='domino';
         renderAll();
         const p2=getPlayableTiles();
         if(p2.length>0){
-          setPhaseHint('Seleziona una tessera verde → poi ◀SX o DX▶');
+          setPhaseHint('Select a green tile → then ◀L or R▶');
           document.getElementById('btn-pass').classList.remove('hidden');
-          if(!G.autopilot) toast('Tessera pescata! Tocca a te 🎲');
+          if(!G.autopilot) toast('Tile drawn! Your turn 🎲');
+          if(G.autopilot && !G.over) runAutopilot();
         } else {
+          // Still no playable tile after drawing — auto-pass
           setPhaseHint('');
-          document.getElementById('btn-pass').classList.remove('hidden');
+          stopArcadeTimer();
+          toast('⏭ Still no playable tile — auto-passing…');
+          setTimeout(()=>{
+            if(G.over) return;
+            G.consecutivePasses=(G.consecutivePasses||0)+1;
+            if(G.consecutivePasses>=6){ endByBlocking(); return; }
+            endPlayerTurn(false);
+          }, 800);
         }
-        if(G.autopilot && !G.over) runAutopilot();
       });
     }, 500);
   }
@@ -1698,7 +2099,7 @@ document.getElementById('btn-pass').addEventListener('click',()=>{
   if(!G.isPlayerTurn||G.phase!=='domino') return;
   G.consecutivePasses=(G.consecutivePasses||0)+1;
   if(G.consecutivePasses>=6){ endByBlocking(); return; }
-  toast('⏭ Passato.');
+  toast('⏭ Passed.');
   endPlayerTurn(false);
 });
 
@@ -1710,36 +2111,100 @@ function checkWin(who){
   const pDone=G.playerHand.every(t=>t.state==='played');
   const aDone=G.aiHand.every(t=>t.state==='played');
   if(pDone){
-    G.over=true; sndWin();
+    G.over=true; stopArcadeTimer(); document.body.classList.remove('arcade-on'); sndWin();
+    arcadeReduceTimers();
     const ap=pipSum(G.aiHand.filter(t=>t.state!=='played'));
     G.score+=ap*5; G.coins+=ap;
+    saveWallet();
     addHist('win');
-    showOverlay('🏆','HAI VINTO!',
-      `Tutte le tessere giocate!\nAI: ${ap} pip rimasti → +${ap*5}pts\nPunteggio: ${G.score} · Monete: ${G.coins}🪙`,
-      '✦ Nuova partita',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');},
-      '🏆 Storico',()=>{G={};showHist('ss');});
+    if(G.arcadeMode){
+      showOverlay('🏆','YOU WIN!',
+        `All tiles played!\nAI: ${ap} pips left → +${ap*5}pts\nScore: ${G.score} · Coins: ${G.coins}🪙\n⚡ Next level timer reduced!`,
+        '▶ Continue',()=>{ continueGame(); },
+        '✕ Abandon',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+    } else {
+      showOverlay('🏆','YOU WIN!',
+        `All tiles played!\nAI: ${ap} pips left → +${ap*5}pts\nScore: ${G.score} · Coins: ${G.coins}🪙`,
+        '▶ Play Again',()=>{ const n=G.name,a=G.avatarKey; G={}; hideAll(); startGame(n,a); },
+        '✕ Quit to Menu',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+    }
   } else if(aDone){
-    G.over=true; sndLose();
+    G.over=true; stopArcadeTimer(); document.body.classList.remove('arcade-on'); sndLose();
     const pp=pipSum(G.playerHand.filter(t=>t.state!=='played'));
     addHist('fail');
-    showOverlay('🤖','AI HA VINTO!',
-      `L'AI ha finito le tessere!\nTu: ${pp} pip rimasti.\nPunteggio: ${G.score}`,
-      '✦ Riprova',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');},
-      '🏆 Storico',()=>{G={};showHist('ss');});
+    if(G.arcadeMode){
+      showOverlay('🤖','AI WINS!',
+        `AI finished all tiles!\nYou: ${pp} pips left.\nScore: ${G.score}`,
+        '↺ Retry',()=>{ retryGame(); },
+        '✕ Abandon',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+    } else {
+      showOverlay('🤖','AI WINS!',
+        `AI finished all tiles!\nYou: ${pp} pips left.\nScore: ${G.score}`,
+        '▶ Play Again',()=>{ const n=G.name,a=G.avatarKey; G={}; hideAll(); startGame(n,a); },
+        '✕ Quit to Menu',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+    }
   }
 }
 function endByBlocking(){
-  G.over=true;
-  const pp=pipSum(G.playerHand.filter(t=>t.state!=='played'));
+  G.over=true; stopArcadeTimer(); document.body.classList.remove('arcade-on');
+  // Shield: give player a pip bonus when blocked
+  const pipBonus=G.shieldActive?5:0;
+  G.shieldActive=false;
+  const ppRaw=pipSum(G.playerHand.filter(t=>t.state!=='played'));
+  const pp=Math.max(0,ppRaw-pipBonus);
   const ap=pipSum(G.aiHand.filter(t=>t.state!=='played'));
   const win=pp<=ap;
   if(win){G.score+=(ap-pp)*5; G.coins+=ap; sndWin();}else sndLose();
   addHist(win?'win':'fail');
-  showOverlay(win?'🏆':'😔',win?'VINCI PER BLOCCO!':'PERDI PER BLOCCO!',
-    `Gioco bloccato!\nTu: ${pp} pip · AI: ${ap} pip\nPunteggio: ${G.score}`,
-    '✦ Nuova partita',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+  if(G.arcadeMode && win){
+    arcadeReduceTimers();
+    showOverlay('🏆','WIN BY BLOCK!',
+      `Game blocked!\nYou: ${pp} pips · AI: ${ap} pips\nScore: ${G.score}\n⚡ Next level timer reduced!`,
+      '▶ Continue',()=>{ continueGame(); },
+      '✕ Abandon',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+  } else if(G.arcadeMode && !win){
+    showOverlay('😔','LOSE BY BLOCK!',
+      `Game blocked!\nYou: ${pp} pips · AI: ${ap} pips\nScore: ${G.score}`,
+      '↺ Retry',()=>{ retryGame(); },
+      '✕ Abandon',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+  } else {
+    showOverlay(win?'🏆':'😔',win?'WIN BY BLOCK!':'LOSE BY BLOCK!',
+      `Game blocked!\nYou: ${pp} pips · AI: ${ap} pips\nScore: ${G.score}`,
+      '▶ Play Again',()=>{ const n=G.name,a=G.avatarKey; G={}; hideAll(); startGame(n,a); },
+      '✕ Quit to Menu',()=>{G={};hideAll();document.getElementById('ss').classList.remove('hidden');});
+  }
 }
 
+
+function continueGame(){
+  // Start next arcade game immediately with same settings
+  const name=G.name, avatarKey=G.avatarKey;
+  G={}; hideAll();
+  startGame(name, avatarKey);
+}
+function retryGame(){
+  // Retry with same settings (arcade lose: keep same timer)
+  const name=G.name, avatarKey=G.avatarKey, diff=G.difficulty;
+  // Restore timer (don't reduce on loss)
+  try{
+    const at=JSON.parse(localStorage.getItem('ppdm_arcade_times')||'null')||{...arcadeTimes};
+    at[diff]=Math.min(arcadeTimes[diff], (at[diff]||arcadeTimes[diff])+2); // undo reduction for loss
+    localStorage.setItem('ppdm_arcade_times',JSON.stringify(at));
+  }catch{}
+  G={}; hideAll();
+  startGame(name, avatarKey);
+}
+
+function arcadeReduceTimers(){
+  if(!G.arcadeMode) return;
+  try{
+    const at=JSON.parse(localStorage.getItem('ppdm_arcade_times')||'null') || {...arcadeTimes};
+    at[G.difficulty]=Math.max(6, (at[G.difficulty]||arcadeTimes[G.difficulty])-2);
+    localStorage.setItem('ppdm_arcade_times',JSON.stringify(at));
+    if(at[G.difficulty]>6) toast(`⚡ Arcade: next game timer = ${at[G.difficulty]}s!`);
+    else toast('⚡ Arcade: minimum timer reached (6s)!');
+  }catch{}
+}
 /* ═══════════════════════════════════════════
    START GAME
 ═══════════════════════════════════════════ */
@@ -1752,7 +2217,7 @@ function startGame(name,avatarKey){
   G={
     name, avatar:AVATARS[avatarKey], avatarKey,
     difficulty:diff, tileType, aiMemSlots:aiMem,
-    score:0, coins:50, combo:1,
+    score:0, coins: (loadWallet()?.coins ?? 50), combo:1,
     over:false, paused:false, startTime:Date.now(),
     isPlayerTurn:true, phase:'memory_initial',
     playerHand:[], // filled by memory phase
@@ -1760,9 +2225,31 @@ function startGame(name,avatarKey){
     stock:all.slice(7),
     board:[], leftEnd:null, rightEnd:null,
     selTile:null, pendingSide:null, consecutivePasses:0,
-    helps:{reveal:0,xray:0,automatch:0,boardmatch:0,autopilot:0,aiplay:0},
-    helpsPurchased:{},
+    helpsPurchased: loadWallet()?.helpsPurchased || {},
+    helps:(()=>{
+      const base={reveal:0,xray:0,automatch:0,boardmatch:0,autopilot:0,bomb:0,shield:0,slowmo:0};
+      try{
+        // 1. Load persisted helps from previous game
+        const w=loadWallet();
+        if(w&&w.helps) Object.keys(base).forEach(k=>{ if(w.helps[k]) base[k]=w.helps[k]; });
+        // 2. Merge any pre-game shop purchases on top
+        const ph=JSON.parse(localStorage.getItem('ppdm_pregame_helps')||'{}');
+        Object.keys(base).forEach(k=>{ if(ph[k]) base[k]=(base[k]||0)+ph[k]; });
+        localStorage.removeItem('ppdm_pregame_helps');
+      }catch{}
+      return base;
+    })(),
     autopilot:false,
+    arcadeMode: selArcade,
+    timerSeconds: (()=>{
+      if(!selArcade) return 0;
+      try{
+        const at=JSON.parse(localStorage.getItem('ppdm_arcade_times')||'null');
+        if(at&&at[selDiff]) return Math.max(6, at[selDiff]);
+      }catch{}
+      return arcadeTimes[selDiff];
+    })(),
+    bombPending:false, shieldActive:false, slowmoPending:false,
     _usedTileIds: new Set(all.slice(0,7).map(t=>t.id)),
   };
 
@@ -1777,7 +2264,7 @@ function startGame(name,avatarKey){
   renderBoard();
 
   // Start with memory phase to pick 7 tiles
-  toast(`Benvenuto ${name}! 🎲 Pesca 7 tessere dal Memory!`);
+  toast(`Welcome ${name}! 🎲 Draw 7 tiles from Memory!`);
   setTimeout(()=>{
     startMemoryPhase(true, ()=>{
       // Memory done — start domino phase
@@ -1786,14 +2273,19 @@ function startGame(name,avatarKey){
       renderAll();
       const playable=getPlayableTiles();
       if(playable.length>0){
-        setPhaseHint('Seleziona tessera verde → poi ◀SX o DX▶');
+        setPhaseHint('Select green tile → then ◀L or R▶');
         document.getElementById('btn-pass').classList.remove('hidden');
-        toast('🎲 Tessere pronte! Inizia a giocare!');
+        toast('🎲 Tiles ready! Start playing!');
+        if(G.autopilot && !G.over) runAutopilot();
+        else startArcadeTimer();
       } else {
-        setPhaseHint('Nessuna tessera giocabile subito — puoi passare');
+        setPhaseHint('No playable tile right now — you can pass');
         document.getElementById('btn-pass').classList.remove('hidden');
+        startArcadeTimer();
       }
     });
+    // If autopilot was active (bought pre-game), start it in memory too
+    if(G.autopilot) runAutopilot();
   }, 400);
 }
 
@@ -1802,11 +2294,11 @@ function startGame(name,avatarKey){
 ═══════════════════════════════════════════ */
 document.getElementById('hud-quit').addEventListener('click',()=>{
   if(!G.name||G.over) return;
-  confirm2('🚪','Esci','Abbandonare la partita?','Esci',()=>{
+  confirm2('🚪','Quit','Abandon the game?','Quit',()=>{
     addHist('fail');
     document.getElementById('mem-popup').classList.add('hidden');
     hideAll(); document.getElementById('ss').classList.remove('hidden');
-    toast('🚪 Partita salvata.'); G={};
+    toast('🚪 Game saved.'); G={};
   });
 });
 document.getElementById('hud-hist').addEventListener('click',()=>{ if(G.name) showHist('gs'); });
@@ -1826,10 +2318,10 @@ async function runAutopilot(){
     // Memory aperto: esegui automatch
     const memPopup=document.getElementById('mem-popup');
     if(memPopup && !memPopup.classList.contains('hidden')){
-      if(!MEM.helpBusy && !MEM.locked){
-        await sleep(600);
+      if(!MEM.helpBusy && !MEM.locked && MEM.found < MEM.needed){
+        await sleep(700);
         if(!G.autopilot||G.over) break;
-        // Trova la coppia migliore (compatibile col tavolo se possibile)
+        // Use boardmatch logic: prefer tiles matching board ends
         const counts={};
         MEM.cards.forEach((c,i)=>{
           if(MEM.matched.has(i)) return;
@@ -1851,9 +2343,17 @@ async function runAutopilot(){
           const any=Object.values(counts).find(v=>v.length>=2);
           if(any) pair=any.slice(0,2);
         }
-        if(pair){
+        if(pair && !MEM.helpBusy){
           MEM.helpBusy=true;
-          doAutoMatch(pair, ()=>{ MEM.helpBusy=false; });
+          doAutoMatch(pair, ()=>{ MEM.helpBusy=false; renderMemHelps(); });
+          await sleep(1400);
+        } else if(!pair){
+          // No pairs left in grid — close memory if done
+          if(MEM.found>=MEM.needed){
+            document.getElementById('mem-popup').classList.add('hidden');
+            MEM.onDone&&MEM.onDone(); MEM={};
+          }
+          await sleep(500);
         }
       }
       await sleep(400); continue;
@@ -1889,62 +2389,32 @@ function toggleAutopilot(){
     // FERMA
     G.autopilot=false;
     updateAutopilotBtn();
-    toast('🕹️ Auto-Pilota FERMATO');
+    toast('🕹️ Auto-Pilot STOPPED');
     return;
   }
 
-  // AVVIA — consuma un aiuto se disponibile, altrimenti serve acquistarlo
+  // AVVIA — consuma un help se disponibile, altrimenti serve acquistarlo
   if(!G.helps||!G.helps['autopilot']||G.helps['autopilot']<=0){
-    toast('🛒 Compra prima Auto-Pilota nello Shop!'); return;
+    toast('🛒 Buy Auto-Pilot in the Shop first!'); return;
   }
   G.helps['autopilot']--;
   G.autopilot=true;
   updateAutopilotBtn();
-  toast('🕹️ Auto-Pilota ATTIVO — tocca di nuovo per fermare', 3000);
-  // Avvia subito se è il turno del giocatore
-  if(G.isPlayerTurn&&G.phase==='domino'&&!G.over) runAutopilot();
+  saveWallet();
+  toast('🕹️ Auto-Pilot ON — tap again to stop', 3000);
+  // Start immediately: either in domino or in memory phase
+  if(!G.over) runAutopilot();
 }
 
 function updateAutopilotBtn(){
   const btn=document.getElementById('hud-autopilot');
-  const btnAI=document.getElementById('hud-aiplay');
-  const ownedAuto=(G.helps&&G.helps['autopilot'])||0;
-  const ownedAI=(G.helps&&G.helps['aiplay'])||0;
-
-  // Auto-pilota: sempre visibile, grigio se 0
-  btn.style.display='';
-  btn.style.opacity= G.autopilot ? '1' : (ownedAuto>0 ? '1' : '.35');
-  if(G.autopilot){
-    btn.style.background='rgba(255,80,80,.25)'; btn.style.borderColor='var(--red)';
-    btn.title='Auto-Pilota ATTIVO — clicca per fermare'; btn.textContent='🛑';
-  } else {
-    btn.style.background=''; btn.style.borderColor='';
-    btn.title=`Auto-Pilota: ${ownedAuto>0?ownedAuto+' disponibili':'compra nello Shop'}`;
-    btn.textContent='🕹️';
-  }
-
-  // AI un turno: sempre visibile, grigio se 0
-  if(btnAI){
-    btnAI.style.display='';
-    btnAI.style.opacity= ownedAI>0 ? '1' : '.35';
-    btnAI.title=`AI un turno: ${ownedAI>0?ownedAI+' disponibili':'compra nello Shop'}`;
-    btnAI.textContent='🤖';
-  }
 }
 
 document.getElementById('hud-autopilot').addEventListener('click',toggleAutopilot);
-document.getElementById('hud-aiplay').addEventListener('click',()=>{
-  if(!G.isPlayerTurn||G.phase!=='domino'||G.over){ toast('Non è il tuo turno!'); return; }
-  if(!G.helps||!G.helps['aiplay']||G.helps['aiplay']<=0){ toast('Compra prima "AI un turno" nello Shop!'); return; }
-  G.helps['aiplay']--;
-  updateAutopilotBtn();
-  toast('🤖 AI gioca un turno per te!');
-  endPlayerTurn(false);
-});
 document.getElementById('pbtn').addEventListener('click',()=>{
   const name=document.getElementById('pname').value.trim();
-  if(!name){ toast('✏️ Inserisci il tuo nome!'); return; }
-  if(!pAvatarKey){ toast('👆 Scegli un avatar!'); return; }
+  if(!name){ toast('✏️ Enter your name!'); return; }
+  if(!pAvatarKey){ toast('👆 Choose an avatar!'); return; }
   sndClick();
   startGame(name,pAvatarKey);
 });
@@ -1976,7 +2446,7 @@ document.getElementById('dbg-godmode').addEventListener('click',()=>{
   G.coins=9999; G.score+=5000;
   Object.keys(G.helps||{}).forEach(k=>G.helps[k]=99);
   updHUD(); updateDebug(); renderMemHelps();
-  toast('☢ GOD MODE! Coins=9999, tutti gli aiuti x99');
+  toast('☢ GOD MODE! Coins=9999, all helps x99');
 });
 document.getElementById('dbg-addcoins').addEventListener('click',()=>{
   if(!G.name) return;
@@ -1986,13 +2456,8 @@ document.getElementById('dbg-skipmem').addEventListener('click',()=>{
   if(!G.name) return;
   document.getElementById('mem-popup').classList.add('hidden');
   if(MEM.onDone){ MEM.onDone(); MEM={}; }
-  toast('⏭ Memory skippato!');
+  toast('⏭ Memory skipped!');
 });
-
-/* ═══════════════════════════════════════════
-   BOOT
-═══════════════════════════════════════════ */
-document.getElementById('ss').classList.remove('hidden');
 </script>
 </body>
 </html>
