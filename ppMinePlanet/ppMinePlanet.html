@@ -50,7 +50,8 @@ body.light #topbar{background:linear-gradient(180deg,rgba(220,245,230,.95) 0%,tr
 #hp-fill{height:100%;background:var(--red);box-shadow:0 0 6px var(--red);border-radius:2px;transition:width .3s;}
 #theme-btn{font-family:'Courier New',monospace;font-size:11px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;}
 #theme-btn:hover{color:var(--glow);border-color:var(--glow);}
-
+.theme-btn{font-family:'Courier New',monospace;font-size:11px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;}
+.theme-btn:hover{color:var(--glow);border-color:var(--glow);}
 /* SIDE PANELS */
 #left-panel{position:fixed;left:8px;top:85px;z-index:80;display:flex;flex-direction:column;gap:6px;}
 #right-panel{position:fixed;right:8px;top:85px;z-index:80;display:flex;flex-direction:column;gap:6px;}
@@ -153,6 +154,96 @@ body.light .start-input{background:rgba(0,120,60,.04);border-color:rgba(0,120,60
 .start-secbtn:hover{border-color:var(--glow);color:var(--glow);}
 .start-avatar-display{font-size:1.6rem;line-height:1;}
 
+
+/* ── ARCADE TIMER ── */
+#arcade-timer-wrap{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:85;display:none;align-items:center;gap:8px;padding:4px 14px;background:rgba(0,0,0,.7);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;pointer-events:none;}
+#arcade-timer-bar{width:200px;height:6px;background:rgba(255,51,85,.15);border:1px solid rgba(255,51,85,.3);border-radius:3px;}
+#arcade-timer-fill{height:100%;background:var(--glow);border-radius:3px;transition:width .5s linear,background .5s;}
+#arcade-timer-txt{font-size:12px;color:var(--glow);letter-spacing:1px;min-width:38px;text-align:right;text-shadow:0 0 8px var(--glow);}
+#arcade-mode-badge{position:fixed;top:60px;right:8px;z-index:84;font-size:8px;color:var(--amber);letter-spacing:2px;text-shadow:0 0 8px var(--amber);background:rgba(0,0,0,.6);border:1px solid rgba(255,170,0,.3);padding:2px 6px;border-radius:3px;display:none;}
+
+/* ── COINS HUD ── */
+#coins-hud{display:flex;flex-direction:column;align-items:center;gap:2px;}
+#coins-hud .top-label{color:var(--amber);}
+#coins-hud .top-val{color:var(--amber);text-shadow:0 0 8px var(--amber);}
+
+/* ── DEBUG BADGE ── */
+#debug-badge{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:200;font-size:9px;color:#ff0;background:rgba(0,0,0,.8);border:1px solid #ff0;border-radius:3px;padding:2px 10px;letter-spacing:2px;display:none;pointer-events:none;}
+
+/* ── LANG SELECTOR ── */
+#lang-select{font-family:'Courier New',monospace;font-size:10px;padding:3px 6px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;outline:none;transition:all .15s;}
+#lang-select:hover{color:var(--glow);border-color:var(--glow);}
+#lang-select option{background:#0a1a10;color:#3ab050;}
+
+/* ── SHOP BUTTON in topbar ── */
+#shop-btn-hud{font-family:'Courier New',monospace;font-size:10px;padding:5px 9px;background:var(--surface);color:var(--amber);border:1px solid rgba(255,170,0,.3);border-radius:3px;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+#shop-btn-hud:hover{border-color:var(--amber);box-shadow:0 0 10px rgba(255,170,0,.3);}
+
+/* ── SHOP OVERLAY ── */
+#shop-overlay{position:fixed;inset:0;z-index:550;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s;}
+body.light #shop-overlay{background:rgba(210,235,220,.96);}
+#shop-overlay.show{opacity:1;pointer-events:all;}
+#shop-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0;max-width:560px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(255,170,0,.12);}
+#shop-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+#shop-title{font-size:14px;color:var(--amber);letter-spacing:3px;text-shadow:0 0 10px var(--amber);}
+#shop-coins-display{font-size:13px;color:var(--amber);letter-spacing:1px;}
+#shop-body{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+#shop-body::-webkit-scrollbar{width:4px;}
+#shop-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.shop-item{background:rgba(255,170,0,.04);border:1px solid rgba(255,170,0,.15);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:12px;}
+.shop-item:hover{border-color:rgba(255,170,0,.4);}
+.shop-icon{font-size:1.8rem;line-height:1;flex-shrink:0;}
+.shop-info{flex:1;}
+.shop-name{font-size:11px;color:var(--glow);letter-spacing:1px;margin-bottom:3px;}
+.shop-desc{font-size:9px;color:var(--text-dim);letter-spacing:1px;line-height:1.7;}
+.shop-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
+.shop-buy-btn{font-family:'Courier New',monospace;font-size:9px;padding:5px 10px;background:rgba(255,170,0,.1);color:var(--amber);border:1px solid rgba(255,170,0,.4);border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all .12s;}
+.shop-buy-btn:hover{background:rgba(255,170,0,.2);box-shadow:0 0 10px rgba(255,170,0,.3);}
+.shop-buy-btn:disabled{opacity:.3;pointer-events:none;}
+.shop-ads-btn{font-family:'Courier New',monospace;font-size:9px;padding:5px 10px;background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.3);border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all .12s;}
+.shop-ads-btn:hover{background:rgba(0,229,255,.16);box-shadow:0 0 10px rgba(0,229,255,.3);}
+.shop-ads-btn.hidden{display:none;}
+.shop-price{font-size:9px;color:var(--amber);letter-spacing:1px;text-align:right;}
+#shop-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+#shop-reset-btn{font-family:'Courier New',monospace;font-size:8px;padding:4px 8px;background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.3);border-radius:3px;cursor:pointer;}
+#shop-reset-btn:hover{background:rgba(255,51,85,.2);}
+.shop-section-title{font-size:9px;color:var(--text-dim);letter-spacing:3px;padding:4px 0 2px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+
+/* ── AD SIMULATION OVERLAY ── */
+#ad-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#ad-overlay.show{display:flex;}
+#ad-box{background:#111;border:2px solid var(--amber);border-radius:8px;padding:28px 36px;max-width:400px;width:90%;text-align:center;display:flex;flex-direction:column;gap:14px;}
+#ad-label{font-size:11px;color:var(--amber);letter-spacing:3px;}
+#ad-content{font-size:28px;padding:20px;}
+#ad-skip-wrap{font-size:10px;color:var(--text-dim);letter-spacing:1px;}
+#ad-skip-btn{font-family:'Courier New',monospace;font-size:11px;padding:8px 20px;background:rgba(0,255,136,.12);color:var(--glow);border:1px solid var(--glow);border-radius:3px;cursor:pointer;display:none;}
+
+/* ── AI RESOLVER ANIMATION ── */
+#ai-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;pointer-events:none;}
+#ai-overlay.show{display:flex;}
+#ai-label{font-size:13px;color:var(--purple);letter-spacing:3px;text-shadow:0 0 16px var(--purple);animation:pulse 1s infinite;}
+
+/* ── INVINCIBILITY BADGE ── */
+#invinc-badge{position:fixed;top:60px;left:8px;z-index:84;font-size:8px;color:#ffdd00;letter-spacing:2px;background:rgba(0,0,0,.6);border:1px solid rgba(255,221,0,.4);padding:2px 6px;border-radius:3px;display:none;pointer-events:none;}
+
+
+/* ── SHOP INVENTORY BAR ── */
+#shop-inv-bar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;min-height:0;}
+#shop-inv-bar.empty{display:none;}
+.inv-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;transition:transform .1s;}
+.inv-item button{font-family:'Courier New',monospace;font-size:9px;padding:5px 8px;border-radius:3px;cursor:pointer;transition:all .1s;letter-spacing:0.5px;white-space:nowrap;border:1px solid;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent;}
+.inv-item button.inv-btn-map    {background:rgba(0,229,255,.08);color:var(--cyan);border-color:rgba(0,229,255,.3);}
+.inv-item button.inv-btn-lantern{background:rgba(255,238,68,.08);color:#ffee44;border-color:rgba(255,238,68,.3);}
+.inv-item button.inv-btn-medkit {background:rgba(255,68,102,.08);color:#ff4466;border-color:rgba(255,68,102,.3);}
+.inv-item button.inv-btn-invincible{background:rgba(255,221,0,.08);color:#ffdd00;border-color:rgba(255,221,0,.3);}
+.inv-item button.inv-btn-slowtime{background:rgba(187,102,255,.08);color:var(--purple);border-color:rgba(187,102,255,.3);}
+.inv-item button.inv-btn-ai     {background:rgba(187,102,255,.08);color:var(--purple);border-color:rgba(187,102,255,.3);}
+.inv-item button:not(.off):hover,.inv-item button:not(.off):active{filter:brightness(1.3);transform:scale(1.05);}
+.inv-item button.off{opacity:.25;pointer-events:none;}
+.inv-badge{position:absolute;top:-4px;right:-4px;background:var(--amber);color:#000;font-size:8px;font-weight:bold;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.inv-item button.needs-cell{opacity:.45;}
+.inv-item button.needs-cell:hover{filter:none;transform:none;}
+
 @keyframes flicker{0%,93%,96%,100%{opacity:1;}94%{opacity:.7;}95%{opacity:1;}97%{opacity:.6;}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
 
@@ -188,6 +279,8 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <div id="bg-layer"><canvas id="stars"></canvas></div>
 <div id="light-bg"></div>
 <div id="crt"></div><div id="vignette"></div>
+<div id="debug-badge">⚡ DEBUG MODE</div>
+<div id="invinc-badge">🛡️ INVINCIBLE</div>
 <div id="flash"></div>
 <canvas id="pc"></canvas>
 <canvas id="gc"></canvas>
@@ -206,7 +299,21 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
   <button class="start-playbtn" id="start-play-btn">🚀 PLAY!</button>
   <button class="start-secbtn" id="start-hist-btn">📜 GAME HISTORY</button>
+  <button class="start-secbtn" id="start-shop-btn" onclick="openShop()">🛒 SHOP</button>
   <button class="start-secbtn" id="start-help-btn">❓ HOW TO PLAY</button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <select class="theme-btn" id="lang-select-start" onchange="setLang(this.value)" >
+      <option value="en">🇬🇧 EN</option>
+      <option value="it">🇮🇹 IT</option>
+      <option value="fr">🇫🇷 FR</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="es">🇪🇸 ES</option>
+      <option value="pt">🇵🇹 PT</option>
+      <option value="ja">🇯🇵 JA</option>
+    </select>
+    <button class="theme-btn" id="arcade-toggle-btn" onclick="toggleArcadeMode()" >⏱ ARCADE: OFF</button>
+    <button id="theme-btn" onclick="toggleTheme()">🌗</button>
+  </div>
   <div id="start-footer">
     <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.02 — click for info &amp; license</span>
   </div>
@@ -254,9 +361,28 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <span class="top-label">SCORE</span>
     <span class="top-val" id="score-num">0</span>
   </div>
+  <div class="top-stat" id="coins-hud">
+    <span class="top-label">COINS</span>
+    <span class="top-val amber" id="coins-num">0</span>
+  </div>
+  <button id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
+  <select id="lang-select" onchange="setLang(this.value)">
+    <option value="en">🇬🇧 EN</option>
+    <option value="it">🇮🇹 IT</option>
+    <option value="fr">🇫🇷 FR</option>
+    <option value="de">🇩🇪 DE</option>
+    <option value="es">🇪🇸 ES</option>
+    <option value="pt">🇵🇹 PT</option>
+    <option value="ja">🇯🇵 JA</option>
+  </select>
   <button id="theme-btn" onclick="toggleTheme()">🌗</button>
 </div>
 
+<div id="arcade-timer-wrap">
+  <div id="arcade-timer-bar"><div id="arcade-timer-fill" style="width:100%"></div></div>
+  <span id="arcade-timer-txt">--:--</span>
+</div>
+<div id="arcade-mode-badge">⏱ ARCADE</div>
 <div id="left-panel">
   <div class="card"><div class="card-title">MINES</div><div class="card-val red" id="mines-val">?</div><div style="font-size:14px;margin-top:3px;color:var(--amber)" id="flags-val"></div><div style="font-size:14px;margin-top:2px;color:var(--red)" id="bombs-hit-val"></div></div>
   <div class="card"><div class="card-title">SAFE</div><div class="card-val" id="safe-val">?</div></div>
@@ -271,7 +397,8 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <div id="toast"></div>
 
 <div id="bottombar">
-  <div id="cell-info">— tap a cell —</div>
+  <div id="shop-inv-bar" class="empty"></div>
+<div id="cell-info">— tap a cell —</div>
   <div class="btn-row">
     <button class="btn cyan off" id="b-reveal"  onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
     <button class="btn amber off" id="b-collect" onclick="doCollect()">⛏ <u>C</u>OLLECT</button>
@@ -390,33 +517,60 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <!-- HELP POPUP -->
 <div class="popup-overlay" id="popup-help">
   <div class="popup-box" style="max-width:520px;max-height:88vh;overflow-y:auto;">
-    <div class="popup-title">❓ HOW TO PLAY</div>
-    <div class="popup-body">
-      <p><strong>🎯 OBJECTIVE</strong></p>
-      <p>Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level.</p>
-      <p style="margin-top:8px;"><strong>🖱 CONTROLS</strong></p>
-      <p>Tap/click a cell to select it. Use the buttons at the bottom to act:</p>
-      <p>• 🔍 <strong style="color:var(--cyan);">REVEAL</strong> — uncovers the selected cell. If it's a mine, you lose HP!</p>
-      <p>• ⛏ <strong style="color:var(--amber);">COLLECT</strong> — gathers a resource from a revealed cell into your inventory.</p>
-      <p>• 🚩 <strong style="color:var(--red);">FLAG</strong> — marks a suspected mine. Flagged cells cannot be revealed.</p>
-      <p style="margin-top:8px;"><strong>⚠ MINES</strong></p>
-      <p>Revealing a 💣 MINE costs HP. Each cell shows a number: adjacent mine count. Use it to deduce safe cells. Water hides 💣 WATER MINES too!</p>
-      <p style="margin-top:8px;"><strong>✨ SPECIAL ITEMS</strong></p>
-      <p>• 💥 BOMB — reveals all neighbors (may hit mines for half damage)</p>
-      <p>• 🗺️ MAP — reveals several random safe terrain cells</p>
-      <p>• 🧪 POTION — 60% chance to heal, 40% chance to damage</p>
-      <p>• 🔦 LANTERN — safely illuminates all adjacent cells (no mine damage)</p>
-      <p>• 🩺 MEDKIT — restores HP when revealed</p>
-      <p style="margin-top:8px;"><strong>📊 PANELS</strong></p>
-      <p>Left panel shows <strong style="color:var(--red);">MINES</strong> present on the map, flags placed, and mines accidentally hit. Right panel shows the <strong style="color:var(--glow);">OBJECTIVE</strong>: collected / needed (available on map).</p>
-      <p style="margin-top:8px;"><strong>🏆 SCORING</strong></p>
-      <p>+5 per revealed cell, +20×level per collected resource, +200×level for completing a level. Each level increases difficulty!</p>
+    <div class="popup-title" data-i18n="help_title">❓ HOW TO PLAY</div>
+    <div class="popup-body" id="help-body">
+      <p><strong data-i18n="help_obj_head">🎯 OBJECTIVE</strong></p>
+      <p data-i18n="help_obj">Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level. Each level increases in size and difficulty.</p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_ctrl_head">🖱 CONTROLS</strong></p>
+      <p data-i18n="help_ctrl">Tap/click a cell to select it. On desktop use keyboard shortcuts:</p>
+      <p>• <strong style="color:var(--cyan);">R</strong> — <span data-i18n="help_key_r">Reveal selected cell</span></p>
+      <p>• <strong style="color:var(--amber);">C</strong> — <span data-i18n="help_key_c">Collect resource / use item</span></p>
+      <p>• <strong style="color:var(--red);">F</strong> — <span data-i18n="help_key_f">Flag suspected mine</span></p>
+      <p>• <strong>+/-</strong> — <span data-i18n="help_key_zoom">Zoom in/out</span></p>
+      <p>• <strong>0 / ESC</strong> — <span data-i18n="help_key_reset">Reset view</span></p>
+      <p>• <strong>Arrows</strong> — <span data-i18n="help_key_pan">Pan the map</span></p>
+      <p>• <strong style="color:#ff0;">CTRL+D</strong> — <span data-i18n="help_key_debug">Toggle Debug Mode (infinite resources)</span></p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_actions_head">⚡ ACTIONS</strong></p>
+      <p>• 🔍 <strong style="color:var(--cyan);" data-i18n="help_reveal">REVEAL</strong> — <span data-i18n="help_reveal_desc">Uncovers the selected cell. Mine cells cost HP!</span></p>
+      <p>• ⛏ <strong style="color:var(--amber);" data-i18n="help_collect">COLLECT</strong> — <span data-i18n="help_collect_desc">Gathers a resource or activates a found item.</span></p>
+      <p>• 🚩 <strong style="color:var(--red);" data-i18n="help_flag">FLAG</strong> — <span data-i18n="help_flag_desc">Marks a suspected mine. Flagged cells cannot be revealed accidentally.</span></p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_mines_head">⚠ MINES</strong></p>
+      <p data-i18n="help_mines">Revealing a 💣 MINE costs HP. The number on each revealed cell shows how many mines are adjacent — use logic to find safe cells. Water hides 💣 WATER MINES too!</p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_res_head">📦 RESOURCES</strong></p>
+      <p data-i18n="help_res_land">Land: 🌲 Wood · 🪨 Stone · ⚙️ Iron · 🪵 Coal · 🪙 Gold · 💎 Crystal · 🌿 Herbs · 🍄 Mushroom</p>
+      <p data-i18n="help_res_water">Water: 🐠 Fish · 🦀 Crab · 🪸 Coral · 🫧 Pearl · 🐙 Octopus</p>
+      <p data-i18n="help_res_info">New resource types unlock as you advance levels. Collect the exact amounts shown in the right panel.</p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_special_head">✨ SPECIAL ITEMS</strong></p>
+      <p>• 💥 <strong data-i18n="help_bomb">BOMB</strong> — <span data-i18n="help_bomb_desc">Reveals all neighbors (may hit mines for half damage)</span></p>
+      <p>• 🗺️ <strong data-i18n="help_map">MAP</strong> — <span data-i18n="help_map_desc">Reveals several random safe terrain cells</span></p>
+      <p>• 🧪 <strong data-i18n="help_potion">POTION</strong> — <span data-i18n="help_potion_desc">60% chance to heal, 40% chance to damage</span></p>
+      <p>• 🔦 <strong data-i18n="help_lantern">LANTERN</strong> — <span data-i18n="help_lantern_desc">Safely illuminates all adjacent cells (no mine damage)</span></p>
+      <p>• 🩺 <strong data-i18n="help_medkit">MEDKIT</strong> — <span data-i18n="help_medkit_desc">Restores HP when collected</span></p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_shop_head">🛒 SHOP</strong></p>
+      <p data-i18n="help_shop">Earn 🪙 coins by revealing cells and collecting resources. Spend them in the Shop to buy items or power-ups. Watch ads to get items for free! Prices increase with each purchase.</p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_arcade_head">⏱ ARCADE MODE</strong></p>
+      <p data-i18n="help_arcade">Enable Arcade Mode from the start screen. A countdown timer is set based on the number of cells and resources — complete the level before time runs out! Use ⏳ Time Slowdown from the shop to double your remaining time.</p>
+
+      <p style="margin-top:8px;"><strong data-i18n="help_score_head">🏆 SCORING</strong></p>
+      <p>• <span data-i18n="help_score_reveal">+5 per revealed cell</span></p>
+      <p>• <span data-i18n="help_score_collect">+20×level per collected resource</span></p>
+      <p>• <span data-i18n="help_score_level">+200×level for completing a level</span></p>
+      <p>• <span data-i18n="help_score_coins">+coins for reveals &amp; collects (used in Shop)</span></p>
     </div>
     <div class="popup-actions">
-      <button class="btn green" onclick="closePopup('popup-help')">✕ CLOSE</button>
+      <button class="btn green" onclick="closePopup('popup-help')" data-i18n="close">✕ CLOSE</button>
     </div>
   </div>
 </div>
+
+
 
 <script>
 // ── THEME ──
@@ -643,7 +797,7 @@ function buildPlanet(){
   }
 
   // Portal: inner land cell (exclude all special/resource types)
-  const NON_PORTAL=['mine','waterMine','medkit','bomb','map','potion','lantern'];
+  const NON_PORTAL=['mine','waterMine','medkit','bomb','map','potion','lantern','wood','stone','iron','coal','gold','crystal','herbs','mushroom','fish','coral','pearl','crab','octopus'];
   const landPool=cells.filter(c=>!WATER_TYPES.includes(c.type)&&!NON_PORTAL.includes(c.type)&&c.dist<R-1);
   if(landPool.length){
     landPool.sort((a,b)=>a.dist-b.dist);
@@ -1157,6 +1311,7 @@ function updateActionBtns(c){
   document.getElementById('b-reveal').classList.toggle('off',!c||c.revealed||c.flagged);
   document.getElementById('b-collect').classList.toggle('off',!c||!c.revealed||(![...COLLECT_TYPES,...SPECIAL_COLLECT].includes(c.type)));
   document.getElementById('b-flag').classList.toggle('off',!c||c.revealed);
+  renderInvBar(); // refresh inventory button states on cell selection change
 }
 function updateHpUI(){document.getElementById('hp-num').textContent=hp;document.getElementById('hp-fill').style.width=(Math.max(0,hp)/maxHp*100)+'%';}
 function updateScoreUI(){document.getElementById('score-num').textContent=score;}
@@ -1381,6 +1536,996 @@ document.getElementById('start-help-btn').addEventListener('click',()=>{
 hideGameUI();
 
 requestAnimationFrame(loop);
+
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── VARIABLES: USE_ADS flag
+// ════════════════════════════════════════════════════════════════════════════
+const USE_ADS = false;
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── DEBUG MODE (Ctrl+D)
+// ════════════════════════════════════════════════════════════════════════════
+let debugMode = false;
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+    e.preventDefault();
+    debugMode = !debugMode;
+    document.getElementById('debug-badge').style.display = debugMode ? 'block' : 'none';
+    toast(debugMode ? '⚡ DEBUG ON — infinite resources' : '⚡ DEBUG OFF');
+    if (debugMode) {
+      Object.keys(objective).forEach(k => { inventory[k] = (objective[k] || 0) + 99; });
+      coins += 9999; updateCoinsUI();
+      updateResUI();
+    }
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── COINS SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+let coins = 0;
+const COINS_KEY = 'mineplanet-coins';
+
+async function loadCoins() {
+  try {
+    const r = await window.storage.get(COINS_KEY);
+    if (r && r.value) coins = parseInt(r.value) || 0;
+  } catch(e) {
+    try { const v = localStorage.getItem(COINS_KEY); if(v) coins = parseInt(v)||0; } catch(e2){}
+  }
+  updateCoinsUI();
+}
+function saveCoins() {
+  try { window.storage && window.storage.set(COINS_KEY, String(coins)); } catch(e) {}
+  try { localStorage.setItem(COINS_KEY, String(coins)); } catch(e) {}
+}
+function addCoins(n) { coins += n; saveCoins(); updateCoinsUI(); }
+function updateCoinsUI() {
+  const el = document.getElementById('coins-num'); if(el) el.textContent = coins;
+  const el2 = document.getElementById('shop-coins-val'); if(el2) el2.textContent = coins;
+}
+
+// Coin earning: patch updateScoreUI to detect delta
+let _lastCoinScore = 0;
+const _origUpdateScoreUI = updateScoreUI;
+window.updateScoreUI = function() {
+  const delta = score - _lastCoinScore;
+  if (delta === 5) addCoins(1);
+  else if (delta >= 20) addCoins(Math.ceil(delta / 20) * 3);
+  _lastCoinScore = score;
+  _origUpdateScoreUI();
+};
+
+// Invincibility: patch updateHpUI
+const _origUpdateHpUI = updateHpUI;
+window.updateHpUI = function() {
+  if (invincible && hp < 1) hp = 1;
+  _origUpdateHpUI();
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── SHOP SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+const SHOP_KEY = 'mineplanet-shop-prices';
+const SHOP_DEFAULT_PRICES = { map: 80, lantern: 60, medkit: 50, invincible: 200, slowtime: 120, ai: 350 };
+let shopPrices = { ...SHOP_DEFAULT_PRICES };
+let invincible = false;
+
+async function loadShopPrices() {
+  try {
+    const r = await window.storage.get(SHOP_KEY);
+    if (r && r.value) shopPrices = JSON.parse(r.value);
+  } catch(e) {
+    try { const v = localStorage.getItem(SHOP_KEY); if(v) shopPrices = JSON.parse(v); } catch(e2){}
+  }
+}
+function saveShopPrices() {
+  try { window.storage && window.storage.set(SHOP_KEY, JSON.stringify(shopPrices)); } catch(e) {}
+  try { localStorage.setItem(SHOP_KEY, JSON.stringify(shopPrices)); } catch(e) {}
+}
+function openShop() {
+  updateCoinsUI();
+  refreshShopPrices();
+  const st = document.getElementById('shop-slowtime-item');
+  if(st) st.style.display = arcadeMode ? '' : 'none';
+  document.querySelectorAll('.shop-ads-btn').forEach(b => b.classList.toggle('hidden', !USE_ADS));
+  document.getElementById('shop-overlay').classList.add('show');
+}
+function closeShop() { document.getElementById('shop-overlay').classList.remove('show'); }
+function refreshShopPrices() {
+  Object.keys(shopPrices).forEach(key => {
+    const el = document.getElementById('price-' + key);
+    if (el) el.textContent = '🪙 ' + shopPrices[key];
+  });
+}
+function shopBuy(key) {
+  const price = shopPrices[key];
+  if (coins < price) { toast('🪙 Not enough coins (' + price + ' needed)'); return; }
+  coins -= price;
+  shopPrices[key] = Math.round(shopPrices[key] * 1.5);
+  saveCoins(); saveShopPrices(); updateCoinsUI(); refreshShopPrices();
+  applyShopItem(key);
+}
+function shopWatchAd(key) { if (!USE_ADS) return; showAd(() => applyShopItem(key)); }
+// ── SHOP INVENTORY (items purchased go here, used later by player) ──
+let shopInventory = { map:0, lantern:0, medkit:0, invincible:0, slowtime:0, ai:0 };
+const INV_KEY = 'mineplanet-shopinv';
+
+async function loadShopInventory() {
+  try {
+    const r = await window.storage.get(INV_KEY);
+    if (r && r.value) shopInventory = JSON.parse(r.value);
+  } catch(e) {
+    try { const v = localStorage.getItem(INV_KEY); if(v) shopInventory = JSON.parse(v); } catch(e2){}
+  }
+  renderInvBar();
+}
+function saveShopInventory() {
+  try { window.storage && window.storage.set(INV_KEY, JSON.stringify(shopInventory)); } catch(e){}
+  try { localStorage.setItem(INV_KEY, JSON.stringify(shopInventory)); } catch(e){}
+}
+
+// Item config for the inventory bar
+const INV_CFG = {
+  map:        { icon:'🗺️', label:'MAP',     cls:'inv-btn-map',     needsCell:false },
+  lantern:    { icon:'🔦', label:'LANTERN', cls:'inv-btn-lantern', needsCell:true  },
+  medkit:     { icon:'🩺', label:'MEDKIT',  cls:'inv-btn-medkit',  needsCell:false },
+  invincible: { icon:'🛡️', label:'INVNC.',  cls:'inv-btn-invincible', needsCell:false },
+  slowtime:   { icon:'⏳', label:'SLOW',    cls:'inv-btn-slowtime', needsCell:false },
+  ai:         { icon:'🤖', label:'AI',      cls:'inv-btn-ai',      needsCell:false },
+};
+
+function stockItem(key) {
+  // Purchase → add to inventory, don't use immediately
+  shopInventory[key] = (shopInventory[key] || 0) + 1;
+  saveShopInventory();
+  renderInvBar();
+  toast(INV_CFG[key].icon + ' ' + INV_CFG[key].label + ' added to inventory! Use it from the action bar.');
+}
+
+function renderInvBar() {
+  const bar = document.getElementById('shop-inv-bar');
+  if (!bar) return;
+  const hasAny = Object.values(shopInventory).some(v => v > 0);
+  bar.classList.toggle('empty', !hasAny);
+
+  // Only show items player has ≥ 1 of
+  bar.innerHTML = Object.entries(INV_CFG).map(([key, cfg]) => {
+    const qty = shopInventory[key] || 0;
+    if (qty === 0) return '';
+    // Determine if button should be active
+    // lantern needs a selected cell; slowtime needs arcade mode active
+    const needsCellAndMissing = cfg.needsCell && !sel;
+    const needsArcade = key === 'slowtime' && !arcadeMode;
+    const isOff = gameAbandoned || needsCellAndMissing || needsArcade;
+    const offCls = isOff ? ' off' : '';
+    const needsCls = cfg.needsCell ? ' needs-cell' : '';
+    return `<div class="inv-item">
+      <button class="${cfg.cls}${offCls}${needsCls}" onclick="useInvItem('${key}')" title="${cfg.label}">
+        ${cfg.icon} ${cfg.label}
+      </button>
+      <div class="inv-badge">${qty}</div>
+    </div>`;
+  }).join('');
+}
+
+function useInvItem(key) {
+  if (!shopInventory[key] || shopInventory[key] <= 0) return;
+  // Execute the effect
+  if (key === 'map') {
+    if (!cells.length) { toast('🗺️ Start a game first!'); return; }
+    const hidden = cells.filter(c => !c.revealed && !c.flagged && !WATER_TYPES.includes(c.type) && c.type !== 'mine');
+    const toReveal = hidden.sort(() => Math.random() - .5).slice(0, 6 + level);
+    toReveal.forEach(c => c.revealed = true);
+    toast('🗺️ MAP used! ' + toReveal.length + ' cells revealed');
+    drawAll(); updateUI();
+  } else if (key === 'lantern') {
+    if (!sel) { toast('🔦 Select a cell first!'); return; }
+    let revealed = 0;
+    hexNeighbors(sel.q, sel.r).forEach(({q, r}) => {
+      const nc = findCell(q, r);
+      if (nc && !nc.revealed && !nc.flagged) { nc.revealed = true; revealed++; }
+    });
+    spawnBurst(canvas.width/2, canvas.height/2, '#ffee44', 12);
+    toast('🔦 LANTERN used! ' + revealed + ' cells lit safely');
+    drawAll(); updateUI();
+  } else if (key === 'medkit') {
+    const heal = Math.min(4 + Math.floor(level / 2), 8);
+    hp = Math.min(hp + heal, maxHp); updateHpUI();
+    spawnBurst(canvas.width/2, canvas.height/2, '#ff4466', 12);
+    toast('🩺 MEDKIT used! +' + heal + ' HP');
+  } else if (key === 'invincible') {
+    invincible = true;
+    document.getElementById('invinc-badge').style.display = 'block';
+    toast('🛡️ INVINCIBILITY active for this match!');
+  } else if (key === 'slowtime') {
+    if (!arcadeMode) { toast('⏳ Only available in Arcade mode!'); return; }
+    arcadeTimeLeft = Math.min(arcadeTimeLeft * 2, arcadeTotalTime);
+    toast('⏳ TIME DOUBLED!');
+  } else if (key === 'ai') {
+    startAIResolver();
+  }
+  // Consume 1 from inventory
+  shopInventory[key]--;
+  saveShopInventory();
+  renderInvBar();
+}
+
+function applyShopItem(key) {
+  // Now just stocks the item — no immediate use
+  closeShop();
+  stockItem(key);
+}
+function shopReset() {
+  shopPrices = { ...SHOP_DEFAULT_PRICES };
+  shopInventory = { map:0, lantern:0, medkit:0, invincible:0, slowtime:0, ai:0 };
+  coins = 50;
+  saveShopPrices(); saveShopInventory(); saveCoins();
+  updateCoinsUI(); refreshShopPrices(); renderInvBar();
+  toast('↺ Shop reset — wallet: 🪙 50, inventory cleared');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── AD SIMULATION
+// ════════════════════════════════════════════════════════════════════════════
+let adCallback = null; let adTimer = null;
+const AD_EMOJIS = ['🎮','🏆','⭐','🎯','🚀','💡','🎁','🌟'];
+function showAd(callback) {
+  adCallback = callback;
+  document.getElementById('ad-content').textContent = AD_EMOJIS[Math.floor(Math.random()*AD_EMOJIS.length)];
+  document.getElementById('ad-skip-btn').style.display = 'none';
+  document.getElementById('ad-overlay').classList.add('show');
+  let t = 5;
+  document.getElementById('ad-countdown').textContent = 'Skip in ' + t + 's...';
+  adTimer = setInterval(() => {
+    t--;
+    if (t <= 0) {
+      clearInterval(adTimer);
+      document.getElementById('ad-countdown').textContent = '';
+      document.getElementById('ad-skip-btn').style.display = 'block';
+    } else document.getElementById('ad-countdown').textContent = 'Skip in ' + t + 's...';
+  }, 1000);
+}
+function adSkip() {
+  clearInterval(adTimer);
+  document.getElementById('ad-overlay').classList.remove('show');
+  if (adCallback) { adCallback(); adCallback = null; }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── ARCADE MODE
+// ════════════════════════════════════════════════════════════════════════════
+let arcadeMode = false, arcadeTimeLeft = 0, arcadeTotalTime = 0, arcadeRunning = false;
+let arcadeInterval = null;
+function toggleArcadeMode() {
+  arcadeMode = !arcadeMode;
+  const btn = document.getElementById('arcade-toggle-btn');
+  if(btn) btn.textContent = '⏱ ARCADE: ' + (arcadeMode ? 'ON' : 'OFF');
+  toast(arcadeMode ? '⏱ ARCADE MODE ON' : '⏱ ARCADE MODE OFF');
+}
+function startArcadeTimer() {
+  if (!arcadeMode) return;
+  clearInterval(arcadeInterval);
+  const cfg = lvlCfg(level);
+  const totalRes = (cfg.woodNeed||0)+(cfg.stoneNeed||0)+(cfg.ironNeed||0)+(cfg.fishNeed||0)
+    +(cfg.coalNeed||0)+(cfg.goldNeed||0)+(cfg.crystalNeed||0)+(cfg.herbsNeed||0)
+    +(cfg.mushroomNeed||0)+(cfg.coralNeed||0)+(cfg.pearlNeed||0)+(cfg.crabNeed||0)+(cfg.octopusNeed||0);
+  arcadeTotalTime = 30 * cfg.radius + 15 * totalRes;
+  arcadeTimeLeft = arcadeTotalTime; arcadeRunning = true;
+  document.getElementById('arcade-timer-wrap').style.display = 'flex';
+  updateArcadeTimerUI();
+  arcadeInterval = setInterval(() => {
+    if (!arcadeRunning || gameAbandoned) return;
+    arcadeTimeLeft--;
+    updateArcadeTimerUI();
+    if (arcadeTimeLeft <= 0) { clearInterval(arcadeInterval); arcadeRunning = false; toast('⏱ TIME UP!'); setTimeout(() => gameOver(), 800); }
+  }, 1000);
+}
+function stopArcadeTimer() {
+  clearInterval(arcadeInterval); arcadeRunning = false;
+  document.getElementById('arcade-timer-wrap').style.display = 'none';
+}
+function updateArcadeTimerUI() {
+  const m = Math.floor(arcadeTimeLeft/60), s = arcadeTimeLeft%60;
+  document.getElementById('arcade-timer-txt').textContent = m+':'+String(s).padStart(2,'0');
+  const pct = Math.max(0, arcadeTimeLeft/arcadeTotalTime*100);
+  const fill = document.getElementById('arcade-timer-fill');
+  fill.style.width = pct+'%';
+  fill.style.background = pct>50?'var(--glow)':pct>25?'var(--amber)':'var(--red)';
+  document.getElementById('arcade-timer-txt').style.color = pct>25?'var(--glow)':'var(--red)';
+}
+
+// Patch buildPlanet for arcade + invincibility reset
+const _origBuildPlanet = buildPlanet;
+window.buildPlanet = function() {
+  invincible = false;
+  document.getElementById('invinc-badge').style.display = 'none';
+  _lastCoinScore = score;
+  _origBuildPlanet();
+  if (arcadeMode) startArcadeTimer();
+  renderInvBar(); // refresh after new planet built
+};
+const _origNextLevel = nextLevel;
+window.nextLevel = function() { stopArcadeTimer(); _origNextLevel(); };
+const _origGameOver = gameOver;
+window.gameOver = function() { stopArcadeTimer(); _origGameOver(); };
+document.getElementById('start-play-btn').addEventListener('click', () => { stopArcadeTimer(); _lastCoinScore = 0; setTimeout(renderInvBar, 100); }, true);
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── AI RESOLVER
+// ════════════════════════════════════════════════════════════════════════════
+let aiRunning = false;
+function startAIResolver() {
+  if (aiRunning || gameAbandoned) return;
+  aiRunning = true;
+  document.getElementById('ai-overlay').classList.add('show');
+  stopArcadeTimer();
+  setTimeout(runAIStep, 300);
+}
+function runAIStep() {
+  if (!aiRunning) return;
+  // Reveal non-mine cells
+  const toReveal = cells.filter(c => !c.revealed && !c.flagged && c.type !== 'mine' && c.type !== 'waterMine');
+  if (toReveal.length) {
+    const batch = toReveal.sort(() => Math.random()-.5).slice(0, 3);
+    batch.forEach(c => {
+      c.revealed = true; score += 5;
+      if (COLLECT_TYPES.includes(c.type) && c.type !== 'portal') {
+        inventory[c.type] = (inventory[c.type]||0)+1;
+        score += 20*level; addCoins(3); updateResUI();
+        c.type = WATER_TYPES.includes(c.type)?'water':'empty';
+      }
+      if (c.type === 'medkit') { const h=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+h,maxHp);updateHpUI(); c.type='empty'; }
+    });
+    updateScoreUI(); drawAll(); updateUI();
+    setTimeout(runAIStep, 130);
+    return;
+  }
+  // Collect any remaining
+  const toCollect = cells.filter(c => c.revealed && COLLECT_TYPES.includes(c.type) && c.type !== 'portal');
+  if (toCollect.length) {
+    toCollect.forEach(c => { inventory[c.type]=(inventory[c.type]||0)+1; score+=20*level; addCoins(3); c.type=WATER_TYPES.includes(c.type)?'water':'empty'; });
+    updateResUI(); updateScoreUI(); drawAll();
+    setTimeout(runAIStep, 200); return;
+  }
+  // Find & reveal portal, then win
+  const portalCell = cells.find(c => c.type === 'portal');
+  if (portalCell && !portalCell.revealed) { portalCell.revealed=true; drawAll(); setTimeout(runAIStep, 300); return; }
+  if (portalCell && portalCell.revealed && objDone()) {
+    score += 200*level; updateScoreUI();
+    spawnBurst(canvas.width/2, canvas.height/2, '#aa44ff', 32);
+    flashFn('#aa44ff', '.2');
+    setTimeout(() => {
+      aiRunning = false;
+      document.getElementById('ai-overlay').classList.remove('show');
+      document.getElementById('sc-level').classList.add('show');
+      document.getElementById('sc-score').textContent = 'SCORE: '+score;
+      document.getElementById('sc-next').textContent = 'NEXT: LVL '+(level+1);
+      const cfg2 = lvlCfg(level+1);
+      document.getElementById('sc-diff').textContent = 'MINES: '+Math.round(cfg2.mineRatio*100)+'%  GRID: R'+cfg2.radius;
+      saveToHistory('🤖 AI WIN LVL '+level);
+    }, 600);
+    return;
+  }
+  aiRunning = false;
+  document.getElementById('ai-overlay').classList.remove('show');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── MULTILANGUAGE SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+const LANG_KEY = 'mineplanet-lang';
+let currentLang = 'en';
+
+const STRINGS = {
+  en: {
+    // Buttons
+    'btn_reveal':'🔍 <u>R</u>EVEAL','btn_collect':'⛏ <u>C</u>OLLECT','btn_flag':'🚩 <u>F</u>LAG',
+    'btn_quit':'🏳 QUIT','btn_menu':'🏠 MENU',
+    // HUD
+    'hud_player':'PLAYER','hud_coins':'COINS',
+    // Start screen
+    'start_play':'🚀 PLAY!','start_hist':'📜 GAME HISTORY','start_shop':'🛒 SHOP','start_help':'❓ HOW TO PLAY',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Enter your name...','start_name_label':'YOUR NAME','start_avatar_label':'CHOOSE YOUR AVATAR',
+    // Shop
+    'shop_title':'🛒 SHOP','shop_items':'ITEMS','shop_powerups':'POWER-UPS',
+    'shop_buy':'BUY 🪙','shop_watch_ad':'WATCH AD 📺','shop_reset':'↺ RESET PRICES & WALLET',
+    'item_map':'MAP','item_map_desc':'Reveals several random safe terrain cells',
+    'item_lantern':'LANTERN','item_lantern_desc':'Safely illuminates all adjacent cells (no mine damage)',
+    'item_medkit':'MEDKIT','item_medkit_desc':'Restores HP immediately',
+    'item_invinc':'INVINCIBILITY','item_invinc_desc':'No HP damage for the entire current match',
+    'item_slowtime':'TIME SLOWDOWN','item_slowtime_desc':'Doubles remaining time (Arcade mode only)',
+    'item_ai':'AI RESOLVER','item_ai_desc':'Auto-completes the level with animated step-by-step resolution',
+    // Screens
+    'win_title':'🌍 PLANET SOLVED!','go_title':'💀 GAME OVER',
+    'go_msg':'HP DEPLETED — board revealed to show your mistakes',
+    'btn_next':'▶ NEXT LEVEL','btn_end':'🏁 END GAME','btn_restart':'↺ RESTART','btn_mainmenu':'🏠 MAIN MENU',
+    'close':'✕ CLOSE',
+    // Help
+    'help_title':'❓ HOW TO PLAY',
+    'help_obj_head':'🎯 OBJECTIVE',
+    'help_obj':'Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level. Each level increases in size and difficulty.',
+    'help_ctrl_head':'🖱 CONTROLS',
+    'help_ctrl':'Tap/click a cell to select it. On desktop use keyboard shortcuts:',
+    'help_key_r':'Reveal selected cell',
+    'help_key_c':'Collect resource / use item',
+    'help_key_f':'Flag suspected mine',
+    'help_key_zoom':'Zoom in/out',
+    'help_key_reset':'Reset view',
+    'help_key_pan':'Pan the map',
+    'help_key_debug':'Toggle Debug Mode (infinite resources)',
+    'help_actions_head':'⚡ ACTIONS',
+    'help_reveal':'REVEAL',
+    'help_reveal_desc':'Uncovers the selected cell. Mine cells cost HP!',
+    'help_collect':'COLLECT',
+    'help_collect_desc':'Gathers a resource or activates a found item.',
+    'help_flag':'FLAG',
+    'help_flag_desc':'Marks a suspected mine. Flagged cells cannot be revealed accidentally.',
+    'help_mines_head':'⚠ MINES',
+    'help_mines':'Revealing a 💣 MINE costs HP. The number on each revealed cell shows how many mines are adjacent — use logic to find safe cells. Water hides 💣 WATER MINES too!',
+    'help_res_head':'📦 RESOURCES',
+    'help_res_land':'Land: 🌲 Wood · 🪨 Stone · ⚙️ Iron · 🪵 Coal · 🪙 Gold · 💎 Crystal · 🌿 Herbs · 🍄 Mushroom',
+    'help_res_water':'Water: 🐠 Fish · 🦀 Crab · 🪸 Coral · 🫧 Pearl · 🐙 Octopus',
+    'help_res_info':'New resource types unlock as you advance levels. Collect the exact amounts shown in the right panel.',
+    'help_special_head':'✨ SPECIAL ITEMS',
+    'help_bomb':'BOMB',
+    'help_bomb_desc':'Reveals all neighbors (may hit mines for half damage)',
+    'help_map':'MAP',
+    'help_map_desc':'Reveals several random safe terrain cells',
+    'help_potion':'POTION',
+    'help_potion_desc':'60% chance to heal, 40% chance to damage',
+    'help_lantern':'LANTERN',
+    'help_lantern_desc':'Safely illuminates all adjacent cells (no mine damage)',
+    'help_medkit':'MEDKIT',
+    'help_medkit_desc':'Restores HP when collected',
+    'help_shop_head':'🛒 SHOP',
+    'help_shop':'Earn 🪙 coins by revealing cells and collecting resources. Spend them in the Shop to buy items or power-ups. Watch ads to get items for free! Prices increase with each purchase.',
+    'help_arcade_head':'⏱ ARCADE MODE',
+    'help_arcade':'Enable Arcade Mode from the start screen. A countdown timer is set based on the number of cells and resources — complete the level before time runs out! Use ⏳ Time Slowdown from the shop to double your remaining time.',
+    'help_score_head':'🏆 SCORING',
+    'help_score_reveal':'+5 per revealed cell',
+    'help_score_collect':'+20×level per collected resource',
+    'help_score_level':'+200×level for completing a level',
+    'help_score_coins':'+coins for reveals & collects (used in Shop)',
+  },
+  it: {
+    'btn_reveal':'🔍 <u>R</u>IVELA','btn_collect':'⛏ <u>C</u>OLLEZIONE','btn_flag':'🚩 <u>F</u>LAG',
+    'btn_quit':'🏳 ABBANDONA','btn_menu':'🏠 MENU',
+    'hud_player':'GIOCATORE','hud_coins':'MONETE',
+    'start_play':'🚀 GIOCA!','start_hist':'📜 CRONOLOGIA','start_shop':'🛒 NEGOZIO','start_help':'❓ COME GIOCARE',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Inserisci il tuo nome...','start_name_label':'IL TUO NOME','start_avatar_label':'SCEGLI IL TUO AVATAR',
+    'shop_title':'🛒 NEGOZIO','shop_items':'OGGETTI','shop_powerups':'POTENZIAMENTI',
+    'shop_buy':'COMPRA 🪙','shop_watch_ad':'📺 GUARDA PUBBLICITÀ','shop_reset':'↺ RESET PREZZI E PORTAFOGLIO',
+    'item_map':'MAPPA','item_map_desc':'Rivela caselle di terreno sicure a caso',
+    'item_lantern':'LANTERNA','item_lantern_desc':'Illumina le celle adiacenti senza danni da mine',
+    'item_medkit':'KIT MEDICO','item_medkit_desc':'Ripristina la vita immediatamente',
+    'item_invinc':'INVINCIBILITÀ','item_invinc_desc':'Nessun danno per tutta la partita',
+    'item_slowtime':'RALLENTATORE','item_slowtime_desc':'Raddoppia il tempo rimanente (solo Arcade)',
+    'item_ai':'AI RESOLVER','item_ai_desc':'Completa il livello automaticamente con animazione passo-passo',
+    'win_title':'🌍 PIANETA RISOLTO!','go_title':'💀 GAME OVER',
+    'go_msg':'VITA ESAURITA — il campo viene rivelato per mostrare gli errori',
+    'btn_next':'▶ LIVELLO SUCCESSIVO','btn_end':'🏁 FINE GIOCO','btn_restart':'↺ RIAVVIA','btn_mainmenu':'🏠 MENU PRINCIPALE',
+    'close':'✕ CHIUDI',
+    'help_title':'❓ COME GIOCARE',
+    'help_obj_head':'🎯 OBIETTIVO',
+    'help_obj':'Esplora il pianeta esagonale, raccogli tutte le risorse richieste nel pannello di destra, poi raggiungi il 🌀 PORTALE e premi RACCOGLI per completare il livello. Ogni livello aumenta di dimensione e difficoltà.',
+    'help_ctrl_head':'🖱 CONTROLLI',
+    'help_ctrl':'Tocca/clicca una cella per selezionarla. Su desktop usa i tasti rapidi:',
+    'help_key_r':'Rivela la cella selezionata',
+    'help_key_c':'Raccogli risorsa / usa oggetto',
+    'help_key_f':'Segna mina sospetta',
+    'help_key_zoom':'Zoom avanti/indietro',
+    'help_key_reset':'Reimposta la vista',
+    'help_key_pan':'Sposta la mappa',
+    'help_key_debug':'Attiva modalità debug (risorse infinite)',
+    'help_actions_head':'⚡ AZIONI',
+    'help_reveal':'RIVELA',
+    'help_reveal_desc':'Scopre la cella selezionata. Le mine tolgono vita!',
+    'help_collect':'RACCOGLI',
+    'help_collect_desc':'Raccoglie una risorsa o attiva un oggetto trovato.',
+    'help_flag':'SEGNA',
+    'help_flag_desc':'Marca una mina sospetta. Le celle segnate non possono essere rivelate accidentalmente.',
+    'help_mines_head':'⚠ MINE',
+    'help_mines':'Rivelare una 💣 MINA costa vita. Il numero su ogni cella rivelata indica quante mine sono adiacenti — usa la logica per trovare celle sicure. Anche le acque nascondono 💣 MINE ACQUATICHE!',
+    'help_res_head':'📦 RISORSE',
+    'help_res_land':'Terra: 🌲 Legno · 🪨 Pietra · ⚙️ Ferro · 🪵 Carbone · 🪙 Oro · 💎 Cristallo · 🌿 Erbe · 🍄 Fungo',
+    'help_res_water':'Acqua: 🐠 Pesce · 🦀 Granchio · 🪸 Corallo · 🫧 Perla · 🐙 Polpo',
+    'help_res_info':'Nuovi tipi di risorse si sbloccano avanzando di livello. Raccogli le quantità esatte indicate nel pannello di destra.',
+    'help_special_head':'✨ OGGETTI SPECIALI',
+    'help_bomb':'BOMBA',
+    'help_bomb_desc':'Rivela tutti i vicini (può colpire mine per metà danno)',
+    'help_map':'MAPPA',
+    'help_map_desc':'Rivela diverse caselle di terreno sicure a caso',
+    'help_potion':'POZIONE',
+    'help_potion_desc':'60% di possibilità di guarire, 40% di danno',
+    'help_lantern':'LANTERNA',
+    'help_lantern_desc':'Illumina tutte le celle adiacenti senza danni da mine',
+    'help_medkit':'KIT MEDICO',
+    'help_medkit_desc':'Ripristina vita quando raccolto',
+    'help_shop_head':'🛒 NEGOZIO',
+    'help_shop':'Guadagna 🪙 monete rivelando celle e raccogliendo risorse. Usale nel Negozio per acquistare oggetti o potenziamenti. Guarda le pubblicità per ottenerli gratis! I prezzi aumentano ad ogni acquisto.',
+    'help_arcade_head':'⏱ MODALITÀ ARCADE',
+    'help_arcade':'Attiva la modalità Arcade dalla schermata iniziale. Un conto alla rovescia viene calcolato in base al numero di celle e risorse — completa il livello prima che scada il tempo! Usa ⏳ Rallentatore dal negozio per raddoppiare il tempo rimasto.',
+    'help_score_head':'🏆 PUNTEGGIO',
+    'help_score_reveal':'+5 per cella rivelata',
+    'help_score_collect':'+20×livello per risorsa raccolta',
+    'help_score_level':'+200×livello per completare un livello',
+    'help_score_coins':'+monete per rivelare e raccogliere (usate nel Negozio)',
+  },
+  fr: {
+    'btn_reveal':'🔍 <u>R</u>ÉVÉLER','btn_collect':'⛏ <u>C</u>OLLECTER','btn_flag':'🚩 <u>F</u>LAQUER',
+    'btn_quit':'🏳 QUITTER','btn_menu':'🏠 MENU',
+    'hud_player':'JOUEUR','hud_coins':'PIÈCES',
+    'start_play':'🚀 JOUER!','start_hist':'📜 HISTORIQUE','start_shop':'🛒 BOUTIQUE','start_help':'❓ COMMENT JOUER',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Entrez votre nom...','start_name_label':'VOTRE NOM','start_avatar_label':'CHOISISSEZ VOTRE AVATAR',
+    'shop_title':'🛒 BOUTIQUE','shop_items':'OBJETS','shop_powerups':'AMÉLIORATIONS',
+    'shop_buy':'ACHETER 🪙','shop_watch_ad':'📺 VOIR PUBLICITÉ','shop_reset':'↺ RÉINITIALISER',
+    'item_map':'CARTE','item_map_desc':'Révèle plusieurs cases de terrain sûres au hasard',
+    'item_lantern':'LANTERNE','item_lantern_desc':'Éclaire les cases adjacentes sans dégâts de mines',
+    'item_medkit':'TROUSSE MÉD.','item_medkit_desc':'Restaure la vie immédiatement',
+    'item_invinc':'INVINCIBILITÉ','item_invinc_desc':'Aucun dégât pendant toute la partie',
+    'item_slowtime':'RALENTISSEMENT','item_slowtime_desc':'Double le temps restant (Arcade uniquement)',
+    'item_ai':'IA SOLVEUR','item_ai_desc':'Complète le niveau automatiquement avec animation',
+    'win_title':'🌍 PLANÈTE RÉSOLUE!','go_title':'💀 GAME OVER',
+    'go_msg':'VIE ÉPUISÉE — plateau révélé pour montrer les erreurs',
+    'btn_next':'▶ NIVEAU SUIVANT','btn_end':'🏁 FIN','btn_restart':'↺ RECOMMENCER','btn_mainmenu':'🏠 MENU PRINCIPAL',
+    'close':'✕ FERMER',
+    'help_title':'❓ COMMENT JOUER',
+    'help_obj_head':'🎯 OBJECTIF',
+    'help_obj':'Explorez la planète hexagonale, collectez toutes les ressources requises dans le panneau de droite, puis atteignez le 🌀 PORTAIL et appuyez sur COLLECTER pour terminer le niveau.',
+    'help_ctrl_head':'🖱 CONTRÔLES',
+    'help_ctrl':'Touchez/cliquez une case pour la sélectionner. Raccourcis clavier:',
+    'help_key_r':'Révéler la case sélectionnée',
+    'help_key_c':'Collecter / utiliser un objet',
+    'help_key_f':'Marquer une mine suspectée',
+    'help_key_zoom':'Zoom avant/arrière',
+    'help_key_reset':'Réinitialiser la vue',
+    'help_key_pan':'Déplacer la carte',
+    'help_key_debug':'Activer le mode debug (ressources infinies)',
+    'help_actions_head':'⚡ ACTIONS',
+    'help_reveal':'RÉVÉLER',
+    'help_reveal_desc':'Découvre la case sélectionnée. Les mines coûtent de la vie!',
+    'help_collect':'COLLECTER',
+    'help_collect_desc':'Ramasse une ressource ou active un objet trouvé.',
+    'help_flag':'MARQUER',
+    'help_flag_desc':'Marque une mine suspectée. Les cases marquées ne peuvent pas être révélées accidentellement.',
+    'help_mines_head':'⚠ MINES',
+    'help_mines':'Révéler une 💣 MINE coûte de la vie. Le chiffre sur chaque case révélée indique le nombre de mines adjacentes. L\'eau cache aussi des 💣 MINES AQUATIQUES!',
+    'help_res_head':'📦 RESSOURCES',
+    'help_res_land':'Terre: 🌲 Bois · 🪨 Pierre · ⚙️ Fer · 🪵 Charbon · 🪙 Or · 💎 Cristal · 🌿 Herbes · 🍄 Champignon',
+    'help_res_water':'Eau: 🐠 Poisson · 🦀 Crabe · 🪸 Corail · 🫧 Perle · 🐙 Pieuvre',
+    'help_res_info':'De nouveaux types de ressources se débloquent en avançant. Collectez les quantités exactes indiquées.',
+    'help_special_head':'✨ OBJETS SPÉCIAUX',
+    'help_bomb':'BOMBE','help_bomb_desc':'Révèle tous les voisins (peut toucher des mines pour moitié des dégâts)',
+    'help_map':'CARTE','help_map_desc':'Révèle plusieurs cases de terrain sûres au hasard',
+    'help_potion':'POTION','help_potion_desc':'60% de chance de soigner, 40% de blesser',
+    'help_lantern':'LANTERNE','help_lantern_desc':'Éclaire toutes les cases adjacentes sans dégâts',
+    'help_medkit':'TROUSSE','help_medkit_desc':'Restaure la vie quand collectée',
+    'help_shop_head':'🛒 BOUTIQUE',
+    'help_shop':'Gagnez 🪙 pièces en révélant des cases et collectant des ressources. Dépensez-les en boutique. Regardez des pubs pour obtenir des objets gratuitement!',
+    'help_arcade_head':'⏱ MODE ARCADE',
+    'help_arcade':'Activez le mode Arcade depuis l\'écran de démarrage. Un minuteur est calculé selon le nombre de cases et ressources — terminez le niveau avant la fin du temps!',
+    'help_score_head':'🏆 SCORE',
+    'help_score_reveal':'+5 par case révélée',
+    'help_score_collect':'+20×niveau par ressource collectée',
+    'help_score_level':'+200×niveau pour terminer un niveau',
+    'help_score_coins':'+pièces pour révéler et collecter (utilisées en boutique)',
+  },
+  de: {
+    'btn_reveal':'🔍 <u>A</u>UFDECKEN','btn_collect':'⛏ <u>S</u>AMMELN','btn_flag':'🚩 <u>M</u>ARKIEREN',
+    'btn_quit':'🏳 AUFGEBEN','btn_menu':'🏠 MENÜ',
+    'hud_player':'SPIELER','hud_coins':'MÜNZEN',
+    'start_play':'🚀 SPIELEN!','start_hist':'📜 SPIELVERLAUF','start_shop':'🛒 SHOP','start_help':'❓ ANLEITUNG',
+    'arcade_off':'⏱ ARCADE: AUS','arcade_on':'⏱ ARCADE: EIN',
+    'start_name_ph':'Name eingeben...','start_name_label':'DEIN NAME','start_avatar_label':'WÄHLE DEINEN AVATAR',
+    'shop_title':'🛒 SHOP','shop_items':'GEGENSTÄNDE','shop_powerups':'POWER-UPS',
+    'shop_buy':'KAUFEN 🪙','shop_watch_ad':'📺 WERBUNG ANSEHEN','shop_reset':'↺ ZURÜCKSETZEN',
+    'item_map':'KARTE','item_map_desc':'Zeigt mehrere sichere Geländefelder',
+    'item_lantern':'LATERNE','item_lantern_desc':'Beleuchtet benachbarte Felder ohne Minenschaden',
+    'item_medkit':'VERBANDSKASTEN','item_medkit_desc':'Stellt sofort Leben wieder her',
+    'item_invinc':'UNVERWUNDBARKEIT','item_invinc_desc':'Kein Schaden im gesamten Spiel',
+    'item_slowtime':'ZEITVERLANGSAMUNG','item_slowtime_desc':'Verdoppelt verbleibende Zeit (nur Arcade)',
+    'item_ai':'KI LÖSER','item_ai_desc':'Löst das Level automatisch mit Animation',
+    'win_title':'🌍 PLANET GELÖST!','go_title':'💀 GAME OVER',
+    'go_msg':'LEBEN AUFGEBRAUCHT — Brett aufgedeckt',
+    'btn_next':'▶ NÄCHSTES LEVEL','btn_end':'🏁 BEENDEN','btn_restart':'↺ NEU STARTEN','btn_mainmenu':'🏠 HAUPTMENÜ',
+    'close':'✕ SCHLIESSEN',
+    'help_title':'❓ ANLEITUNG',
+    'help_obj_head':'🎯 ZIEL',
+    'help_obj':'Erkunde den hexagonalen Planeten, sammle alle erforderlichen Ressourcen im rechten Panel und erreiche dann das 🌀 PORTAL.',
+    'help_ctrl_head':'🖱 STEUERUNG',
+    'help_ctrl':'Tippe/klicke ein Feld zum Auswählen. Tastenkürzel:',
+    'help_key_r':'Ausgewähltes Feld aufdecken',
+    'help_key_c':'Ressource sammeln / Gegenstand benutzen',
+    'help_key_f':'Verdächtige Mine markieren',
+    'help_key_zoom':'Zoom ein/aus',
+    'help_key_reset':'Ansicht zurücksetzen',
+    'help_key_pan':'Karte verschieben',
+    'help_key_debug':'Debug-Modus (unendliche Ressourcen)',
+    'help_actions_head':'⚡ AKTIONEN',
+    'help_reveal':'AUFDECKEN',
+    'help_reveal_desc':'Deckt das ausgewählte Feld auf. Minen kosten Leben!',
+    'help_collect':'SAMMELN',
+    'help_collect_desc':'Sammelt eine Ressource oder aktiviert einen gefundenen Gegenstand.',
+    'help_flag':'MARKIEREN',
+    'help_flag_desc':'Markiert eine verdächtige Mine. Markierte Felder können nicht versehentlich aufgedeckt werden.',
+    'help_mines_head':'⚠ MINEN',
+    'help_mines':'Eine 💣 MINE aufzudecken kostet Leben. Die Zahl auf jedem aufgedeckten Feld zeigt die Anzahl benachbarter Minen. Auch Wasser verbirgt 💣 WASSERMINEN!',
+    'help_res_head':'📦 RESSOURCEN',
+    'help_res_land':'Land: 🌲 Holz · 🪨 Stein · ⚙️ Eisen · 🪵 Kohle · 🪙 Gold · 💎 Kristall · 🌿 Kräuter · 🍄 Pilz',
+    'help_res_water':'Wasser: 🐠 Fisch · 🦀 Krabbe · 🪸 Koralle · 🫧 Perle · 🐙 Oktopus',
+    'help_res_info':'Neue Ressourcentypen werden mit steigendem Level freigeschaltet.',
+    'help_special_head':'✨ SPEZIELLE GEGENSTÄNDE',
+    'help_bomb':'BOMBE','help_bomb_desc':'Deckt alle Nachbarn auf (Minen halber Schaden)',
+    'help_map':'KARTE','help_map_desc':'Zeigt mehrere sichere Geländefelder',
+    'help_potion':'TRANK','help_potion_desc':'60% heilen, 40% Schaden',
+    'help_lantern':'LATERNE','help_lantern_desc':'Beleuchtet alle Nachbarfelder sicher',
+    'help_medkit':'VERBAND','help_medkit_desc':'Stellt Leben wieder her',
+    'help_shop_head':'🛒 SHOP',
+    'help_shop':'Verdiene 🪙 Münzen durch Aufdecken und Sammeln. Kaufe damit Gegenstände im Shop oder schaue Werbung für kostenlose Items!',
+    'help_arcade_head':'⏱ ARCADE-MODUS',
+    'help_arcade':'Aktiviere den Arcade-Modus im Startbildschirm. Ein Countdown wird basierend auf Feldern und Ressourcen gesetzt — schließe das Level ab, bevor die Zeit abläuft!',
+    'help_score_head':'🏆 PUNKTE',
+    'help_score_reveal':'+5 pro aufgedecktem Feld',
+    'help_score_collect':'+20×Level pro gesammelter Ressource',
+    'help_score_level':'+200×Level für Level-Abschluss',
+    'help_score_coins':'+Münzen für Aufdecken und Sammeln',
+  },
+  es: {
+    'btn_reveal':'🔍 <u>R</u>EVELAR','btn_collect':'⛏ <u>C</u>OLETAR','btn_flag':'🚩 <u>M</u>ARCAR',
+    'btn_quit':'🏳 RENDIRSE','btn_menu':'🏠 MENÚ',
+    'hud_player':'JUGADOR','hud_coins':'MONEDAS',
+    'start_play':'🚀 ¡JUGAR!','start_hist':'📜 HISTORIAL','start_shop':'🛒 TIENDA','start_help':'❓ CÓMO JUGAR',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Escribe tu nombre...','start_name_label':'TU NOMBRE','start_avatar_label':'ELIGE TU AVATAR',
+    'shop_title':'🛒 TIENDA','shop_items':'OBJETOS','shop_powerups':'POTENCIADORES',
+    'shop_buy':'COMPRAR 🪙','shop_watch_ad':'📺 VER ANUNCIO','shop_reset':'↺ REINICIAR PRECIOS',
+    'item_map':'MAPA','item_map_desc':'Revela varias celdas de terreno seguras al azar',
+    'item_lantern':'LINTERNA','item_lantern_desc':'Ilumina celdas adyacentes sin daño por minas',
+    'item_medkit':'BOTIQUÍN','item_medkit_desc':'Restaura vida inmediatamente',
+    'item_invinc':'INVENCIBILIDAD','item_invinc_desc':'Sin daño durante toda la partida',
+    'item_slowtime':'RALENTIZAR','item_slowtime_desc':'Duplica el tiempo restante (solo Arcade)',
+    'item_ai':'IA RESOLVENTE','item_ai_desc':'Completa el nivel automáticamente con animación',
+    'win_title':'🌍 ¡PLANETA RESUELTO!','go_title':'💀 GAME OVER',
+    'go_msg':'VIDA AGOTADA — tablero revelado para mostrar errores',
+    'btn_next':'▶ SIGUIENTE NIVEL','btn_end':'🏁 FIN','btn_restart':'↺ REINICIAR','btn_mainmenu':'🏠 MENÚ PRINCIPAL',
+    'close':'✕ CERRAR',
+    'help_title':'❓ CÓMO JUGAR',
+    'help_obj_head':'🎯 OBJETIVO',
+    'help_obj':'Explora el planeta hexagonal, recoge todos los recursos requeridos en el panel derecho, luego llega al 🌀 PORTAL y pulsa RECOGER para completar el nivel.',
+    'help_ctrl_head':'🖱 CONTROLES',
+    'help_ctrl':'Toca/clic una celda para seleccionarla. Atajos de teclado:',
+    'help_key_r':'Revelar celda seleccionada',
+    'help_key_c':'Recoger / usar objeto',
+    'help_key_f':'Marcar mina sospechosa',
+    'help_key_zoom':'Zoom',
+    'help_key_reset':'Reiniciar vista',
+    'help_key_pan':'Desplazar mapa',
+    'help_key_debug':'Modo debug (recursos infinitos)',
+    'help_actions_head':'⚡ ACCIONES',
+    'help_reveal':'REVELAR',
+    'help_reveal_desc':'Descubre la celda seleccionada. ¡Las minas cuestan vida!',
+    'help_collect':'RECOGER',
+    'help_collect_desc':'Recoge un recurso o activa un objeto encontrado.',
+    'help_flag':'MARCAR',
+    'help_flag_desc':'Marca una mina sospechosa. Las celdas marcadas no se pueden revelar accidentalmente.',
+    'help_mines_head':'⚠ MINAS',
+    'help_mines':'Revelar una 💣 MINA cuesta vida. El número en cada celda muestra las minas adyacentes. ¡El agua también esconde 💣 MINAS ACUÁTICAS!',
+    'help_res_head':'📦 RECURSOS',
+    'help_res_land':'Tierra: 🌲 Madera · 🪨 Piedra · ⚙️ Hierro · 🪵 Carbón · 🪙 Oro · 💎 Cristal · 🌿 Hierbas · 🍄 Seta',
+    'help_res_water':'Agua: 🐠 Pez · 🦀 Cangrejo · 🪸 Coral · 🫧 Perla · 🐙 Pulpo',
+    'help_res_info':'Nuevos tipos de recursos se desbloquean al avanzar de nivel.',
+    'help_special_head':'✨ OBJETOS ESPECIALES',
+    'help_bomb':'BOMBA','help_bomb_desc':'Revela todos los vecinos (minas mitad de daño)',
+    'help_map':'MAPA','help_map_desc':'Revela varias celdas seguras al azar',
+    'help_potion':'POCIÓN','help_potion_desc':'60% curar, 40% dañar',
+    'help_lantern':'LINTERNA','help_lantern_desc':'Ilumina celdas adyacentes sin daño',
+    'help_medkit':'BOTIQUÍN','help_medkit_desc':'Restaura vida al recoger',
+    'help_shop_head':'🛒 TIENDA',
+    'help_shop':'Gana 🪙 monedas revelando celdas y recogiendo recursos. Gástalas en la Tienda o mira anuncios para objetos gratis.',
+    'help_arcade_head':'⏱ MODO ARCADE',
+    'help_arcade':'Activa el Modo Arcade desde la pantalla de inicio. Un temporizador se calcula según celdas y recursos — ¡completa el nivel antes de que acabe el tiempo!',
+    'help_score_head':'🏆 PUNTUACIÓN',
+    'help_score_reveal':'+5 por celda revelada',
+    'help_score_collect':'+20×nivel por recurso recogido',
+    'help_score_level':'+200×nivel por completar un nivel',
+    'help_score_coins':'+monedas por revelar y recoger',
+  },
+  pt: {
+    'btn_reveal':'🔍 <u>R</u>EVELAR','btn_collect':'⛏ <u>C</u>OLETAR','btn_flag':'🚩 <u>M</u>ARCAR',
+    'btn_quit':'🏳 DESISTIR','btn_menu':'🏠 MENU',
+    'hud_player':'JOGADOR','hud_coins':'MOEDAS',
+    'start_play':'🚀 JOGAR!','start_hist':'📜 HISTÓRICO','start_shop':'🛒 LOJA','start_help':'❓ COMO JOGAR',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Digite seu nome...','start_name_label':'SEU NOME','start_avatar_label':'ESCOLHA SEU AVATAR',
+    'shop_title':'🛒 LOJA','shop_items':'ITENS','shop_powerups':'MELHORIAS',
+    'shop_buy':'COMPRAR 🪙','shop_watch_ad':'📺 VER ANÚNCIO','shop_reset':'↺ REINICIAR',
+    'item_map':'MAPA','item_map_desc':'Revela várias células de terreno seguras',
+    'item_lantern':'LANTERNA','item_lantern_desc':'Ilumina células adjacentes com segurança',
+    'item_medkit':'KIT MÉDICO','item_medkit_desc':'Restaura vida imediatamente',
+    'item_invinc':'INVENCIBILIDADE','item_invinc_desc':'Sem dano em toda a partida',
+    'item_slowtime':'DESACELERAÇÃO','item_slowtime_desc':'Dobra o tempo restante (só Arcade)',
+    'item_ai':'IA RESOLVEDOR','item_ai_desc':'Completa o nível automaticamente com animação',
+    'win_title':'🌍 PLANETA RESOLVIDO!','go_title':'💀 GAME OVER',
+    'go_msg':'VIDA ESGOTADA — tabuleiro revelado para mostrar erros',
+    'btn_next':'▶ PRÓXIMO NÍVEL','btn_end':'🏁 FIM','btn_restart':'↺ REINICIAR','btn_mainmenu':'🏠 MENU PRINCIPAL',
+    'close':'✕ FECHAR',
+    'help_title':'❓ COMO JOGAR',
+    'help_obj_head':'🎯 OBJETIVO',
+    'help_obj':'Explore o planeta hexagonal, colete todos os recursos necessários no painel direito, depois alcance o 🌀 PORTAL e pressione COLETAR para completar o nível.',
+    'help_ctrl_head':'🖱 CONTROLES',
+    'help_ctrl':'Toque/clique em uma célula para selecioná-la. Atalhos de teclado:',
+    'help_key_r':'Revelar célula selecionada',
+    'help_key_c':'Coletar / usar item',
+    'help_key_f':'Marcar mina suspeita',
+    'help_key_zoom':'Zoom',
+    'help_key_reset':'Redefinir vista',
+    'help_key_pan':'Mover mapa',
+    'help_key_debug':'Modo debug (recursos infinitos)',
+    'help_actions_head':'⚡ AÇÕES',
+    'help_reveal':'REVELAR',
+    'help_reveal_desc':'Descobre a célula selecionada. Minas custam vida!',
+    'help_collect':'COLETAR',
+    'help_collect_desc':'Coleta um recurso ou ativa um item encontrado.',
+    'help_flag':'MARCAR',
+    'help_flag_desc':'Marca uma mina suspeita. Células marcadas não podem ser reveladas acidentalmente.',
+    'help_mines_head':'⚠ MINAS',
+    'help_mines':'Revelar uma 💣 MINA custa vida. O número em cada célula mostra as minas adjacentes. A água também esconde 💣 MINAS AQUÁTICAS!',
+    'help_res_head':'📦 RECURSOS',
+    'help_res_land':'Terra: 🌲 Madeira · 🪨 Pedra · ⚙️ Ferro · 🪵 Carvão · 🪙 Ouro · 💎 Cristal · 🌿 Ervas · 🍄 Cogumelo',
+    'help_res_water':'Água: 🐠 Peixe · 🦀 Caranguejo · 🪸 Coral · 🫧 Pérola · 🐙 Polvo',
+    'help_res_info':'Novos tipos de recursos são desbloqueados ao avançar de nível.',
+    'help_special_head':'✨ ITENS ESPECIAIS',
+    'help_bomb':'BOMBA','help_bomb_desc':'Revela todos os vizinhos (minas metade do dano)',
+    'help_map':'MAPA','help_map_desc':'Revela várias células seguras ao acaso',
+    'help_potion':'POÇÃO','help_potion_desc':'60% curar, 40% dano',
+    'help_lantern':'LANTERNA','help_lantern_desc':'Ilumina células adjacentes sem dano',
+    'help_medkit':'KIT','help_medkit_desc':'Restaura vida ao coletar',
+    'help_shop_head':'🛒 LOJA',
+    'help_shop':'Ganhe 🪙 moedas revelando células e coletando recursos. Gaste-as na Loja ou assista anúncios para itens grátis!',
+    'help_arcade_head':'⏱ MODO ARCADE',
+    'help_arcade':'Ative o Modo Arcade na tela inicial. Um temporizador é calculado com base em células e recursos — complete o nível antes do tempo acabar!',
+    'help_score_head':'🏆 PONTUAÇÃO',
+    'help_score_reveal':'+5 por célula revelada',
+    'help_score_collect':'+20×nível por recurso coletado',
+    'help_score_level':'+200×nível por completar um nível',
+    'help_score_coins':'+moedas por revelar e coletar',
+  },
+  ja: {
+    'btn_reveal':'🔍 <u>R</u>開く','btn_collect':'⛏ <u>C</u>集める','btn_flag':'🚩 <u>F</u>印',
+    'btn_quit':'🏳 やめる','btn_menu':'🏠 メニュー',
+    'hud_player':'プレイヤー','hud_coins':'コイン',
+    'start_play':'🚀 プレイ!','start_hist':'📜 履歴','start_shop':'🛒 ショップ','start_help':'❓ 遊び方',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'名前を入力...','start_name_label':'あなたの名前','start_avatar_label':'アバターを選択',
+    'shop_title':'🛒 ショップ','shop_items':'アイテム','shop_powerups':'パワーアップ',
+    'shop_buy':'購入 🪙','shop_watch_ad':'📺 広告を見る','shop_reset':'↺ リセット',
+    'item_map':'地図','item_map_desc':'安全な地形マスをランダムに公開',
+    'item_lantern':'ランタン','item_lantern_desc':'隣接マスを安全に照らす（地雷ダメージなし）',
+    'item_medkit':'応急手当','item_medkit_desc':'HPを即座に回復',
+    'item_invinc':'無敵','item_invinc_desc':'試合中ダメージなし',
+    'item_slowtime':'時間スロー','item_slowtime_desc':'残り時間を倍増（アーケードのみ）',
+    'item_ai':'AI解決者','item_ai_desc':'レベルをアニメーションで自動クリア',
+    'win_title':'🌍 惑星クリア!','go_title':'💀 ゲームオーバー',
+    'go_msg':'HP切れ — ボード公開',
+    'btn_next':'▶ 次のレベル','btn_end':'🏁 終了','btn_restart':'↺ 再スタート','btn_mainmenu':'🏠 メインメニュー',
+    'close':'✕ 閉じる',
+    'help_title':'❓ 遊び方',
+    'help_obj_head':'🎯 目標',
+    'help_obj':'六角形の惑星を探索し、右パネルに表示された全てのリソースを集め、🌀 ポータルに到達してCOLLECTを押してレベルをクリアしよう。',
+    'help_ctrl_head':'🖱 操作方法',
+    'help_ctrl':'セルをタップ/クリックして選択。キーボードショートカット:',
+    'help_key_r':'選択したセルを開く',
+    'help_key_c':'リソースを集める / アイテムを使う',
+    'help_key_f':'地雷の疑いにフラグを立てる',
+    'help_key_zoom':'ズーム',
+    'help_key_reset':'ビューをリセット',
+    'help_key_pan':'マップを移動',
+    'help_key_debug':'デバッグモード（無限リソース）',
+    'help_actions_head':'⚡ アクション',
+    'help_reveal':'開く',
+    'help_reveal_desc':'選択したセルを開く。地雷はHPを消費！',
+    'help_collect':'集める',
+    'help_collect_desc':'リソースを収集またはアイテムを起動。',
+    'help_flag':'印',
+    'help_flag_desc':'地雷の疑いにフラグ。フラグ付きセルは誤って開けない。',
+    'help_mines_head':'⚠ 地雷',
+    'help_mines':'💣 地雷を開くとHPを消費。各セルの数字は隣接する地雷数。水中にも💣 水中地雷が潜む！',
+    'help_res_head':'📦 リソース',
+    'help_res_land':'陸: 🌲 木 · 🪨 石 · ⚙️ 鉄 · 🪵 石炭 · 🪙 金 · 💎 クリスタル · 🌿 ハーブ · 🍄 キノコ',
+    'help_res_water':'水: 🐠 魚 · 🦀 カニ · 🪸 サンゴ · 🫧 真珠 · 🐙 タコ',
+    'help_res_info':'レベルが上がると新しいリソースが解放される。',
+    'help_special_head':'✨ 特殊アイテム',
+    'help_bomb':'ボム','help_bomb_desc':'全隣接セルを開く（地雷は半分のダメージ）',
+    'help_map':'地図','help_map_desc':'安全な地形マスをランダムに公開',
+    'help_potion':'ポーション','help_potion_desc':'60%回復、40%ダメージ',
+    'help_lantern':'ランタン','help_lantern_desc':'隣接セルを安全に照らす',
+    'help_medkit':'応急手当','help_medkit_desc':'集めるとHP回復',
+    'help_shop_head':'🛒 ショップ',
+    'help_shop':'セルを開いてリソースを集めて🪙コインを獲得。ショップでアイテムを購入するか広告を見て無料でゲット！',
+    'help_arcade_head':'⏱ アーケードモード',
+    'help_arcade':'スタート画面でアーケードモードを有効化。セル数とリソースに基づくカウントダウンが始まる。時間切れになる前にクリアしよう！',
+    'help_score_head':'🏆 スコア',
+    'help_score_reveal':'セル公開ごとに+5',
+    'help_score_collect':'リソース収集ごとに+20×レベル',
+    'help_score_level':'レベルクリアごとに+200×レベル',
+    'help_score_coins':'公開・収集でコイン獲得（ショップで使用）',
+  }
+};
+
+function T(key) {
+  return (STRINGS[currentLang]||STRINGS.en)[key] || STRINGS.en[key] || key;
+}
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-select,#lang-select-start').forEach(s => s.value = lang);
+  try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
+  applyI18n();
+}
+function applyI18n() {
+  // data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (el.tagName==='INPUT') { el.placeholder = T(k).replace(/<[^>]+>/g,''); return; }
+    el.innerHTML = T(k);
+  });
+  // Action buttons (preserve HTML)
+  const br=document.getElementById('b-reveal'); if(br) br.innerHTML=T('btn_reveal');
+  const bc=document.getElementById('b-collect'); if(bc) bc.innerHTML=T('btn_collect');
+  const bf=document.getElementById('b-flag'); if(bf) bf.innerHTML=T('btn_flag');
+  const bq=document.getElementById('b-quit'); if(bq&&!gameAbandoned) bq.innerHTML=T('btn_quit');
+  const bm=document.getElementById('b-menu'); if(bm) bm.innerHTML=T('btn_menu');
+  // Start screen
+  const sp=document.getElementById('start-play-btn'); if(sp) sp.innerHTML=T('start_play');
+  const sh=document.getElementById('start-hist-btn'); if(sh) sh.innerHTML=T('start_hist');
+  const ss=document.getElementById('start-shop-btn'); if(ss) ss.innerHTML=T('start_shop');
+  const shelp=document.getElementById('start-help-btn'); if(shelp) shelp.innerHTML=T('start_help');
+  const sn=document.getElementById('start-name'); if(sn) sn.placeholder=T('start_name_ph').replace(/<[^>]+>/g,'');
+  // Arcade toggle
+  const ab=document.getElementById('arcade-toggle-btn'); if(ab) ab.textContent=arcadeMode?T('arcade_on'):T('arcade_off');
+  // Player label
+  const pl=document.getElementById('player-label'); if(pl) pl.textContent=T('hud_player');
+  // Coins label
+  const cl=document.querySelector('#coins-hud .top-label'); if(cl) cl.textContent=T('hud_coins');
+  // Shop title
+  const st2=document.getElementById('shop-title'); if(st2) st2.textContent=T('shop_title');
+  // Win/lose screens
+  const wh=document.querySelector('#sc-level h1'); if(wh) wh.textContent=T('win_title').replace(/<[^>]+>/g,'');
+  const gh=document.querySelector('#sc-over h1'); if(gh) gh.textContent=T('go_title').replace(/<[^>]+>/g,'');
+  const gp=document.querySelector('#sc-over p'); if(gp) gp.textContent=T('go_msg').replace(/<[^>]+>/g,'');
+  // (single i18n loop above handles all elements)
+}
+
+// Load saved lang
+(function(){
+  try { const s=localStorage.getItem(LANG_KEY); if(s&&STRINGS[s]){currentLang=s;} } catch(e){}
+  document.querySelectorAll('#lang-select,#lang-select-start').forEach(s=>s.value=currentLang);
+  setTimeout(applyI18n, 60);
+})();
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── INIT
+// ════════════════════════════════════════════════════════════════════════════
+loadCoins();
+loadShopPrices();
+loadShopInventory();
+
 </script>
+
+<!-- SHOP OVERLAY -->
+<div id="shop-overlay">
+  <div id="shop-box">
+    <div id="shop-header">
+      <span id="shop-title">🛒 SHOP</span>
+      <span id="shop-coins-display">🪙 <span id="shop-coins-val">0</span></span>
+    </div>
+    <div id="shop-body">
+      <div class="shop-section-title" data-i18n="shop_items">ITEMS</div>
+      <!-- MEDKIT -->
+      <div class="shop-item" data-key="medkit">
+        <div class="shop-icon">🩺</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_medkit">MEDKIT</div>
+          <div class="shop-desc" data-i18n="item_medkit_desc">Restores HP immediately</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-medkit"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('medkit')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('medkit')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- LANTERN -->
+      <div class="shop-item" data-key="lantern">
+        <div class="shop-icon">🔦</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_lantern">LANTERN</div>
+          <div class="shop-desc" data-i18n="item_lantern_desc">Safely illuminates all adjacent cells (no mine damage)</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-lantern"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('lantern')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('lantern')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- MAP -->
+      <div class="shop-item" data-key="map">
+        <div class="shop-icon">🗺️</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_map">MAP</div>
+          <div class="shop-desc" data-i18n="item_map_desc">Reveals several random safe terrain cells</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-map"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('map')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('map')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <div class="shop-section-title" data-i18n="shop_powerups">POWER-UPS</div>
+      <!-- INVINCIBILITY -->
+      <div class="shop-item" data-key="invincible">
+        <div class="shop-icon">🛡️</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_invinc">INVINCIBILITY</div>
+          <div class="shop-desc" data-i18n="item_invinc_desc">No HP damage for the entire current match</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-invincible"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('invincible')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('invincible')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- TIME SLOWDOWN (arcade only) -->
+      <div class="shop-item" data-key="slowtime" id="shop-slowtime-item">
+        <div class="shop-icon">⏳</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_slowtime">TIME SLOWDOWN</div>
+          <div class="shop-desc" data-i18n="item_slowtime_desc">Doubles remaining time (Arcade mode only)</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-slowtime"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('slowtime')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('slowtime')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- AI RESOLVER -->
+      <div class="shop-item" data-key="ai">
+        <div class="shop-icon">🤖</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_ai">AI RESOLVER</div>
+          <div class="shop-desc" data-i18n="item_ai_desc">Auto-completes the level with animated step-by-step resolution</div>
+        </div>
+        <div class="shop-actions">
+          <div class="shop-price" id="price-ai"></div>
+          <button class="shop-buy-btn" onclick="shopBuy('ai')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('ai')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+    </div>
+    <div id="shop-footer">
+      <button id="shop-reset-btn" onclick="shopReset()" data-i18n="shop_reset">↺ RESET PRICES &amp; WALLET</button>
+      <button class="btn green" style="font-size:9px;padding:5px 12px;min-width:auto;" onclick="closeShop()" data-i18n="close">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- AD SIMULATION OVERLAY -->
+<div id="ad-overlay">
+  <div id="ad-box">
+    <div id="ad-label">📺 ADVERTISEMENT</div>
+    <div id="ad-content">🎮</div>
+    <div id="ad-skip-wrap"><span id="ad-countdown"></span></div>
+    <button id="ad-skip-btn" onclick="adSkip()">✓ CLAIM REWARD</button>
+  </div>
+</div>
+
+<!-- AI RESOLVER OVERLAY -->
+<div id="ai-overlay">
+  <div id="ai-label">🤖 AI RESOLVING...</div>
+</div>
+
 </body>
 </html>
