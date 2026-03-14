@@ -365,7 +365,6 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <span class="top-label">COINS</span>
     <span class="top-val amber" id="coins-num">0</span>
   </div>
-  <button id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
   <select id="lang-select" onchange="setLang(this.value)">
     <option value="en">🇬🇧 EN</option>
     <option value="it">🇮🇹 IT</option>
@@ -397,17 +396,18 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <div id="toast"></div>
 
 <div id="bottombar">
-  <div id="shop-inv-bar" class="empty"></div>
 <div id="cell-info">— tap a cell —</div>
   <div class="btn-row">
     <button class="btn cyan off" id="b-reveal"  onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
     <button class="btn amber off" id="b-collect" onclick="doCollect()">⛏ <u>C</u>OLLECT</button>
     <button class="btn red off"  id="b-flag"    onclick="doFlag()">🚩 <u>F</u>LAG</button>
   </div>
+  <div id="shop-inv-bar" class="empty"></div>
   <div class="btn-row">
     <button class="zbtn" onclick="zoom(1.15)">🔍＋</button>
     <button class="zbtn" onclick="resetView()">⊙ RESET</button>
     <button class="zbtn" onclick="zoom(0.87)">🔍－</button>
+    <button class="btn " id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
     <button class="btn purple" style="padding:7px 10px;min-width:auto;" onclick="openHistoryOverlay()">📜 HISTORY</button>
     <button class="btn cyan" style="padding:7px 10px;min-width:auto;" onclick="openPopup('popup-help')">❓ HELP</button>
     <button class="btn red" id="b-quit" style="padding:7px 10px;min-width:auto;" onclick="onQuitOrStart()">🏳 QUIT</button>
@@ -575,7 +575,9 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <script>
 // ── THEME ──
 let isDark=true;
-function toggleTheme(){isDark=!isDark;document.body.classList.toggle('light',!isDark);}
+function toggleTheme(){
+  isDark=!isDark;document.body.classList.toggle('light',!isDark);
+}
 
 // ── STARS ──
 (()=>{
@@ -682,7 +684,8 @@ const ICFG={
   lantern:  {i:'🔦',   s:.58, g:'#ffee44'},
 };
 
-const NUM_COLORS=['#00ff88','#44ff55','#aaff44','#ffff33','#ffbb00','#ff7700','#ff2255','#ee00ff','#aaaaff'];
+const NUM_COLORS_DARK=['#00ff88','#44ff55','#aaff44','#ffff33','#ffbb00','#ff7700','#ff2255','#ee00ff','#aaaaff'];
+const NUM_COLORS_LIGT=['#00cc77','#3ac94d','#8ecc39','#d4c92a','#ffa500','#ff6200','#e6194b','#c71585','#7a7aff'];
 const RES_ICONS={wood:'🌲',stone:'🪨',iron:'⚙️',crystal:'💎',fish:'🐠',gold:'🪙',coal:'🪵',herbs:'🌿',mushroom:'🍄',coral:'🪸',pearl:'🫧',crab:'🦀',octopus:'🐙'};
 const COLLECT_TYPES=['wood','stone','iron','crystal','fish','gold','coal','herbs','mushroom','coral','pearl','crab','octopus','portal'];
 // Special items that can be collected manually (not auto-activated on reveal)
@@ -1013,13 +1016,14 @@ function drawCell(c,sx,sy,sz){
 
     // Adjacency badge — shown on all cell types (land + water)
     if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine'){
-      const col=NUM_COLORS[c.adjacent-1]||'#fff';
-      const fs=Math.max(10,Math.min(sz*.28,18));
+      const col=(isDark?NUM_COLORS_DARK:NUM_COLORS_LIGT)[c.adjacent-1]||'#fff';
+      // const fs=Math.max(10,Math.min(sz*.28,18));
+      const fs=Math.max(22,Math.min(sz*.28,18));
       ctx.font=`bold ${fs}px "Georgia"`;
       const ns=String(c.adjacent),tw=ctx.measureText(ns).width;
       const bx=sx+(cfg.i?sz*.3:0),by=sy-(cfg.i?sz*.28:0);
-      ctx.fillStyle='rgba(0,0,0,0.10)';
-      roundRect(bx-tw/2-5,by-fs/2-3,tw+10,fs+6,3);ctx.fill();
+      // ctx.fillStyle='rgba(0,0,0,0.10)';
+      // roundRect(bx-tw/2-5,by-fs/2-3,tw+10,fs+6,3);ctx.fill();
       ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;
       ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText(ns,bx,by);ctx.shadowBlur=0;
