@@ -611,7 +611,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <div id="ss" class="screen">
 
   <div style="text-align:center;width:100%;max-width:500px;flex-shrink:0">
-    <div class="logo" style="font-size:clamp(1.6rem,7vw,2.8rem)">🥚ppTamaEmoji🥚</div>
+    <div class="logo" style="font-size:clamp(1.6rem,7vw,2.8rem)">🥚 TamaEmoji 🥚</div>
     <div class="tagline" id="tagline-txt">Your Digital Companion ✦ Lives with You</div>
   </div>
 
@@ -918,9 +918,9 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <!-- ══ HELP POPUP ══ -->
 <div id="help-popup" class="popup-bg hidden">
   <div class="popup-box">
-    <div class="popup-title">❓ ppTamaEmoji — Guide</div>
+    <div class="popup-title">❓ TamaEmoji — Guide</div>
 
-    <div class="popup-section">🥚 What is ppTamaEmoji?</div>
+    <div class="popup-section">🥚 What is TamaEmoji?</div>
     <div class="popup-row">A digital companion that lives with you in real time. Born from an egg, it grows, develops a unique personality, works, studies, travels, falls ill, ages and eventually passes away — leaving an heir. No two companions are the same.</div>
 
     <div class="popup-section">🌱 Life Phases</div>
@@ -1006,7 +1006,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <!-- ══ ABOUT POPUP ══ -->
 <div id="about-popup" class="popup-bg hidden">
   <div class="popup-box">
-    <div class="popup-title">🥚 ppTamaEmoji</div>
+    <div class="popup-title">🥚 TamaEmoji 🥚</div>
     <div class="popup-row"><strong>Version:</strong> 01.00 — March 2026</div>
     <div class="popup-row"><strong>Genre:</strong> Evolutionary Digital Companion · Life Simulation</div>
     <div class="popup-row"><strong>Author:</strong> Paolo Pista. — PISTINO DEVELOPMENT</div>
@@ -1590,7 +1590,7 @@ function addNotif(msg, type='info', ico='💬', pushAlso=false) {
   const dot = document.getElementById('notif-dot');
   if(dot) dot.classList.add('on');
   if(pushAlso && notifSettings2.push && notifPermission === 'granted' && document.hidden) {
-    try { new Notification('🥚 ppTamaEmoji', { body: msg }); } catch{}
+    try { new Notification('🥚 TamaEmoji', { body: msg }); } catch{}
   }
   if(type === 'urgent') {
     const flash = document.getElementById('urgent-flash');
@@ -1677,7 +1677,7 @@ async function requestNotifPermission() {
       document.getElementById('ns-push').checked = true;
       toast('✅ Push notifications enabled!');
       addNotif('Push enabled! You\'ll get alerts even in background.', 'happy', '✅');
-      try { new Notification('🥚 ppTamaEmoji', { body: 'Hi! I\'ll alert you when I need you 💕' }); } catch{}
+      try { new Notification('🥚 TamaEmoji', { body: 'Hi! I\'ll alert you when I need you 💕' }); } catch{}
     } else if(result === 'denied') {
       toast('🚫 Notifications blocked by browser');
     }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🌍 ppMinePlanet 🌍</title>
+<title>🌍ppMinePlanet🌍</title>
 <!-- <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> -->
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -288,7 +288,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <!-- START SCREEN -->
 <div id="start-screen">
   <div style="text-align:center;margin-bottom:4px;">
-    <div class="start-logo">🌍 MINE PLANET 🌍</div>
+    <div class="start-logo">🌍MINE PLANET🌍</div>
     <div class="start-tagline">HEX-GRID EXPLORATION · MINESWEEPER ADVENTURE ✦</div>
   </div>
   <div class="start-card">
@@ -315,7 +315,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <button id="theme-btn" onclick="toggleTheme()">🌗</button>
   </div>
   <div id="start-footer">
-    <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.02 — click for info &amp; license</span>
+    <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — ppMinePlanet v01.02 — click for info &amp; license</span>
   </div>
 </div>
 
@@ -491,7 +491,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <!-- ABOUT POPUP -->
 <div class="popup-overlay" id="popup-about">
   <div class="popup-box">
-    <div class="popup-title">🌍 MINE PLANET 🌍</div>
+    <div class="popup-title">🌍MINE PLANET🌍</div>
     <div class="popup-body">
       <p><strong>Version:</strong> 01.02 — February 2026</p>
       <p><strong>Genre:</strong> Hex-grid exploration / minesweeper adventure</p>
@@ -574,10 +574,13 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 
 <script>
 // ── THEME ──
-let isDark=true;
+const THEME_KEY = 'mineplanet-theme';
+let isDark = localStorage.getItem(THEME_KEY) !== 'light';
 function toggleTheme(){
   isDark=!isDark;document.body.classList.toggle('light',!isDark);
+  localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
 }
+if (!isDark) {document.body.classList.add('light');} else {document.body.classList.remove('light');}
 
 // ── STARS ──
 (()=>{
@@ -1462,18 +1465,17 @@ loadHistory();
 
 // ── AVATARS ──
 const AVATARS={
-  explorer: {i:'🧭',l:'Explorer'},
-  astronaut:{i:'🧑‍🚀',l:'Astronaut'},
+  astroM:   {i:'👨‍🚀', l:'Commander' },
+  astroF:   {i:'👩‍🚀', l:'Captain'   },
   robot:    {i:'🤖',l:'Robot'},
   alien:    {i:'👽',l:'Alien'},
-  wizard:   {i:'🧙',l:'Wizard'},
-  pirate:   {i:'🏴‍☠️',l:'Pirate'},
-  ninja:    {i:'🥷',l:'Ninja'},
-  viking:   {i:'⚔️',l:'Viking'},
-  scientist:{i:'🔬',l:'Scientist'},
   dragon:   {i:'🐲',l:'Dragon'},
+  devil:    {i:'😈',l:'Devil'},
+  angel:    {i:'😇',l:'Angel'},
+  wizard:   {i:'🧙',l:'Wizard'},
+  ninja:    {i:'🥷',l:'Ninja'},
+  cat:      {i:'🐱',l:'Cat'},
 };
-
 // ── BUILD AVATAR GRID ──
 let selectedAvatarKey=null;
 (()=>{
