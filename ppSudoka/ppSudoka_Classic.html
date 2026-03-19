@@ -396,8 +396,8 @@ body.light .cinp{background:rgba(0,0,0,.03)}
     <div class="hs"><span class="hl">PLAYER</span><span class="hv" id="h-name">—</span></div>
     <div class="hs"><span class="hl">MODE</span><span class="hv" id="h-mode">—</span></div>
     <div class="hs"><span class="hl">⏱</span><span class="hv" id="h-time">0:00</span></div>
-    <div class="hs"><span class="hl">ERR</span><span class="hv" id="h-err" style="color:var(--red)">0</span></div>
-    <div class="hs"><span class="hl">💡</span><span class="hv" id="h-hints">3</span></div>
+    <div class="hs"><span class="hl">ERR</span><span class="hv" id="h-err" style="color:var(--red)">0/0</span></div>
+    <div class="hs"><span class="hl">💡</span><span class="hv" id="h-hints">3/3</span></div>
     <button class="hud-btn" id="hud-hist" title="History" style="margin-left:auto">🏆</button>
     <button class="hud-btn" id="hud-help" title="Guida">❓</button>
     <button class="hud-btn danger" id="hud-quit" title="Quit" style="margin-right:50px">🚪</button>
@@ -424,10 +424,10 @@ body.light .cinp{background:rgba(0,0,0,.03)}
 <div id="ov" class="hidden">
   <div class="ovb">
     <div class="oe" id="oe">🎉</div>
-    <div class="ot" id="ot">Titolo</div>
-    <div class="ox" id="ox">Testo</div>
+    <div class="ot" id="ot">Title</div>
+    <div class="ox" id="ox">Text</div>
     <button class="obtn" id="ob">OK</button>
-    <button class="obtn sec hidden" id="ob2">Secondario</button>
+    <button class="obtn sec hidden" id="ob2">Cancel</button>
   </div>
 </div>
 
@@ -451,7 +451,7 @@ body.light .cinp{background:rgba(0,0,0,.03)}
     <div class="popup-row"><strong>🎯 Goal:</strong> Fill every cell with a number (1–9) so that each row, column and region contains all numbers exactly once.</div>
     <div class="popup-row"><span class="tag">⬜ CLASSIC</span> Traditional 9×9 grid with 9 square 3×3 regions.</div>
     <div class="popup-row"><span class="tag">🎨 VISUAL</span> Symbols instead of numbers! Animals, shapes, and icons. Perfect for visual memory. Each symbol maps to a hidden number 1–9.</div>
-    <div class="popup-row"><span class="tag">🔷 IRREGULAR</span> Griglia 9×9 con regioni a forma libera. Ogni partita può avere regioni organiche colorate oppure un layout a labirinto con pareti a corridoio — stessa logica, aspetto sempre diverso.</div>
+    <div class="popup-row"><span class="tag">🔷 IRREGULAR</span> A 9×9 grid with free-form regions. Each game can feature colored organic regions or a maze-like layout with corridor walls—same logic, different look each time.</div>
     <div class="popup-row"><span class="tag">💀 KILLER</span> Classic grid divided into "cages". The sum of numbers in each cage must match the shown total. No repeats within a cage! Fusion of Sudoku and Kakuro.</div>
     <div class="popup-row"><strong>🛠 Tools:</strong> ✏️ Notes · ✓ Check · 🧹 Clear Notes · ↩ Undo · 💡 Hint (max 3)</div>
     <button class="popup-close" id="help-close">✕ Close</button>
@@ -805,12 +805,14 @@ function startGame(){
   const diff=pDiff,nRemove=DIFF[diff].remove;
   G={name:pName,mode:pMode,diff,score:0,errors:0,hintsUsed:0,
     noteMode:false,selected:null,history:[],
-    startTime:Date.now(),timerID:null,elapsed:0,paused:false};
+    startTime:Date.now(),timerID:null,elapsed:0,paused:false,
+    maxErrors:5,streakThreshold:5,correctStreak:0,
+    maxHints:3,hintStreak:0,hintThreshold:8};
   document.getElementById('h-name').textContent=pName;
   const modeNames={classic:'Classic',visual:'Visual',irregular:'Irregular', killer:'Killer'};
   document.getElementById('h-mode').textContent=modeNames[pMode]||pMode;
-  document.getElementById('h-err').textContent='0';
-  document.getElementById('h-hints').textContent='3';
+  document.getElementById('h-err').textContent='0/5';
+  document.getElementById('h-hints').textContent='3/3';
   document.getElementById('t-note').classList.remove('active');
 
   if(pMode==='classic') buildClassic(nRemove);
@@ -1097,10 +1099,10 @@ function enterValue(v){
   cell.notes.clear();cell.val=v;
   const isCorrect=G.full[sel.r][sel.c]===v;
   if(!isCorrect){
-    G.errors++;document.getElementById('h-err').textContent=G.errors;
+    G.errors++;document.getElementById('h-err').textContent=G.errors+'/'+G.maxErrors; //PP:
     cell.el.classList.add('error','cell-shake');
     setTimeout(()=>cell.el.classList.remove('cell-shake'),220);
-    if(G.errors>=5){toast('❌ Troppi errori!');setTimeout(()=>gameOver(),800);}
+    if(G.errors>=5){toast('❌ Too many mistakes!');setTimeout(()=>gameOver(),800);}
   } else {
     cell.el.classList.remove('error');
     cell.el.classList.add('cell-pop');
@@ -1108,10 +1110,27 @@ function enterValue(v){
     autoRemoveNotes(sel.r,sel.c,v);
     // Killer: check cage validity
     if(G.mode==='killer')checkCage(sel.r,sel.c);
+    if(G.correctStreak>=G.streakThreshold){
+      G.maxErrors++;
+      G.correctStreak=0;
+      G.streakThreshold+=3;
+      document.getElementById('h-err').textContent=G.errors+'/'+G.maxErrors;
+      toast('🎉 Error limit increased to '+G.maxErrors+'!');
+    } else {G.correctStreak++;}
+    if(G.hintStreak>=G.hintThreshold){
+      G.maxHints++;
+      G.hintThreshold+=2;
+      G.hintStreak=0;
+      document.getElementById('h-hints').textContent=G.maxHints-G.hintsUsed+'/'+G.maxHints;
+      toast('🎉 Available hints increased to '+G.maxHints+'!');
+    } else {G.hintStreak++;}
+
   }
   // Display: symbol for visual mode, number otherwise
+  const cageLabel=cell.el.querySelector('.cage-label'); //PP:
   if(G.mode==='visual')cell.el.textContent=G.visSymbols[v-1];
   else cell.el.textContent=v;
+  if(cageLabel)cell.el.appendChild(cageLabel); //PP:
   refreshHighlights();updateProgress();checkWin();
   // Refresh pad hints per la cella corrente
   refreshPadHints();
@@ -1178,7 +1197,7 @@ function undoMove(){
 }
 
 function hintCell(){
-  if(G.hintsUsed>=3){toast('💡 No hints left!');return;}
+  if(G.hintsUsed>=G.maxHints){toast('💡 No hints left!');return;}
   const sel=G.selected;if(!sel){toast('💡 Select a cell first!');return;}
   const cell=getCell(sel.r,sel.c);if(!cell||cell.given){toast('💡 Cell already revealed!');return;}
   const correct=G.full[sel.r][sel.c];
@@ -1188,7 +1207,7 @@ function hintCell(){
   else cell.el.textContent=correct;
   cell.el.classList.remove('error');cell.el.classList.add('given','cell-pop');
   setTimeout(()=>cell.el.classList.remove('cell-pop'),200);
-  G.hintsUsed++;document.getElementById('h-hints').textContent=3-G.hintsUsed;
+  G.hintsUsed++;document.getElementById('h-hints').textContent=G.maxHints-G.hintsUsed+'/'+G.maxHints;
   toast('💡 Hint used!');
   refreshHighlights();updateProgress();checkWin();
 }
@@ -1345,11 +1364,11 @@ function buildNumpad(){
     }
   }
   const er=document.createElement('button');
-  er.className='nkey erase';er.textContent='⌫';er.title='Cancella';
+  er.className='nkey erase';er.textContent='⌫';er.title='Cancel';
   er.addEventListener('click',()=>{G.activeNum=null;document.querySelectorAll('.nkey[data-v]').forEach(b=>b.classList.remove('nkey-active'));eraseCell();});
   row.appendChild(er);
   const ht=document.createElement('button');
-  ht.className='nkey hint-btn';ht.textContent='💡';ht.title='Suggerimento (max 3)';
+  ht.className='nkey hint-btn';ht.textContent='💡';ht.title='Hint';
   ht.addEventListener('click',hintCell);row.appendChild(ht);
 }
 

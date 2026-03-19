@@ -1,0 +1,2759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>😊ppPacSmile😊</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Quicksand:wght@500;700&display=swap');
+
+/* ══ TEMA SCURO (default) ══ */
+:root {
+  --bg:#0d0d1f;--bg2:#08081a;--panel:#14142e;--panel2:#1a1a38;
+  --border:rgba(255,255,255,.1);--border2:rgba(255,255,255,.07);
+  --text:#f0f0ff;--text2:rgba(255,255,255,.6);--text3:rgba(255,255,255,.35);
+  --text4:rgba(255,255,255,.2);--accent:#ffcc00;--accent2:#ff6b6b;
+  --blue:#4af;--green:#4ec970;--pink:#ff9de2;
+  --hud-bg:rgba(10,10,30,.96);--hud-seg:rgba(255,255,255,.04);
+  --hl-col:rgba(255,255,255,.38);--inp-bg:rgba(255,255,255,.07);
+  --inp-border:rgba(255,255,255,.12);--card-bg:rgba(255,255,255,.04);
+  --hist-bg:rgba(10,10,28,.97);--hist-item:rgba(255,255,255,.04);
+  --hist-item-h:rgba(255,255,255,.07);--overlay-bg:rgba(0,0,0,.82);
+  --copyright-bg:linear-gradient(0deg,rgba(5,5,20,.9) 0%,transparent 100%);
+  --copyright-col:rgba(255,255,255,.2);
+  --wall1:#181848;--wall2:#28288a;--wall-lock1:#38106a;--wall-lock2:#7828a8;
+  --wall-sec1:#081e3e;--wall-sec2:#183870;--dot-col:rgba(110,110,190,.32);
+  --maze-bg:#07071a;--sf-opacity:1;
+  --transition:background .3s,color .3s,border-color .3s,box-shadow .3s;
+}
+body.light {
+  --bg:#f0f4ff;--bg2:#e4eaf8;--panel:#ffffff;--panel2:#f5f7ff;
+  --border:rgba(80,80,160,.15);--border2:rgba(80,80,160,.08);
+  --text:#1a1a3a;--text2:rgba(30,30,80,.65);--text3:rgba(30,30,80,.45);
+  --text4:rgba(30,30,80,.25);--accent:#e6a800;--accent2:#e03050;
+  --blue:#1a7acc;--green:#1a9a50;--pink:#cc4488;
+  --hud-bg:rgba(255,255,255,.97);--hud-seg:rgba(80,80,160,.06);
+  --hl-col:rgba(30,30,80,.42);--inp-bg:rgba(80,80,180,.06);
+  --inp-border:rgba(80,80,180,.2);--card-bg:rgba(80,80,180,.05);
+  --hist-bg:rgba(240,244,255,.98);--hist-item:rgba(80,80,160,.05);
+  --hist-item-h:rgba(80,80,160,.1);--overlay-bg:rgba(200,210,240,.88);
+  --copyright-bg:linear-gradient(0deg,rgba(220,228,255,.98) 0%,transparent 100%);
+  --copyright-col:rgba(30,30,80,.4);
+  --wall1:#c8d0ee;--wall2:#a0aad8;--wall-lock1:#d8c0f0;--wall-lock2:#b090d8;
+  --wall-sec1:#c0d4f0;--wall-sec2:#90b0e0;--dot-col:rgba(80,80,180,.25);
+  --maze-bg:#e8eeff;--sf-opacity:0;
+}
+#light-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:radial-gradient(ellipse at 20% 15%,rgba(200,220,255,.7) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 85%,rgba(255,220,200,.5) 0%,transparent 50%),
+    radial-gradient(ellipse at 60% 40%,rgba(220,240,200,.4) 0%,transparent 40%),#f0f4ff;}
+body.light #light-bg{opacity:1;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);
+  font-family:'Quicksand',sans-serif;overflow:hidden;touch-action:none;transition:var(--transition);}
+
+/* ══ STARFIELD ══ */
+#sf{position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 15% 25%,rgba(30,10,70,.8) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 75%,rgba(10,30,60,.8) 0%,transparent 55%),#0d0d1f;
+  transition:opacity .4s;opacity:var(--sf-opacity);}
+.st{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:var(--a);transform:scale(1)}50%{opacity:var(--b);transform:scale(1.5)}}
+
+/* ══ SCREENS ══ */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;gap:10px;
+  padding:52px 14px 20px 14px; /* top: room for toolbar */
+  overflow-y:auto;}
+.screen.hidden{display:none!important}
+/* Start screen centres when content fits, scrolls when it doesn't */
+#ss.screen{justify-content:flex-start;padding-top:56px;}
+#gs.screen{padding:0!important;justify-content:flex-start!important;
+  overflow:hidden!important;inset:0!important;}
+.hidden{display:none!important}
+
+/* ══ THEME TOGGLE ══ */
+#theme-toggle{display:flex;align-items:center;justify-content:center;cursor:pointer;}
+#theme-icon{pointer-events:none;user-select:none;font-size:.9rem;}
+
+/* ══ LANG + SOUND toolbar ══ */
+#top-toolbar{position:fixed;top:14px;left:14px;z-index:500;display:flex;gap:6px;align-items:center;}
+.toolbar-btn{background:var(--panel2);border:2px solid var(--border);border-radius:10px;
+  padding:4px 10px;font-size:.75rem;font-family:'Quicksand',sans-serif;font-weight:700;
+  color:var(--text);cursor:pointer;transition:all .2s;}
+.toolbar-btn:hover{border-color:var(--accent);color:var(--accent);}
+.toolbar-btn.active-lang{border-color:var(--accent);background:rgba(255,204,0,.1);}
+#sound-btn{font-size:1rem;padding:3px 8px;}
+#lang-selector{position:fixed;top:48px;left:14px;z-index:501;
+  background:var(--panel);border:1px solid var(--border);border-radius:12px;
+  padding:8px;display:flex;flex-direction:column;gap:4px;box-shadow:0 8px 30px rgba(0,0,0,.3);}
+#lang-selector.hidden{display:none!important;}
+.lang-opt{background:transparent;border:1px solid transparent;border-radius:8px;
+  padding:6px 12px;cursor:pointer;font-family:'Quicksand',sans-serif;font-weight:700;
+  font-size:.82rem;color:var(--text);text-align:left;transition:all .15s;}
+.lang-opt:hover{background:var(--hud-seg);border-color:var(--border);}
+.lang-opt.active{background:rgba(255,204,0,.12);border-color:var(--accent);color:var(--accent);}
+
+/* ══ LOGO ══ */
+.logo{font-family:'Boogaloo',cursive;font-size:clamp(2.8rem,12vw,4.8rem);line-height:1;
+  background:linear-gradient(135deg,#ffcc00,#ff6b6b,#c084fc,#4af);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 25px rgba(255,204,0,.5));animation:lp 2.5s ease-in-out infinite;}
+body.light .logo{background:linear-gradient(135deg,#cc8800,#cc2244,#8833cc,#1166cc);
+  -webkit-background-clip:text;background-clip:text;filter:drop-shadow(0 0 12px rgba(180,120,0,.4));}
+@keyframes lp{0%,100%{filter:drop-shadow(0 0 18px rgba(255,204,0,.4))}50%{filter:drop-shadow(0 0 45px rgba(255,204,0,.9))}}
+.tagline{font-size:.78rem;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-top:4px;text-align:center;}
+
+/* ══ CARD ══ */
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:20px;
+  padding:clamp(16px,4vw,26px);width:100%;max-width:400px;
+  backdrop-filter:blur(12px);transition:var(--transition);}
+.clbl{font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--blue);margin-bottom:6px;display:block;}
+.cinp{width:100%;background:var(--inp-bg);border:2px solid var(--inp-border);
+  border-radius:13px;padding:12px 16px;color:var(--text);font-family:'Quicksand',sans-serif;
+  font-size:1rem;font-weight:700;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:14px;}
+.cinp::placeholder{color:var(--text3);}
+.cinp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,204,0,.15);}
+.grow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.gbtn{border:2px solid var(--border);background:var(--card-bg);border-radius:15px;
+  padding:12px 6px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;
+  align-items:center;gap:5px;color:var(--text);font-family:'Quicksand',sans-serif;font-weight:700;font-size:.75rem;}
+.gbtn .ge{font-size:2rem;line-height:1}
+.gbtn:hover{border-color:var(--accent);background:rgba(255,204,0,.08)}
+.gbtn.active{border-color:var(--accent);background:rgba(255,204,0,.15);box-shadow:0 0 22px rgba(255,204,0,.3);}
+body.light .gbtn:hover{background:rgba(200,160,0,.1)}
+body.light .gbtn.active{background:rgba(200,160,0,.15);}
+
+.playbtn{background:linear-gradient(135deg,#ffcc00,#ff9500);color:#1a0800;border:none;
+  border-radius:50px;padding:15px 44px;font-family:'Boogaloo',cursive;font-size:1.35rem;
+  letter-spacing:2px;cursor:pointer;box-shadow:0 5px 28px rgba(255,204,0,.5);
+  transition:all .2s;width:100%;max-width:280px;}
+.playbtn:hover{transform:translateY(-3px);box-shadow:0 9px 38px rgba(255,204,0,.7)}
+.hint{font-size:.7rem;color:var(--text3);text-align:center;line-height:1.8;}
+
+/* ══ HUD ══ */
+#hud{position:relative;z-index:20;width:100%;background:var(--hud-bg);
+  border-bottom:1px solid var(--border2);padding:6px 10px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0;transition:var(--transition);}
+.hs{display:flex;align-items:center;gap:4px;background:var(--hud-seg);border-radius:7px;padding:3px 7px;}
+.hl{font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--hl-col);}
+.hv{font-family:'Boogaloo',cursive;font-size:1rem;color:var(--accent);}
+#hpw{width:54px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+#hpf{height:100%;border-radius:3px;transition:width .3s}
+#fxs{margin-left:auto;font-size:1rem;letter-spacing:2px}
+.hud-iconbtn{background:var(--hud-seg);border:1.5px solid var(--border);
+  border-radius:8px;padding:4px 9px;font-size:1rem;cursor:pointer;
+  transition:all .15s;color:var(--text);line-height:1;}
+.hud-iconbtn:hover{background:var(--hist-item-h);border-color:var(--text3);}
+.hud-iconbtn.danger:hover{background:rgba(255,80,80,.2);border-color:#ff6b6b;color:#ff6b6b}
+
+/* ══ GAME SCREEN ══ */
+#gs{padding:0;justify-content:flex-start;background:transparent}
+#cw{flex:1;display:flex;align-items:flex-start;justify-content:center;overflow:hidden;width:100%;padding-top:2px}
+#cv{display:block;image-rendering:pixelated;max-width:100%;max-height:100%}
+
+/* ══ GAME SCREEN layout ══ */
+#gs{padding:0!important;justify-content:flex-start!important;
+  background:transparent;overflow:hidden!important;}
+#cw{flex:1 1 0;min-height:0;display:flex;align-items:center;
+  justify-content:center;overflow:hidden;width:100%;}
+#cv{display:block;image-rendering:pixelated;max-width:100%;max-height:100%;}
+
+/* ══ BOTTOM ZONE — in-flow, always visible ══ */
+#bottom-zone{
+  flex-shrink:0;
+  display:flex;flex-direction:column;align-items:stretch;
+  background:var(--hud-bg);border-top:1px solid var(--border2);
+  touch-action:none;pointer-events:all;
+  padding-bottom:18px; /* room for copyright bar */
+}
+
+/* PU BAR */
+#pu-bar{
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:5px 6px 3px 6px;flex-wrap:nowrap;overflow-x:auto;
+}
+.pu-slot-btn{
+  flex-shrink:0;width:50px;height:50px;border-radius:12px;border:2px solid var(--border);
+  background:var(--hud-seg);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;cursor:pointer;transition:all .12s;
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;
+}
+.pu-slot-btn.has-item{border-color:var(--accent);background:rgba(255,204,0,.12);}
+.pu-slot-btn.active{border-color:var(--green);background:rgba(78,201,112,.18);
+  box-shadow:0 0 12px rgba(78,201,112,.4);}
+.pu-slot-btn:active{transform:scale(.88);}
+.pu-slot-emoji{font-size:1.4rem;line-height:1;pointer-events:none;}
+.pu-slot-count{font-family:'Boogaloo',cursive;font-size:.7rem;
+  color:var(--accent);line-height:1;pointer-events:none;}
+.pu-slot-btn.empty .pu-slot-emoji{opacity:.22;}
+
+/* DPAD ROW — single row ◀ ▲ ▼ ▶ */
+#jz{
+  display:none;
+  align-items:center;justify-content:center;
+  padding:6px 10px;pointer-events:all;
+}
+#jz.vis{display:flex;}
+.dpad-row{
+  display:flex;flex-direction:row;align-items:center;
+  gap:8px;pointer-events:all;
+}
+.db{
+  width:58px;height:58px;
+  background:rgba(255,255,255,.08);
+  border:2px solid rgba(255,255,255,.2);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;cursor:pointer;
+  transition:background .08s,border-color .08s,transform .08s;
+  user-select:none;-webkit-user-select:none;
+  color:var(--text);touch-action:manipulation;flex-shrink:0;
+}
+body.light .db{
+  background:rgba(0,0,80,.06);
+  border-color:rgba(0,0,100,.18);
+}
+.db:active,.db.pr{
+  background:rgba(255,204,0,.3);
+  border-color:var(--accent);
+  transform:scale(.92);
+}
+.dc{background:transparent!important;border:none!important;}
+#ah{font-size:.58rem;color:var(--text3);text-align:center;line-height:1.5;
+  pointer-events:none;align-self:center;padding:0 4px;max-width:120px;}
+
+/* ══ OVERLAY (level up / game over) ══ */
+#ov{position:fixed;inset:0;z-index:100;background:var(--overlay-bg);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);transition:background .3s;}
+#ov.hidden{display:none}
+.ovb{background:var(--panel);border:2px solid var(--border);border-radius:24px;
+  padding:clamp(22px,6vw,38px);text-align:center;max-width:330px;width:90%;
+  box-shadow:0 0 70px rgba(0,0,0,.25);animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+  transition:var(--transition);}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.oe{font-size:3.2rem;margin-bottom:10px}
+.ot{font-family:'Boogaloo',cursive;font-size:1.9rem;margin-bottom:8px;color:var(--text);}
+.ox{color:var(--text2);margin-bottom:20px;font-size:.9rem;line-height:1.55}
+.obtn{background:linear-gradient(135deg,var(--accent),#ff9500);color:#1a0800;border:none;
+  border-radius:50px;padding:12px 34px;font-family:'Boogaloo',cursive;font-size:1.15rem;
+  cursor:pointer;box-shadow:0 4px 18px rgba(255,204,0,.4);transition:all .15s;display:block;width:100%;margin-top:8px;}
+.obtn:hover{transform:translateY(-2px);box-shadow:0 7px 28px rgba(255,204,0,.6)}
+.obtn.secondary{background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);
+  box-shadow:none;font-size:1rem;}
+.obtn.secondary:hover{background:var(--hist-item-h);}
+.obtn.ads-btn{background:linear-gradient(135deg,#4af,#1a7acc);color:#fff;
+  box-shadow:0 4px 18px rgba(70,170,255,.4);}
+.obtn.ads-btn:hover{box-shadow:0 7px 28px rgba(70,170,255,.6);}
+
+/* ══ TOAST ══ */
+#toast{position:fixed;top:clamp(58px,12vh,76px);left:50%;
+  transform:translateX(-50%) translateY(-20px);
+  background:linear-gradient(135deg,var(--accent),#ff9500);color:#1a0800;
+  font-family:'Boogaloo',cursive;font-size:.98rem;padding:8px 24px;
+  border-radius:50px;z-index:200;opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap;
+  box-shadow:0 4px 20px rgba(255,150,0,.4);}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ COPYRIGHT BAR ══ */
+#copyright-bar{position:fixed;bottom:0;left:0;right:0;z-index:300;text-align:center;font-size:9px;
+  color:var(--copyright-col);letter-spacing:1px;pointer-events:none;padding:3px 0;
+  background:var(--copyright-bg);font-family:'Quicksand',sans-serif;font-weight:700;transition:var(--transition);}
+#copyright-bar span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 6px;border-radius:4px;}
+#copyright-bar span:hover{color:var(--accent);text-shadow:0 0 8px rgba(255,204,0,.4);}
+
+/* ══ ABOUT / HELP POPUP ══ */
+#about-popup,#help-popup{position:fixed;inset:0;z-index:400;background:var(--overlay-bg);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);transition:background .3s;}
+#about-popup.hidden,#help-popup.hidden{display:none;}
+.about-box{background:var(--panel);border:1px solid var(--border);border-radius:22px;
+  padding:28px 26px;max-width:360px;width:92%;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+  transition:var(--transition);max-height:88vh;overflow-y:auto;}
+.about-title{font-family:'Boogaloo',cursive;font-size:1.6rem;color:var(--accent);
+  text-align:center;margin-bottom:16px;letter-spacing:1px;}
+.about-row{font-size:.75rem;color:var(--text2);margin-bottom:8px;line-height:1.6;}
+.about-row strong{color:var(--text);}
+.about-license{font-size:.65rem;color:var(--text3);border:1px solid var(--border2);
+  border-radius:10px;padding:12px;line-height:2;margin-top:14px;}
+.about-license p{margin-bottom:4px;}
+.about-license .lic-title{color:var(--accent);font-weight:700;letter-spacing:2px;
+  font-size:.68rem;margin-bottom:8px;display:block;}
+.about-close{margin-top:18px;width:100%;background:linear-gradient(135deg,var(--accent),#ff9500);
+  color:#1a0800;border:none;border-radius:50px;padding:11px;font-family:'Boogaloo',cursive;
+  font-size:1.05rem;cursor:pointer;transition:all .15s;}
+.about-close:hover{transform:translateY(-2px);}
+
+/* ══ HISTORY SCREEN ══ */
+#hs-screen{z-index:50;background:var(--hist-bg);overflow-y:auto;
+  padding:20px;gap:14px;align-items:center;justify-content:flex-start;padding-top:30px;transition:var(--transition);}
+.hs-title{font-family:'Boogaloo',cursive;font-size:2rem;color:var(--accent);text-align:center;letter-spacing:1px}
+.hs-subtitle{font-size:.72rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-top:-8px}
+#hs-list{width:100%;max-width:500px;display:flex;flex-direction:column;gap:8px}
+.hs-item{background:var(--hist-item);border:1px solid var(--border2);border-radius:14px;
+  padding:13px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;
+  align-items:center;transition:background .15s;}
+.hs-item:hover{background:var(--hist-item-h)}
+.hs-item.gameover{border-left:3px solid var(--accent2)}
+.hs-item.abandon{border-left:3px solid rgba(255,200,0,.5)}
+.hs-rank{font-family:'Boogaloo',cursive;font-size:1.5rem;color:var(--accent);width:28px;text-align:center}
+.hs-main{display:flex;flex-direction:column;gap:2px}
+.hs-name{font-weight:700;font-size:.95rem;color:var(--text);}
+.hs-detail{font-size:.72rem;color:var(--text3);line-height:1.5}
+.hs-score{font-family:'Boogaloo',cursive;font-size:1.3rem;color:var(--accent);text-align:right;white-space:nowrap}
+.hs-badge{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 7px;border-radius:20px;display:inline-block;margin-top:2px}
+.badge-go{background:rgba(255,100,100,.18);color:var(--accent2)}
+.badge-ab{background:rgba(255,200,0,.13);color:#cc8800}
+.hs-empty{color:var(--text3);font-size:.9rem;text-align:center;padding:30px;font-style:italic}
+.hs-actions{display:flex;gap:10px;width:100%;max-width:500px;flex-wrap:wrap}
+.hs-btn{flex:1;padding:12px 20px;border-radius:50px;border:none;cursor:pointer;
+  font-family:'Boogaloo',cursive;font-size:1.05rem;letter-spacing:.5px;transition:all .2s;}
+.hs-btn-back{background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);}
+.hs-btn-back:hover{background:var(--hist-item-h)}
+.hs-btn-del{background:rgba(255,80,80,.1);color:var(--accent2);border:1.5px solid rgba(255,100,100,.2)}
+.hs-btn-del:hover{background:rgba(255,80,80,.2)}
+
+/* ══ CONFIRM OVERLAY ══ */
+#conf-ov{position:fixed;inset:0;z-index:150;background:var(--overlay-bg);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:background .3s;}
+#conf-ov.hidden{display:none}
+.conf-box{background:var(--panel);border:2px solid var(--border);border-radius:20px;
+  padding:28px 24px;text-align:center;max-width:300px;width:90%;
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1);transition:var(--transition);}
+.conf-icon{font-size:2.8rem;margin-bottom:10px}
+.conf-title{font-family:'Boogaloo',cursive;font-size:1.6rem;margin-bottom:8px;color:var(--text);}
+.conf-text{color:var(--text2);font-size:.88rem;margin-bottom:20px;line-height:1.5}
+.conf-btns{display:flex;gap:10px;justify-content:center}
+.conf-btn{padding:11px 24px;border-radius:50px;border:none;font-family:'Boogaloo',cursive;
+  font-size:1.05rem;cursor:pointer;transition:all .15s}
+.conf-yes{background:linear-gradient(135deg,#ff6b6b,#ff3333);color:#fff;box-shadow:0 3px 14px rgba(255,80,80,.4)}
+.conf-yes:hover{transform:translateY(-2px)}
+.conf-no{background:var(--hud-seg);color:var(--text);border:1.5px solid var(--border);}
+.conf-no:hover{background:var(--hist-item-h)}
+
+/* ══ SHOP OVERLAY ══ */
+#shop-overlay{position:fixed;inset:0;z-index:300;background:var(--overlay-bg);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);transition:background .3s;overflow-y:auto;}
+#shop-overlay.hidden{display:none!important;}
+.shop-box{background:var(--panel);border:1px solid var(--border);border-radius:24px;
+  padding:24px 20px;max-width:420px;width:95%;max-height:92vh;overflow-y:auto;
+  animation:popIn .3s cubic-bezier(.34,1.56,.64,1);transition:var(--transition);}
+.shop-title{font-family:'Boogaloo',cursive;font-size:1.8rem;color:var(--accent);
+  text-align:center;letter-spacing:1px;}
+.shop-subtitle{font-size:.7rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;
+  text-align:center;margin-bottom:14px;}
+.shop-coins-row{display:flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(255,204,0,.08);border:1px solid rgba(255,204,0,.2);
+  border-radius:12px;padding:8px 16px;margin-bottom:14px;}
+.shop-coins-label{font-size:.75rem;color:var(--text2);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.shop-coins-val{font-family:'Boogaloo',cursive;font-size:1.4rem;color:var(--accent);}
+#shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(min-width:400px){#shop-grid{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.shop-item{background:var(--card-bg);border:1.5px solid var(--border);border-radius:16px;
+  padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:all .2s;}
+.shop-item:hover{border-color:var(--text3);}
+.shop-item.maxed{border-color:var(--green);background:rgba(78,201,112,.06);}
+.shop-item.cant-afford{opacity:.6;}
+.shop-item-emoji{font-size:1.7rem;line-height:1;}
+.shop-item-name{font-family:'Boogaloo',cursive;font-size:.85rem;color:var(--text);text-align:center;}
+.shop-item-desc{font-size:.63rem;color:var(--text3);text-align:center;line-height:1.4;min-height:28px;}
+.shop-item-footer{width:100%;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.shop-owned{display:flex;gap:3px;}
+.shop-dot{width:8px;height:8px;border-radius:50%;background:var(--border);border:1.5px solid var(--border);}
+.shop-dot.filled{background:var(--accent);border-color:var(--accent);}
+.shop-buy-btn{width:100%;padding:7px 4px;border:none;border-radius:10px;cursor:pointer;
+  font-family:'Boogaloo',cursive;font-size:.82rem;
+  background:linear-gradient(135deg,var(--accent),#ff9500);color:#1a0800;
+  transition:all .15s;}
+.shop-buy-btn:hover:not(:disabled){transform:translateY(-1px);}
+.shop-buy-btn.broke{background:var(--hud-seg);color:var(--text3);border:1px solid var(--border);}
+.shop-buy-btn.maxed{background:rgba(78,201,112,.15);color:var(--green);border:1px solid var(--green);}
+.shop-buy-btn:disabled{cursor:default;}
+.shop-ads-pu-btn{background:linear-gradient(135deg,#4af,#1a7acc)!important;color:#fff!important;margin-top:3px;}
+.shop-ads-pu-btn:hover{transform:translateY(-1px);}
+.shop-item-owned{font-family:'Boogaloo',cursive;font-size:1rem;color:var(--accent);text-align:center;
+  font-weight:700;line-height:1.2;}
+.shop-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.shop-action-btn{flex:1;padding:10px 12px;border:none;border-radius:50px;cursor:pointer;
+  font-family:'Boogaloo',cursive;font-size:.9rem;transition:all .2s;min-width:120px;}
+.shop-btn-ads{background:linear-gradient(135deg,#4af,#1a7acc);color:#fff;
+  box-shadow:0 3px 14px rgba(70,170,255,.3);}
+.shop-btn-reset{background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);}
+.shop-btn-close{background:linear-gradient(135deg,var(--accent),#ff9500);color:#1a0800;
+  box-shadow:0 3px 14px rgba(255,204,0,.3);}
+.shop-btn-reset:hover{background:var(--hist-item-h);}
+</style>
+</head>
+<body>
+<script>
+/* ══ MODULE: i18n ══ */
+/* ══ ppPacSmile — i18n Language System ══ */
+const LANG_KEY = 'pacsmile_lang';
+
+const LANGS = {
+  en: {
+    label: '🇬🇧 EN',
+    // Start Screen
+    setup_title: '🎮 Set up your Smile',
+    your_name: 'Your name',
+    name_placeholder: 'e.g. Paolo…',
+    choose_pacsmile: 'Choose your PacSmile',
+    play_btn: '🚀 PLAY!',
+    history_btn: 'Game History',
+    howtoplay_btn: 'How to Play',
+    shop_btn: 'Shop',
+    tagline: '✨ The Smiley Maze ✨',
+    controls_hint: '⌨️ Arrows/WASD · 📱 D-Pad touch · 👆 Swipe',
+    collect_hint: 'Collect 🍎 fruits and bring them to your counterpart!',
+    // HUD
+    hud_lvl: 'LVL',
+    hud_score: 'SCORE',
+    hud_coins: 'COINS',
+    // Shop
+    shop_title: '🛒 Shop',
+    shop_subtitle: 'Spend your coins wisely!',
+    shop_buy: 'Buy',
+    shop_coins: 'Coins',
+    shop_reset: '🔄 Reset Prices',
+    shop_reset_confirm: 'Reset all shop prices to base cost?',
+    shop_reset_yes: 'Reset',
+    shop_not_enough: '💸 Not enough coins!',
+    shop_purchased: '✅ Purchased!',
+    shop_activated: '⚡ Activated!',
+    shop_ads_coins: '📺 Watch an Ad for +50 coins!',
+    shop_close: '✕ Close',
+    // Power-ups in shop
+    pu_pill_name: 'Pill',
+    pu_pill_desc: 'Frighten all enemies!',
+    pu_turbo_name: 'Turbo',
+    pu_turbo_desc: 'Speed x2 temporarily',
+    pu_candy_name: 'Candy',
+    pu_candy_desc: 'Score x2 for a few seconds',
+    pu_shield_name: 'Shield',
+    pu_shield_desc: 'Absorbs one enemy hit',
+    pu_bomb_name: 'Bomb',
+    pu_bomb_desc: 'Eliminate all enemies!',
+    pu_ice_name: 'Ice',
+    pu_ice_desc: 'Freeze all enemies',
+    pu_medikit_name: 'Medikit',
+    pu_medikit_desc: 'Restore 38 HP',
+    pu_extralife_name: 'Extra Life',
+    pu_extralife_desc: 'Gain one more life',
+    // Game messages
+    toast_enter_name: '✏️ Enter your name!',
+    toast_choose_char: '👆 Choose your PacSmile!',
+    toast_paused: '⏸ Paused',
+    toast_history_cleared: '🗑️ History cleared!',
+    toast_quit_saved: '🚪 Game abandoned and saved!',
+    toast_no_pu: '❌ No power-up in slot!',
+    // Overlay
+    level_title: 'Level',
+    level_go: '▶ Go!',
+    level_goal: 'Goal:',
+    level_fruits: 'fruits.',
+    level_enemies: 'enemies!',
+    level_locked: '🗝️ Locked doors!',
+    level_secret: '💡 Secret passages!',
+    level_runaway: '💨 The counterpart runs away!',
+    gameover_title: 'GAME OVER',
+    gameover_scored: 'scored',
+    gameover_points: 'points at level',
+    gameover_saved: 'Saved to history.',
+    gameover_try: '🔄 Try again',
+    gameover_ads: '📺 Watch Ad → Revive!',
+    levelend_2x: '📺 Watch Ad → 2× Coins!',
+    levelend_continue: '▶ Continue',
+    // Collect toasts
+    toast_delivered: '💝 Delivered',
+    toast_fruits: 'fruits!',
+    toast_frightened: '😱 Enemies frightened!',
+    toast_fruit_pick: '🍎 +1 fruit',
+    toast_fruit_go: '→ go to your counterpart!',
+    toast_held: 'held',
+    toast_hp: '💊 +38 HP!',
+    toast_unlocked: '🗝️ Passage unlocked!',
+    toast_secrets: '💡 Secret passages revealed!',
+    toast_turbo: '⭐ TURBO!',
+    toast_boom: '💣 BOOM! All eliminated!',
+    toast_frozen: '🧊 Enemies frozen!',
+    toast_x2: '🍬 Score x2!',
+    toast_shield: '🛡️ Shield!',
+    toast_extralife: '❤️ Extra life gained!',
+    toast_eaten: '😋 Eaten!',
+    toast_pts: 'pts!',
+    toast_hit: '😱 Hit! -28 HP',
+    toast_shield_absorbed: '🛡️ Shield absorbed!',
+    toast_life_lost: '💀 Life lost! 5s immunity!',
+    toast_fruits_respawn: '🔄 Fruits put back on the field!',
+    toast_coins_earned: '🪙 Coins earned!',
+    toast_2x_coins: '🪙 2× Coins bonus applied!',
+    // History
+    hist_title: '🏆 Game History',
+    hist_subtitle: 'Your PacSmile adventures',
+    hist_back: '← Back',
+    hist_clear: '🗑️ Clear history',
+    hist_empty: '😴 No games recorded yet…\nPlay your first game!',
+    hist_gameover: '💀 Game Over',
+    hist_abandoned: '🚪 Abandoned',
+    hist_pts: 'pts',
+    // Help
+    help_title: '❓ PacSmile Guide',
+    help_objective_label: '🎯 Objective:',
+    help_objective: 'Collect fruits 🍎 in the maze and deliver them to your counterpart (the matching emoji). Deliver all required fruits to advance to the next level!',
+    help_controls_label: '🕹️ Controls:',
+    help_controls: '⌨️ Arrows / WASD — 📱 D-Pad touch — 👆 Swipe — ⏸ Space/Esc to pause',
+    help_powerups_label: '⚡ POWER-UPS',
+    help_pill: '🔵 <strong>Pill</strong> — Enemies frightened for a few seconds, you can eat them!',
+    help_turbo: '⭐ <strong>Turbo</strong> — Speed doubled temporarily',
+    help_candy: '🍬 <strong>Candy</strong> — Score x2 for a few seconds',
+    help_shield: '🛡️ <strong>Shield</strong> — Absorbs one enemy hit',
+    help_medikit: '💊 <strong>Medikit</strong> — Restores 38 HP',
+    help_extralife: '❤️ <strong>Extra life</strong> — Gain an additional life',
+    help_key: '🗝️ <strong>Key</strong> — Unlocks a locked passage 🔒',
+    help_bulb: '💡 <strong>Bulb</strong> — Reveals secret passages',
+    help_bomb: '💣 <strong>Bomb</strong> — Eliminates all visible enemies',
+    help_ice: '🧊 <strong>Ice</strong> — Freezes all enemies for a few seconds',
+    help_enemies_label: '😠 ENEMIES',
+    help_enemies: 'Level 1 has <strong>2 angry enemies</strong>. Each level adds one, up to a maximum of 10. Enemies move <strong>slightly slower</strong> than the player. When <strong>frightened</strong> 😨 (after a pill) you can eat them for a bonus!',
+    help_level7_label: '💨 FROM LEVEL 7',
+    help_level7: 'The <strong>counterpart runs away</strong>! It moves freely through the maze trying to stay away from you. You\'ll have to chase it to deliver the fruits!',
+    help_shop_label: '🛒 SHOP',
+    help_shop: 'Collect coins during the game and spend them in the Shop to buy power-ups you can activate mid-game with the bottom buttons!',
+    help_tips_label: '💡 TIPS',
+    help_tips: '• Enemies hide for a few seconds at the start and after each respawn — use the time to get your bearings!<br>• Use the bomb 💣 when surrounded<br>• Use turbo ⭐ to escape enemies or reach the counterpart 💨<br>• The combo multiplier increases by eating enemies consecutively!<br>• Watch Ads to earn extra coins or revive!',
+    help_close: '✕ Close',
+    // About
+    about_title: '😊 PacSMILE 😊',
+    about_version: 'Version:',
+    about_genre: 'Genre:',
+    about_author: 'Author:',
+    about_platform: 'Platform:',
+    about_genre_val: 'Maze / Arcade smile-style',
+    about_platform_val: 'Single-file HTML5 — works on any modern browser and smartphone',
+    // Confirm
+    conf_clear_title: 'Clear history',
+    conf_clear_text: 'Are you sure you want to delete all history? This action cannot be undone.',
+    conf_delete: 'Delete all',
+    conf_quit_title: 'Quit game',
+    conf_quit_text: 'Are you sure you want to quit? The game will be saved as "Abandoned" in history.',
+    conf_quit_yes: 'Quit',
+    conf_cancel: 'Cancel',
+    conf_reset_prices: '🔄 Reset Prices',
+    conf_reset_text: 'Reset all shop purchase prices to their original base cost?',
+    // D-pad hint
+    dpad_hint: '🍎 Bring fruits<br>to your counterpart!',
+    dpad_hint2: '💊medikit 🗝️key 💡secrets<br>⭐turbo 💣bomb 🧊ice 🍬x2 🛡️shield ❤️life',
+    // Sound
+    sound_on: '🔊',
+    sound_off: '🔇',
+    // Coin earned msg
+    coin_earned: '🪙 +{n} coins!',
+    toast_start_first: '⚠️ Start a game first!',
+    toast_already_active: '⚡ Already active!',
+    toast_revived: '✨ Revived!',
+    toast_tap_to_use: 'tap to use!',
+    ad_simulation: 'Ad Simulation',
+    ad_advertisement: 'Advertisement',
+    ad_dev_mode: 'DEV MODE — closes in ~2s',
+    ad_wait: 'Please wait for the ad to finish',
+    ad_paused: 'ad_paused',
+    conf_cancel_btn: 'Cancel',
+    conf_confirm_btn: 'Confirm',
+  },
+
+  it: {
+    label: '🇮🇹 IT',
+    setup_title: '🎮 Configura il tuo Smile',
+    your_name: 'Il tuo nome',
+    name_placeholder: 'es. Paolo…',
+    choose_pacsmile: 'Scegli il tuo PacSmile',
+    play_btn: '🚀 GIOCA!',
+    history_btn: 'Cronologia',
+    howtoplay_btn: 'Come si gioca',
+    shop_btn: 'Negozio',
+    tagline: '✨ Il Labirinto dei Smile ✨',
+    controls_hint: '⌨️ Frecce/WASD · 📱 D-Pad touch · 👆 Swipe',
+    collect_hint: 'Raccogli 🍎 frutti e portali alla tua controparte!',
+    hud_lvl: 'LIV',
+    hud_score: 'PUNTI',
+    hud_coins: 'MONETE',
+    shop_title: '🛒 Negozio',
+    shop_subtitle: 'Spendi le tue monete saggiamente!',
+    shop_buy: 'Acquista',
+    shop_coins: 'Monete',
+    shop_reset: '🔄 Azzera Prezzi',
+    shop_reset_confirm: 'Azzerare tutti i prezzi del negozio al costo base?',
+    shop_reset_yes: 'Azzera',
+    shop_not_enough: '💸 Monete insufficienti!',
+    shop_purchased: '✅ Acquistato!',
+    shop_activated: '⚡ Attivato!',
+    shop_ads_coins: '📺 Guarda un annuncio per +50 monete!',
+    shop_close: '✕ Chiudi',
+    pu_pill_name: 'Pillola',
+    pu_pill_desc: 'Spaventa tutti i nemici!',
+    pu_turbo_name: 'Turbo',
+    pu_turbo_desc: 'Velocità x2 temporaneamente',
+    pu_candy_name: 'Caramella',
+    pu_candy_desc: 'Punteggio x2 per qualche secondo',
+    pu_shield_name: 'Scudo',
+    pu_shield_desc: 'Assorbe un colpo nemico',
+    pu_bomb_name: 'Bomba',
+    pu_bomb_desc: 'Elimina tutti i nemici!',
+    pu_ice_name: 'Ghiaccio',
+    pu_ice_desc: 'Congela tutti i nemici',
+    pu_medikit_name: 'Medikit',
+    pu_medikit_desc: 'Ripristina 38 HP',
+    pu_extralife_name: 'Vita Extra',
+    pu_extralife_desc: 'Guadagna un\'altra vita',
+    toast_enter_name: '✏️ Inserisci il tuo nome!',
+    toast_choose_char: '👆 Scegli il tuo PacSmile!',
+    toast_paused: '⏸ In pausa',
+    toast_history_cleared: '🗑️ Cronologia cancellata!',
+    toast_quit_saved: '🚪 Gioco abbandonato e salvato!',
+    toast_no_pu: '❌ Nessun power-up in questo slot!',
+    level_title: 'Livello',
+    level_go: '▶ Vai!',
+    level_goal: 'Obiettivo:',
+    level_fruits: 'frutti.',
+    level_enemies: 'nemici!',
+    level_locked: '🗝️ Porte bloccate!',
+    level_secret: '💡 Passaggi segreti!',
+    level_runaway: '💨 La controparte scappa!',
+    gameover_title: 'GAME OVER',
+    gameover_scored: 'ha totalizzato',
+    gameover_points: 'punti al livello',
+    gameover_saved: 'Salvato nella cronologia.',
+    gameover_try: '🔄 Riprova',
+    gameover_ads: '📺 Guarda un annuncio → Rivivi!',
+    levelend_2x: '📺 Guarda un annuncio → Monete 2×!',
+    levelend_continue: '▶ Continua',
+    toast_delivered: '💝 Consegnati',
+    toast_fruits: 'frutti!',
+    toast_frightened: '😱 Nemici spaventati!',
+    toast_fruit_pick: '🍎 +1 frutto',
+    toast_fruit_go: '→ vai dalla tua controparte!',
+    toast_held: 'in mano',
+    toast_hp: '💊 +38 HP!',
+    toast_unlocked: '🗝️ Passaggio sbloccato!',
+    toast_secrets: '💡 Passaggi segreti rivelati!',
+    toast_turbo: '⭐ TURBO!',
+    toast_boom: '💣 BOOM! Tutti eliminati!',
+    toast_frozen: '🧊 Nemici congelati!',
+    toast_x2: '🍬 Punteggio x2!',
+    toast_shield: '🛡️ Scudo!',
+    toast_extralife: '❤️ Vita extra guadagnata!',
+    toast_eaten: '😋 Mangiato!',
+    toast_pts: 'pt!',
+    toast_hit: '😱 Colpito! -28 HP',
+    toast_shield_absorbed: '🛡️ Scudo assorbito!',
+    toast_life_lost: '💀 Vita persa! 5s immunità!',
+    toast_fruits_respawn: '🔄 Frutti rimessi in campo!',
+    toast_coins_earned: '🪙 Monete guadagnate!',
+    toast_2x_coins: '🪙 Bonus 2× Monete applicato!',
+    hist_title: '🏆 Cronologia',
+    hist_subtitle: 'Le tue avventure PacSmile',
+    hist_back: '← Indietro',
+    hist_clear: '🗑️ Cancella cronologia',
+    hist_empty: '😴 Nessuna partita registrata…\nGioca la tua prima partita!',
+    hist_gameover: '💀 Game Over',
+    hist_abandoned: '🚪 Abbandonato',
+    hist_pts: 'pt',
+    help_title: '❓ Guida PacSmile',
+    help_objective_label: '🎯 Obiettivo:',
+    help_objective: 'Raccogli frutti 🍎 nel labirinto e consegnali alla tua controparte (l\'emoji corrispondente). Consegna tutti i frutti richiesti per avanzare al livello successivo!',
+    help_controls_label: '🕹️ Controlli:',
+    help_controls: '⌨️ Frecce / WASD — 📱 D-Pad touch — 👆 Swipe — ⏸ Spazio/Esc per pausa',
+    help_powerups_label: '⚡ POWER-UPS',
+    help_pill: '🔵 <strong>Pillola</strong> — Nemici spaventati per qualche secondo, puoi mangiarli!',
+    help_turbo: '⭐ <strong>Turbo</strong> — Velocità raddoppiata temporaneamente',
+    help_candy: '🍬 <strong>Caramella</strong> — Punteggio x2 per qualche secondo',
+    help_shield: '🛡️ <strong>Scudo</strong> — Assorbe un colpo nemico',
+    help_medikit: '💊 <strong>Medikit</strong> — Ripristina 38 HP',
+    help_extralife: '❤️ <strong>Vita extra</strong> — Guadagna una vita aggiuntiva',
+    help_key: '🗝️ <strong>Chiave</strong> — Sblocca un passaggio bloccato 🔒',
+    help_bulb: '💡 <strong>Lampadina</strong> — Rivela passaggi segreti',
+    help_bomb: '💣 <strong>Bomba</strong> — Elimina tutti i nemici visibili',
+    help_ice: '🧊 <strong>Ghiaccio</strong> — Congela tutti i nemici per qualche secondo',
+    help_enemies_label: '😠 NEMICI',
+    help_enemies: 'Il livello 1 ha <strong>2 nemici arrabbiati</strong>. Ogni livello ne aggiunge uno, fino a un massimo di 10. I nemici si muovono <strong>leggermente più lentamente</strong> del giocatore. Quando <strong>spaventati</strong> 😨 (dopo una pillola) puoi mangiarli per un bonus!',
+    help_level7_label: '💨 DAL LIVELLO 7',
+    help_level7: 'La <strong>controparte scappa</strong>! Si muove liberamente nel labirinto cercando di tenersi lontana da te. Dovrai inseguirla per consegnare i frutti!',
+    help_shop_label: '🛒 NEGOZIO',
+    help_shop: 'Raccogli monete durante il gioco e spendile nel Negozio per comprare power-up da attivare a metà partita con i pulsanti in basso!',
+    help_tips_label: '💡 CONSIGLI',
+    help_tips: '• I nemici si nascondono per qualche secondo all\'inizio e dopo ogni respawn — usa il tempo per orientarti!<br>• Usa la bomba 💣 quando sei circondato<br>• Usa il turbo ⭐ per scappare dai nemici o raggiungere la controparte 💨<br>• Il moltiplicatore combo aumenta mangiando nemici consecutivamente!<br>• Guarda gli annunci per guadagnare monete extra o rivivere!',
+    help_close: '✕ Chiudi',
+    about_title: '😊 PacSMILE 😊',
+    about_version: 'Versione:',
+    about_genre: 'Genere:',
+    about_author: 'Autore:',
+    about_platform: 'Piattaforma:',
+    about_genre_val: 'Labirinto / Arcade smile-style',
+    about_platform_val: 'HTML5 file singolo — funziona su qualsiasi browser moderno e smartphone',
+    conf_clear_title: 'Cancella cronologia',
+    conf_clear_text: 'Sei sicuro di voler eliminare tutta la cronologia? Questa azione non può essere annullata.',
+    conf_delete: 'Elimina tutto',
+    conf_quit_title: 'Esci dal gioco',
+    conf_quit_text: 'Sei sicuro di voler uscire? Il gioco verrà salvato come "Abbandonato" nella cronologia.',
+    conf_quit_yes: 'Esci',
+    conf_cancel: 'Annulla',
+    conf_reset_prices: '🔄 Azzera Prezzi',
+    conf_reset_text: 'Azzerare tutti i prezzi degli acquisti al costo base originale?',
+    dpad_hint: '🍎 Porta i frutti<br>alla tua controparte!',
+    dpad_hint2: '💊medikit 🗝️chiave 💡segreti<br>⭐turbo 💣bomba 🧊ghiaccio 🍬x2 🛡️scudo ❤️vita',
+    sound_on: '🔊',
+    sound_off: '🔇',
+    coin_earned: '🪙 +{n} monete!',
+    toast_start_first: '⚠️ Avvia una partita prima!',
+    toast_already_active: '⚡ Già attivo!',
+    toast_revived: '✨ Rinato!',
+    toast_tap_to_use: 'tocca per usare!',
+    ad_simulation: 'Simulazione Annuncio',
+    ad_advertisement: 'Pubblicità',
+    ad_dev_mode: 'MODALITÀ DEV — chiude in ~2s',
+    ad_wait: 'Attendi la fine della pubblicità',
+    ad_paused: 'Gioco in pausa durante gli annunci',
+    conf_cancel_btn: 'Annulla',
+    conf_confirm_btn: 'Conferma',
+  },
+
+  es: {
+    label: '🇪🇸 ES',
+    setup_title: '🎮 Configura tu Smile',
+    your_name: 'Tu nombre',
+    name_placeholder: 'ej. Pablo…',
+    choose_pacsmile: 'Elige tu PacSmile',
+    play_btn: '🚀 ¡JUGAR!',
+    history_btn: 'Historial',
+    howtoplay_btn: 'Cómo jugar',
+    shop_btn: 'Tienda',
+    tagline: '✨ El Laberinto Sonriente ✨',
+    controls_hint: '⌨️ Flechas/WASD · 📱 D-Pad táctil · 👆 Deslizar',
+    collect_hint: '¡Recoge 🍎 frutas y llévalas a tu contraparte!',
+    hud_lvl: 'NIV',
+    hud_score: 'PUNTOS',
+    hud_coins: 'MONEDAS',
+    shop_title: '🛒 Tienda',
+    shop_subtitle: '¡Gasta tus monedas con sabiduría!',
+    shop_buy: 'Comprar',
+    shop_coins: 'Monedas',
+    shop_reset: '🔄 Reiniciar Precios',
+    shop_reset_confirm: '¿Reiniciar todos los precios al costo base?',
+    shop_reset_yes: 'Reiniciar',
+    shop_not_enough: '💸 ¡Monedas insuficientes!',
+    shop_purchased: '✅ ¡Comprado!',
+    shop_activated: '⚡ ¡Activado!',
+    shop_ads_coins: '📺 ¡Mira un anuncio y gana +50 monedas!',
+    shop_close: '✕ Cerrar',
+    pu_pill_name: 'Píldora',
+    pu_pill_desc: '¡Atemoriza a todos los enemigos!',
+    pu_turbo_name: 'Turbo',
+    pu_turbo_desc: 'Velocidad x2 temporalmente',
+    pu_candy_name: 'Caramelo',
+    pu_candy_desc: 'Puntuación x2 por unos segundos',
+    pu_shield_name: 'Escudo',
+    pu_shield_desc: 'Absorbe un golpe enemigo',
+    pu_bomb_name: 'Bomba',
+    pu_bomb_desc: '¡Elimina a todos los enemigos!',
+    pu_ice_name: 'Hielo',
+    pu_ice_desc: 'Congela a todos los enemigos',
+    pu_medikit_name: 'Botiquín',
+    pu_medikit_desc: 'Restaura 38 HP',
+    pu_extralife_name: 'Vida Extra',
+    pu_extralife_desc: 'Gana una vida más',
+    toast_enter_name: '✏️ ¡Ingresa tu nombre!',
+    toast_choose_char: '👆 ¡Elige tu PacSmile!',
+    toast_paused: '⏸ En pausa',
+    toast_history_cleared: '🗑️ ¡Historial borrado!',
+    toast_quit_saved: '🚪 ¡Juego abandonado y guardado!',
+    toast_no_pu: '❌ ¡No hay power-up en este slot!',
+    level_title: 'Nivel',
+    level_go: '▶ ¡Ir!',
+    level_goal: 'Objetivo:',
+    level_fruits: 'frutas.',
+    level_enemies: '¡enemigos!',
+    level_locked: '🗝️ ¡Puertas bloqueadas!',
+    level_secret: '💡 ¡Pasajes secretos!',
+    level_runaway: '💨 ¡La contraparte huye!',
+    gameover_title: 'GAME OVER',
+    gameover_scored: 'ha conseguido',
+    gameover_points: 'puntos en el nivel',
+    gameover_saved: 'Guardado en el historial.',
+    gameover_try: '🔄 Intentar de nuevo',
+    gameover_ads: '📺 Ver anuncio → ¡Revivir!',
+    levelend_2x: '📺 Ver anuncio → ¡Monedas 2×!',
+    levelend_continue: '▶ Continuar',
+    toast_delivered: '💝 Entregadas',
+    toast_fruits: '¡frutas!',
+    toast_frightened: '😱 ¡Enemigos aterrorizados!',
+    toast_fruit_pick: '🍎 +1 fruta',
+    toast_fruit_go: '→ ¡ve a tu contraparte!',
+    toast_held: 'en mano',
+    toast_hp: '💊 +38 HP!',
+    toast_unlocked: '🗝️ ¡Pasaje desbloqueado!',
+    toast_secrets: '💡 ¡Pasajes secretos revelados!',
+    toast_turbo: '⭐ ¡TURBO!',
+    toast_boom: '💣 ¡BOOM! ¡Todos eliminados!',
+    toast_frozen: '🧊 ¡Enemigos congelados!',
+    toast_x2: '🍬 ¡Puntuación x2!',
+    toast_shield: '🛡️ ¡Escudo!',
+    toast_extralife: '❤️ ¡Vida extra ganada!',
+    toast_eaten: '😋 ¡Comido!',
+    toast_pts: '¡pts!',
+    toast_hit: '😱 ¡Golpeado! -28 HP',
+    toast_shield_absorbed: '🛡️ ¡Escudo absorbido!',
+    toast_life_lost: '💀 ¡Vida perdida! ¡5s inmunidad!',
+    toast_fruits_respawn: '🔄 ¡Frutas devueltas al campo!',
+    toast_coins_earned: '🪙 ¡Monedas ganadas!',
+    toast_2x_coins: '🪙 ¡Bonus de Monedas 2× aplicado!',
+    hist_title: '🏆 Historial',
+    hist_subtitle: 'Tus aventuras PacSmile',
+    hist_back: '← Volver',
+    hist_clear: '🗑️ Borrar historial',
+    hist_empty: '😴 No hay partidas registradas…\n¡Juega tu primera partida!',
+    hist_gameover: '💀 Game Over',
+    hist_abandoned: '🚪 Abandonado',
+    hist_pts: 'pts',
+    help_title: '❓ Guía PacSmile',
+    help_objective_label: '🎯 Objetivo:',
+    help_objective: 'Recoge frutas 🍎 en el laberinto y entrégalas a tu contraparte (el emoji correspondiente). ¡Entrega todas las frutas requeridas para avanzar al siguiente nivel!',
+    help_controls_label: '🕹️ Controles:',
+    help_controls: '⌨️ Flechas / WASD — 📱 D-Pad táctil — 👆 Deslizar — ⏸ Espacio/Esc para pausa',
+    help_powerups_label: '⚡ POWER-UPS',
+    help_pill: '🔵 <strong>Píldora</strong> — ¡Enemigos aterrorizados por unos segundos, puedes comerlos!',
+    help_turbo: '⭐ <strong>Turbo</strong> — Velocidad duplicada temporalmente',
+    help_candy: '🍬 <strong>Caramelo</strong> — Puntuación x2 por unos segundos',
+    help_shield: '🛡️ <strong>Escudo</strong> — Absorbe un golpe enemigo',
+    help_medikit: '💊 <strong>Botiquín</strong> — Restaura 38 HP',
+    help_extralife: '❤️ <strong>Vida extra</strong> — Gana una vida adicional',
+    help_key: '🗝️ <strong>Llave</strong> — Desbloquea un pasaje bloqueado 🔒',
+    help_bulb: '💡 <strong>Bombilla</strong> — Revela pasajes secretos',
+    help_bomb: '💣 <strong>Bomba</strong> — Elimina todos los enemigos visibles',
+    help_ice: '🧊 <strong>Hielo</strong> — Congela a todos los enemigos por unos segundos',
+    help_enemies_label: '😠 ENEMIGOS',
+    help_enemies: 'El nivel 1 tiene <strong>2 enemigos enojados</strong>. Cada nivel añade uno, hasta un máximo de 10. Los enemigos se mueven <strong>ligeramente más lento</strong> que el jugador. ¡Cuando están <strong>aterrorizados</strong> 😨 (después de una píldora) puedes comerlos para un bonus!',
+    help_level7_label: '💨 DESDE EL NIVEL 7',
+    help_level7: '¡La <strong>contraparte huye</strong>! Se mueve libremente por el laberinto intentando alejarse de ti. ¡Tendrás que perseguirla para entregar las frutas!',
+    help_shop_label: '🛒 TIENDA',
+    help_shop: '¡Recoge monedas durante el juego y gástalas en la Tienda para comprar power-ups que puedes activar a mitad del juego con los botones inferiores!',
+    help_tips_label: '💡 CONSEJOS',
+    help_tips: '• ¡Los enemigos se esconden por unos segundos al inicio y después de cada reaparición — usa el tiempo para orientarte!<br>• Usa la bomba 💣 cuando estés rodeado<br>• Usa el turbo ⭐ para escapar de enemigos o alcanzar a la contraparte 💨<br>• ¡El multiplicador combo aumenta comiendo enemigos consecutivamente!<br>• ¡Mira anuncios para ganar monedas extra o revivir!',
+    help_close: '✕ Cerrar',
+    about_title: '😊 PacSMILE 😊',
+    about_version: 'Versión:',
+    about_genre: 'Género:',
+    about_author: 'Autor:',
+    about_platform: 'Plataforma:',
+    about_genre_val: 'Laberinto / Arcade smile-style',
+    about_platform_val: 'HTML5 archivo único — funciona en cualquier navegador moderno y smartphone',
+    conf_clear_title: 'Borrar historial',
+    conf_clear_text: '¿Seguro que quieres eliminar todo el historial? Esta acción no se puede deshacer.',
+    conf_delete: 'Eliminar todo',
+    conf_quit_title: 'Salir del juego',
+    conf_quit_text: '¿Seguro que quieres salir? El juego se guardará como "Abandonado" en el historial.',
+    conf_quit_yes: 'Salir',
+    conf_cancel: 'Cancelar',
+    conf_reset_prices: '🔄 Reiniciar Precios',
+    conf_reset_text: '¿Reiniciar todos los precios de compra al coste base original?',
+    dpad_hint: '🍎 ¡Lleva las frutas<br>a tu contraparte!',
+    dpad_hint2: '💊botiquín 🗝️llave 💡secretos<br>⭐turbo 💣bomba 🧊hielo 🍬x2 🛡️escudo ❤️vida',
+    sound_on: '🔊',
+    sound_off: '🔇',
+    coin_earned: '🪙 +{n} monedas!',
+    toast_start_first: '⚠️ ¡Empieza una partida primero!',
+    toast_already_active: '⚡ ¡Ya activo!',
+    toast_revived: '✨ ¡Revivido!',
+    toast_tap_to_use: '¡toca para usar!',
+    ad_simulation: 'Simulación de Anuncio',
+    ad_advertisement: 'Publicidad',
+    ad_dev_mode: 'MODO DEV — cierra en ~2s',
+    ad_wait: 'Espera a que termine el anuncio',
+    ad_paused: 'Juego pausado durante el anuncio',
+    conf_cancel_btn: 'Cancelar',
+    conf_confirm_btn: 'Confirmar',
+  },
+
+  fr: {
+    label: '🇫🇷 FR',
+    setup_title: '🎮 Configurez votre Smile',
+    your_name: 'Votre nom',
+    name_placeholder: 'ex. Pierre…',
+    choose_pacsmile: 'Choisissez votre PacSmile',
+    play_btn: '🚀 JOUER!',
+    history_btn: 'Historique',
+    howtoplay_btn: 'Comment jouer',
+    shop_btn: 'Boutique',
+    tagline: '✨ Le Labyrinthe Souriant ✨',
+    controls_hint: '⌨️ Flèches/WASD · 📱 D-Pad tactile · 👆 Glisser',
+    collect_hint: 'Collectez 🍎 des fruits et apportez-les à votre contrepartie!',
+    hud_lvl: 'NIV',
+    hud_score: 'SCORE',
+    hud_coins: 'PIÈCES',
+    shop_title: '🛒 Boutique',
+    shop_subtitle: 'Dépensez vos pièces judicieusement!',
+    shop_buy: 'Acheter',
+    shop_coins: 'Pièces',
+    shop_reset: '🔄 Réinitialiser les Prix',
+    shop_reset_confirm: 'Réinitialiser tous les prix au coût de base?',
+    shop_reset_yes: 'Réinitialiser',
+    shop_not_enough: '💸 Pièces insuffisantes!',
+    shop_purchased: '✅ Acheté!',
+    shop_activated: '⚡ Activé!',
+    shop_ads_coins: '📺 Regardez une pub pour +50 pièces!',
+    shop_close: '✕ Fermer',
+    pu_pill_name: 'Pilule',
+    pu_pill_desc: 'Effraie tous les ennemis!',
+    pu_turbo_name: 'Turbo',
+    pu_turbo_desc: 'Vitesse x2 temporairement',
+    pu_candy_name: 'Bonbon',
+    pu_candy_desc: 'Score x2 pendant quelques secondes',
+    pu_shield_name: 'Bouclier',
+    pu_shield_desc: 'Absorbe un coup ennemi',
+    pu_bomb_name: 'Bombe',
+    pu_bomb_desc: 'Élimine tous les ennemis!',
+    pu_ice_name: 'Glace',
+    pu_ice_desc: 'Gèle tous les ennemis',
+    pu_medikit_name: 'Trousse de secours',
+    pu_medikit_desc: 'Restaure 38 HP',
+    pu_extralife_name: 'Vie supplémentaire',
+    pu_extralife_desc: 'Gagnez une vie de plus',
+    toast_enter_name: '✏️ Entrez votre nom!',
+    toast_choose_char: '👆 Choisissez votre PacSmile!',
+    toast_paused: '⏸ En pause',
+    toast_history_cleared: '🗑️ Historique effacé!',
+    toast_quit_saved: '🚪 Jeu abandonné et sauvegardé!',
+    toast_no_pu: '❌ Pas de power-up dans ce slot!',
+    level_title: 'Niveau',
+    level_go: '▶ Allez!',
+    level_goal: 'Objectif:',
+    level_fruits: 'fruits.',
+    level_enemies: 'ennemis!',
+    level_locked: '🗝️ Portes verrouillées!',
+    level_secret: '💡 Passages secrets!',
+    level_runaway: '💨 La contrepartie s\'enfuit!',
+    gameover_title: 'GAME OVER',
+    gameover_scored: 'a marqué',
+    gameover_points: 'points au niveau',
+    gameover_saved: 'Sauvegardé dans l\'historique.',
+    gameover_try: '🔄 Réessayer',
+    gameover_ads: '📺 Voir pub → Revivre!',
+    levelend_2x: '📺 Voir pub → Pièces 2×!',
+    levelend_continue: '▶ Continuer',
+    toast_delivered: '💝 Livrés',
+    toast_fruits: 'fruits!',
+    toast_frightened: '😱 Ennemis effrayés!',
+    toast_fruit_pick: '🍎 +1 fruit',
+    toast_fruit_go: '→ allez à votre contrepartie!',
+    toast_held: 'en main',
+    toast_hp: '💊 +38 HP!',
+    toast_unlocked: '🗝️ Passage déverrouillé!',
+    toast_secrets: '💡 Passages secrets révélés!',
+    toast_turbo: '⭐ TURBO!',
+    toast_boom: '💣 BOOM! Tous éliminés!',
+    toast_frozen: '🧊 Ennemis gelés!',
+    toast_x2: '🍬 Score x2!',
+    toast_shield: '🛡️ Bouclier!',
+    toast_extralife: '❤️ Vie supplémentaire gagnée!',
+    toast_eaten: '😋 Mangé!',
+    toast_pts: 'pts!',
+    toast_hit: '😱 Touché! -28 HP',
+    toast_shield_absorbed: '🛡️ Bouclier absorbé!',
+    toast_life_lost: '💀 Vie perdue! 5s immunité!',
+    toast_fruits_respawn: '🔄 Fruits remis sur le terrain!',
+    toast_coins_earned: '🪙 Pièces gagnées!',
+    toast_2x_coins: '🪙 Bonus Pièces 2× appliqué!',
+    hist_title: '🏆 Historique',
+    hist_subtitle: 'Vos aventures PacSmile',
+    hist_back: '← Retour',
+    hist_clear: '🗑️ Effacer l\'historique',
+    hist_empty: '😴 Aucune partie enregistrée…\nJouez votre première partie!',
+    hist_gameover: '💀 Game Over',
+    hist_abandoned: '🚪 Abandonné',
+    hist_pts: 'pts',
+    help_title: '❓ Guide PacSmile',
+    help_objective_label: '🎯 Objectif:',
+    help_objective: 'Collectez des fruits 🍎 dans le labyrinthe et livrez-les à votre contrepartie (l\'emoji correspondant). Livrez tous les fruits requis pour passer au niveau suivant!',
+    help_controls_label: '🕹️ Contrôles:',
+    help_controls: '⌨️ Flèches / WASD — 📱 D-Pad tactile — 👆 Glisser — ⏸ Espace/Échap pour pause',
+    help_powerups_label: '⚡ POWER-UPS',
+    help_pill: '🔵 <strong>Pilule</strong> — Ennemis effrayés pendant quelques secondes, vous pouvez les manger!',
+    help_turbo: '⭐ <strong>Turbo</strong> — Vitesse doublée temporairement',
+    help_candy: '🍬 <strong>Bonbon</strong> — Score x2 pendant quelques secondes',
+    help_shield: '🛡️ <strong>Bouclier</strong> — Absorbe un coup ennemi',
+    help_medikit: '💊 <strong>Trousse</strong> — Restaure 38 HP',
+    help_extralife: '❤️ <strong>Vie supplémentaire</strong> — Gagnez une vie additionnelle',
+    help_key: '🗝️ <strong>Clé</strong> — Déverrouille un passage bloqué 🔒',
+    help_bulb: '💡 <strong>Ampoule</strong> — Révèle les passages secrets',
+    help_bomb: '💣 <strong>Bombe</strong> — Élimine tous les ennemis visibles',
+    help_ice: '🧊 <strong>Glace</strong> — Gèle tous les ennemis pendant quelques secondes',
+    help_enemies_label: '😠 ENNEMIS',
+    help_enemies: 'Le niveau 1 a <strong>2 ennemis en colère</strong>. Chaque niveau en ajoute un, jusqu\'à un maximum de 10. Les ennemis se déplacent <strong>légèrement plus lentement</strong> que le joueur. Quand ils sont <strong>effrayés</strong> 😨 (après une pilule) vous pouvez les manger pour un bonus!',
+    help_level7_label: '💨 À PARTIR DU NIVEAU 7',
+    help_level7: 'La <strong>contrepartie s\'enfuit</strong>! Elle se déplace librement dans le labyrinthe en essayant de rester loin de vous. Vous devrez la poursuivre pour livrer les fruits!',
+    help_shop_label: '🛒 BOUTIQUE',
+    help_shop: 'Collectez des pièces pendant le jeu et dépensez-les dans la Boutique pour acheter des power-ups que vous pouvez activer en cours de jeu avec les boutons inférieurs!',
+    help_tips_label: '💡 CONSEILS',
+    help_tips: '• Les ennemis se cachent quelques secondes au début et après chaque réapparition — profitez du temps pour vous repérer!<br>• Utilisez la bombe 💣 quand vous êtes encerclé<br>• Utilisez le turbo ⭐ pour fuir les ennemis ou atteindre la contrepartie 💨<br>• Le multiplicateur combo augmente en mangeant des ennemis consécutivement!<br>• Regardez des pubs pour gagner des pièces ou revivre!',
+    help_close: '✕ Fermer',
+    about_title: '😊 PacSMILE 😊',
+    about_version: 'Version:',
+    about_genre: 'Genre:',
+    about_author: 'Auteur:',
+    about_platform: 'Plateforme:',
+    about_genre_val: 'Labyrinthe / Arcade smile-style',
+    about_platform_val: 'HTML5 fichier unique — fonctionne sur tout navigateur moderne et smartphone',
+    conf_clear_title: 'Effacer l\'historique',
+    conf_clear_text: 'Êtes-vous sûr de vouloir supprimer tout l\'historique? Cette action est irréversible.',
+    conf_delete: 'Tout supprimer',
+    conf_quit_title: 'Quitter le jeu',
+    conf_quit_text: 'Êtes-vous sûr de vouloir quitter? Le jeu sera sauvegardé comme "Abandonné" dans l\'historique.',
+    conf_quit_yes: 'Quitter',
+    conf_cancel: 'Annuler',
+    conf_reset_prices: '🔄 Réinitialiser Prix',
+    conf_reset_text: 'Réinitialiser tous les prix d\'achat au coût de base original?',
+    dpad_hint: '🍎 Apportez les fruits<br>à votre contrepartie!',
+    dpad_hint2: '💊trousse 🗝️clé 💡secrets<br>⭐turbo 💣bombe 🧊glace 🍬x2 🛡️bouclier ❤️vie',
+    sound_on: '🔊',
+    sound_off: '🔇',
+    coin_earned: '🪙 +{n} pièces!',
+    toast_start_first: '⚠️ Lancez une partie d\'abord !',
+    toast_already_active: '⚡ Déjà actif !',
+    toast_revived: '✨ Revivifié !',
+    toast_tap_to_use: 'tapez pour utiliser !',
+    ad_simulation: 'Simulation Publicité',
+    ad_advertisement: 'Publicité',
+    ad_dev_mode: 'MODE DEV — ferme en ~2s',
+    ad_wait: 'Attendez la fin de la publicité',
+    ad_paused: 'Jeu mis en pause pendant la pub',
+    conf_cancel_btn: 'Annuler',
+    conf_confirm_btn: 'Confirmer',
+  },
+
+  de: {
+    label: '🇩🇪 DE',
+    setup_title: '🎮 Richte deinen Smile ein',
+    your_name: 'Dein Name',
+    name_placeholder: 'z.B. Hans…',
+    choose_pacsmile: 'Wähle deinen PacSmile',
+    play_btn: '🚀 SPIELEN!',
+    history_btn: 'Spielverlauf',
+    howtoplay_btn: 'Anleitung',
+    shop_btn: 'Shop',
+    tagline: '✨ Das Lächeln-Labyrinth ✨',
+    controls_hint: '⌨️ Pfeile/WASD · 📱 D-Pad Touch · 👆 Wischen',
+    collect_hint: 'Sammle 🍎 Früchte und bringe sie zu deinem Gegenstück!',
+    hud_lvl: 'LVL',
+    hud_score: 'PUNKTE',
+    hud_coins: 'MÜNZEN',
+    shop_title: '🛒 Shop',
+    shop_subtitle: 'Gib deine Münzen weise aus!',
+    shop_buy: 'Kaufen',
+    shop_coins: 'Münzen',
+    shop_reset: '🔄 Preise zurücksetzen',
+    shop_reset_confirm: 'Alle Shoppreise auf den Basispreis zurücksetzen?',
+    shop_reset_yes: 'Zurücksetzen',
+    shop_not_enough: '💸 Nicht genug Münzen!',
+    shop_purchased: '✅ Gekauft!',
+    shop_activated: '⚡ Aktiviert!',
+    shop_ads_coins: '📺 Schau dir eine Werbung an für +50 Münzen!',
+    shop_close: '✕ Schließen',
+    pu_pill_name: 'Pille',
+    pu_pill_desc: 'Erschrecke alle Feinde!',
+    pu_turbo_name: 'Turbo',
+    pu_turbo_desc: 'Temporär doppelte Geschwindigkeit',
+    pu_candy_name: 'Bonbon',
+    pu_candy_desc: 'Punkte x2 für einige Sekunden',
+    pu_shield_name: 'Schild',
+    pu_shield_desc: 'Absorbiert einen Feindtreffer',
+    pu_bomb_name: 'Bombe',
+    pu_bomb_desc: 'Eliminiert alle Feinde!',
+    pu_ice_name: 'Eis',
+    pu_ice_desc: 'Friert alle Feinde ein',
+    pu_medikit_name: 'Medizin',
+    pu_medikit_desc: 'Stellt 38 HP wieder her',
+    pu_extralife_name: 'Extra-Leben',
+    pu_extralife_desc: 'Gewinne ein weiteres Leben',
+    toast_enter_name: '✏️ Gib deinen Namen ein!',
+    toast_choose_char: '👆 Wähle deinen PacSmile!',
+    toast_paused: '⏸ Pausiert',
+    toast_history_cleared: '🗑️ Verlauf gelöscht!',
+    toast_quit_saved: '🚪 Spiel abgebrochen und gespeichert!',
+    toast_no_pu: '❌ Kein Power-Up in diesem Slot!',
+    level_title: 'Level',
+    level_go: '▶ Los!',
+    level_goal: 'Ziel:',
+    level_fruits: 'Früchte.',
+    level_enemies: 'Feinde!',
+    level_locked: '🗝️ Gesperrte Türen!',
+    level_secret: '💡 Geheime Gänge!',
+    level_runaway: '💨 Das Gegenstück flieht!',
+    gameover_title: 'GAME OVER',
+    gameover_scored: 'erzielte',
+    gameover_points: 'Punkte auf Level',
+    gameover_saved: 'Im Verlauf gespeichert.',
+    gameover_try: '🔄 Erneut versuchen',
+    gameover_ads: '📺 Werbung ansehen → Wiederbeleben!',
+    levelend_2x: '📺 Werbung ansehen → 2× Münzen!',
+    levelend_continue: '▶ Weiter',
+    toast_delivered: '💝 Geliefert',
+    toast_fruits: 'Früchte!',
+    toast_frightened: '😱 Feinde erschreckt!',
+    toast_fruit_pick: '🍎 +1 Frucht',
+    toast_fruit_go: '→ geh zu deinem Gegenstück!',
+    toast_held: 'in der Hand',
+    toast_hp: '💊 +38 HP!',
+    toast_unlocked: '🗝️ Durchgang freigeschaltet!',
+    toast_secrets: '💡 Geheime Gänge enthüllt!',
+    toast_turbo: '⭐ TURBO!',
+    toast_boom: '💣 BOOM! Alle eliminiert!',
+    toast_frozen: '🧊 Feinde eingefroren!',
+    toast_x2: '🍬 Punkte x2!',
+    toast_shield: '🛡️ Schild!',
+    toast_extralife: '❤️ Extra-Leben erhalten!',
+    toast_eaten: '😋 Gefressen!',
+    toast_pts: 'Pkt!',
+    toast_hit: '😱 Getroffen! -28 HP',
+    toast_shield_absorbed: '🛡️ Schild absorbiert!',
+    toast_life_lost: '💀 Leben verloren! 5s Immunität!',
+    toast_fruits_respawn: '🔄 Früchte zurück aufs Spielfeld!',
+    toast_coins_earned: '🪙 Münzen verdient!',
+    toast_2x_coins: '🪙 2× Münzen-Bonus angewendet!',
+    hist_title: '🏆 Spielverlauf',
+    hist_subtitle: 'Deine PacSmile-Abenteuer',
+    hist_back: '← Zurück',
+    hist_clear: '🗑️ Verlauf löschen',
+    hist_empty: '😴 Noch keine Spiele aufgezeichnet…\nSpiele dein erstes Spiel!',
+    hist_gameover: '💀 Game Over',
+    hist_abandoned: '🚪 Abgebrochen',
+    hist_pts: 'Pkt',
+    help_title: '❓ PacSmile Anleitung',
+    help_objective_label: '🎯 Ziel:',
+    help_objective: 'Sammle Früchte 🍎 im Labyrinth und liefere sie an dein Gegenstück (das entsprechende Emoji). Liefere alle erforderlichen Früchte, um zum nächsten Level aufzusteigen!',
+    help_controls_label: '🕹️ Steuerung:',
+    help_controls: '⌨️ Pfeile / WASD — 📱 D-Pad Touch — 👆 Wischen — ⏸ Leertaste/Esc für Pause',
+    help_powerups_label: '⚡ POWER-UPS',
+    help_pill: '🔵 <strong>Pille</strong> — Feinde für einige Sekunden erschreckt, du kannst sie fressen!',
+    help_turbo: '⭐ <strong>Turbo</strong> — Temporär doppelte Geschwindigkeit',
+    help_candy: '🍬 <strong>Bonbon</strong> — Punkte x2 für einige Sekunden',
+    help_shield: '🛡️ <strong>Schild</strong> — Absorbiert einen Feindtreffer',
+    help_medikit: '💊 <strong>Medizin</strong> — Stellt 38 HP wieder her',
+    help_extralife: '❤️ <strong>Extra-Leben</strong> — Gewinne ein zusätzliches Leben',
+    help_key: '🗝️ <strong>Schlüssel</strong> — Entsperrt einen gesperrten Durchgang 🔒',
+    help_bulb: '💡 <strong>Glühbirne</strong> — Enthüllt geheime Gänge',
+    help_bomb: '💣 <strong>Bombe</strong> — Eliminiert alle sichtbaren Feinde',
+    help_ice: '🧊 <strong>Eis</strong> — Friert alle Feinde für einige Sekunden ein',
+    help_enemies_label: '😠 FEINDE',
+    help_enemies: 'Level 1 hat <strong>2 wütende Feinde</strong>. Jedes Level fügt einen hinzu, bis zu einem Maximum von 10. Feinde bewegen sich <strong>etwas langsamer</strong> als der Spieler. Wenn sie <strong>erschreckt</strong> 😨 sind (nach einer Pille), kannst du sie für einen Bonus fressen!',
+    help_level7_label: '💨 AB LEVEL 7',
+    help_level7: 'Das <strong>Gegenstück flieht</strong>! Es bewegt sich frei durch das Labyrinth und versucht, sich von dir fernzuhalten. Du musst es verfolgen, um die Früchte abzuliefern!',
+    help_shop_label: '🛒 SHOP',
+    help_shop: 'Sammle Münzen während des Spiels und gib sie im Shop aus, um Power-Ups zu kaufen, die du mit den unteren Tasten mitten im Spiel aktivieren kannst!',
+    help_tips_label: '💡 TIPPS',
+    help_tips: '• Feinde verstecken sich am Anfang und nach jedem Respawn für einige Sekunden — nutze die Zeit zur Orientierung!<br>• Benutze die Bombe 💣 wenn du umzingelt bist<br>• Benutze den Turbo ⭐ um Feinden zu entkommen oder das Gegenstück zu erreichen 💨<br>• Der Combo-Multiplikator steigt beim aufeinanderfolgenden Fressen von Feinden!<br>• Schau dir Werbung an um Münzen zu verdienen oder wieder zu leben!',
+    help_close: '✕ Schließen',
+    about_title: '😊 PacSMILE 😊',
+    about_version: 'Version:',
+    about_genre: 'Genre:',
+    about_author: 'Autor:',
+    about_platform: 'Plattform:',
+    about_genre_val: 'Labyrinth / Arcade smile-style',
+    about_platform_val: 'Einzelne HTML5-Datei — läuft auf jedem modernen Browser und Smartphone',
+    conf_clear_title: 'Verlauf löschen',
+    conf_clear_text: 'Bist du sicher, dass du den gesamten Verlauf löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.',
+    conf_delete: 'Alles löschen',
+    conf_quit_title: 'Spiel verlassen',
+    conf_quit_text: 'Bist du sicher, dass du aufhören möchtest? Das Spiel wird als "Abgebrochen" im Verlauf gespeichert.',
+    conf_quit_yes: 'Verlassen',
+    conf_cancel: 'Abbrechen',
+    conf_reset_prices: '🔄 Preise zurücksetzen',
+    conf_reset_text: 'Alle Kaufpreise auf den ursprünglichen Basispreis zurücksetzen?',
+    dpad_hint: '🍎 Bringe Früchte<br>zu deinem Gegenstück!',
+    dpad_hint2: '💊Medizin 🗝️Schlüssel 💡Geheimnisse<br>⭐Turbo 💣Bombe 🧊Eis 🍬x2 🛡️Schild ❤️Leben',
+    sound_on: '🔊',
+    sound_off: '🔇',
+    coin_earned: '🪙 +{n} Münzen!',
+    toast_start_first: '⚠️ Starte zuerst ein Spiel!',
+    toast_already_active: '⚡ Bereits aktiv!',
+    toast_revived: '✨ Wiederbelebt!',
+    toast_tap_to_use: 'tippen zum Aktivieren!',
+    ad_simulation: 'Werbung Simulation',
+    ad_advertisement: 'Werbung',
+    ad_dev_mode: 'DEV MODUS — schließt in ~2s',
+    ad_wait: 'Bitte warte bis die Werbung endet',
+    ad_paused: 'Spiel pausiert während Werbung',
+    conf_cancel_btn: 'Abbrechen',
+    conf_confirm_btn: 'Bestätigen',
+  },
+};
+
+// Current language state
+let currentLang = localStorage.getItem(LANG_KEY) || 'en';
+if (!LANGS[currentLang]) currentLang = 'en';
+
+function t(key, vars = {}) {
+  const str = (LANGS[currentLang] && LANGS[currentLang][key]) || (LANGS.en && LANGS.en[key]) || key;
+  return str.replace(/\{(\w+)\}/g, (_, k) => vars[k] !== undefined ? vars[k] : `{${k}}`);
+}
+
+function setLang(lang) {
+  if (!LANGS[lang]) return;
+  currentLang = lang;
+  localStorage.setItem(LANG_KEY, lang);
+  applyI18n();
+}
+
+function getLangList() {
+  return Object.entries(LANGS).map(([code, data]) => ({ code, label: data.label }));
+}
+
+
+/* ══ MODULE: sounds ══ */
+/* ══ ppPacSmile — Sound System (Web Audio API) ══ */
+const SOUND_KEY = 'pacsmile_sound';
+let audioCtx = null;
+let soundEnabled = localStorage.getItem(SOUND_KEY) !== 'off';
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(freq, type, dur, vol = 0.18, delay = 0) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type; osc.frequency.value = freq;
+    const t = ctx.currentTime + delay;
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(vol, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    osc.start(t); osc.stop(t + dur + 0.01);
+  } catch(e) {}
+}
+
+function playChord(notes, type, dur, vol = 0.12) {
+  notes.forEach((f, i) => playTone(f, type, dur, vol, i * 0.04));
+}
+
+const SFX = {
+  collect() {
+    playTone(880, 'sine', 0.08, 0.15);
+    playTone(1320, 'sine', 0.06, 0.1, 0.06);
+  },
+  deliver() {
+    [523, 659, 784, 1047].forEach((f, i) => playTone(f, 'sine', 0.12, 0.15, i * 0.07));
+  },
+  eat() {
+    [300, 200, 150].forEach((f, i) => playTone(f, 'sawtooth', 0.08, 0.12, i * 0.05));
+  },
+  hit() {
+    playTone(120, 'sawtooth', 0.15, 0.25);
+    playTone(80, 'square', 0.1, 0.2, 0.07);
+  },
+  powerup() {
+    [440, 550, 660, 880].forEach((f, i) => playTone(f, 'sine', 0.1, 0.14, i * 0.06));
+  },
+  levelup() {
+    const melody = [523, 659, 784, 1047, 1319];
+    melody.forEach((f, i) => playTone(f, 'sine', 0.18, 0.18, i * 0.1));
+  },
+  gameover() {
+    [400, 300, 250, 150].forEach((f, i) => playTone(f, 'sawtooth', 0.2, 0.2, i * 0.12));
+  },
+  shop() {
+    playTone(660, 'sine', 0.08, 0.12);
+    playTone(880, 'sine', 0.07, 0.1, 0.07);
+  },
+  coin() {
+    playTone(1047, 'sine', 0.06, 0.12);
+    playTone(1319, 'sine', 0.06, 0.1, 0.05);
+  },
+  shield() {
+    playTone(440, 'triangle', 0.12, 0.15);
+    playTone(660, 'triangle', 0.1, 0.12, 0.06);
+  },
+  dot() {
+    playTone(800 + Math.random() * 200, 'sine', 0.03, 0.06);
+  },
+  move() {
+    // Silent or very subtle
+  },
+  scared() {
+    playTone(220, 'square', 0.06, 0.08);
+    playTone(180, 'square', 0.05, 0.07, 0.06);
+  },
+  bomb() {
+    [150, 100, 80].forEach((f, i) => playTone(f, 'sawtooth', 0.18, 0.28, i * 0.08));
+    playTone(300, 'square', 0.1, 0.15, 0.1);
+  },
+  ice() {
+    [880, 1047, 1319, 1568].forEach((f, i) => playTone(f, 'triangle', 0.08, 0.12, i * 0.04));
+  },
+  ads() {
+    [440, 550, 660].forEach((f, i) => playTone(f, 'sine', 0.1, 0.12, i * 0.06));
+    playTone(880, 'sine', 0.12, 0.15, 0.22);
+  },
+};
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem(SOUND_KEY, soundEnabled ? 'on' : 'off');
+  return soundEnabled;
+}
+
+
+/* ══ MODULE: ads ══ */
+/* ══ ppPacSmile — GameDistribution SDK Integration ══ */
+
+// GameDistribution game ID — replace with your actual GD game ID
+const GD_GAME_ID = '169218311ece42e4863b2f287d781c13';
+
+let gdSDKReady = true;
+let adPlaying  = false;
+let pendingAdCallback = null;
+
+/* ══ SDK Init ══ */
+
+// Safety: detect localhost/file → force simulation mode
+const GD_IS_LOCAL = (
+  location.hostname === 'localhost' ||
+  location.hostname === '127.0.0.1' ||
+  location.protocol === 'file:'
+);
+
+// Timeout (ms) before we give up waiting for SDK_GAME_START and fire callback anyway
+const GD_AD_TIMEOUT = 8000;
+let   gdAdTimeoutId = null;
+
+function gdFireCallback() {
+  clearTimeout(gdAdTimeoutId);
+  gdAdTimeoutId = null;
+  adPlaying = false;
+  hideAdOverlay();
+  if (pendingAdCallback) {
+    const cb = pendingAdCallback;
+    pendingAdCallback = null;
+    try { cb(); } catch(e) { console.warn('[GD] callback error:', e); }
+  }
+  // Always resume game loop after ad
+  if (window.G && G.player && !G.over) {
+    G.paused = false;
+    lastTs = 0; tickAcc = 0;
+    if (typeof loop === 'function') loop();
+  }
+}
+
+function initGameDistribution() {
+  if (GD_IS_LOCAL && GD_GAME_ID === '169218311ece42e4863b2f287d781c13') {
+    console.log('[GD] Localhost + no Game ID → full simulation mode');
+    gdSDKReady = false; // keep false so showAd uses simulateAd
+    return;
+  }
+
+  if (GD_IS_LOCAL) {
+    console.log('[GD] Localhost detected → simulation mode (ads will be simulated)');
+    gdSDKReady = false;
+    return;
+  }
+
+  window['GD_OPTIONS'] = {
+    gameId: GD_GAME_ID,
+    onEvent: function(event) {
+      switch (event.name) {
+        case 'SDK_READY':
+          gdSDKReady = true;
+          console.log('[GD] SDK Ready ✓');
+          break;
+        case 'SDK_GAME_PAUSE':
+          // Real ad about to play — pause game
+          adPlaying = true;
+          if (window.G && G.player && !G.over) G.paused = true;
+          showAdOverlay('live');
+          // Safety timeout: if SDK_GAME_START never comes, unblock after 15s
+          clearTimeout(gdAdTimeoutId);
+          gdAdTimeoutId = setTimeout(() => {
+            console.warn('[GD] SDK_GAME_START timeout — forcing resume');
+            gdFireCallback();
+          }, 15000);
+          break;
+        case 'SDK_GAME_START':
+          // Ad ended normally
+          gdFireCallback();
+          break;
+        case 'SDK_ERROR':
+          console.warn('[GD] SDK_ERROR — firing callback immediately', event);
+          gdFireCallback();
+          break;
+        case 'SDK_GDPR_TRACKING':
+        case 'SDK_GDPR_TARGETING':
+          break; // handled by SDK
+        default:
+          console.log('[GD] event:', event.name);
+      }
+    }
+  };
+  const script = document.createElement('script');
+  script.src = 'https://html5.api.gamedistribution.com/main.min.js';
+  script.async = true;
+  script.onerror = () => {
+    console.warn('[GD] SDK load failed → simulation mode');
+    gdSDKReady = false;
+  };
+  document.head.appendChild(script);
+}
+
+/* ══ Show Ad ══ */
+// type: 'interstitial' | 'rewarded'
+// callback fires after the ad completes (or on error/fallback)
+function showAd(reason, callback) {
+  pendingAdCallback = null;
+  if (!gdSDKReady || typeof gdsdk === 'undefined') {
+    simulateAd(callback);
+    return;
+  }
+  pendingAdCallback = callback || null;
+  SFX.ads();
+  // Safety timeout in case SDK_GAME_START never arrives
+  clearTimeout(gdAdTimeoutId);
+  gdAdTimeoutId = setTimeout(() => {
+    console.warn('[GD] showAd timeout — forcing callback');
+    gdFireCallback();
+  }, GD_AD_TIMEOUT);
+  try {
+    gdsdk.showAd(gdsdk.AdType.Interstitial);
+  } catch (e) {
+    console.warn('[GD] showAd error:', e);
+    clearTimeout(gdAdTimeoutId);
+    simulateAd(callback);
+  }
+}
+
+function showRewardedAd(callback) {
+  pendingAdCallback = null;
+  if (!gdSDKReady || typeof gdsdk === 'undefined') {
+    simulateAd(callback);
+    return;
+  }
+  pendingAdCallback = callback || null;
+  SFX.ads();
+  clearTimeout(gdAdTimeoutId);
+  gdAdTimeoutId = setTimeout(() => {
+    console.warn('[GD] showRewardedAd timeout — forcing callback');
+    gdFireCallback();
+  }, GD_AD_TIMEOUT);
+  try {
+    gdsdk.showAd(gdsdk.AdType.Interstitial);
+  } catch (e) {
+    simulateAd(callback);
+  }
+}
+
+/* ══ Simulate Ad (fallback when SDK not available) ══ */
+function simulateAd(callback, delay = 2200) {
+  // Show overlay first, then fire after delay
+  showAdOverlay('simulated');
+  setTimeout(() => {
+    hideAdOverlay();
+    pendingAdCallback = null;
+    if (typeof callback === 'function') {
+      try { callback(); } catch(e) { console.warn('[GD] sim callback error:', e); }
+    }
+    // Resume game if it was running
+    if (window.G && G.player && !G.over) {
+      G.paused = false;
+      lastTs = 0; tickAcc = 0;
+      if (typeof loop === 'function') loop();
+    }
+  }, delay);
+}
+
+/* ══ Ad overlay UI ══ */
+function showAdOverlay(reason) {
+  let el = document.getElementById('ad-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'ad-overlay';
+    el.style.cssText = [
+      'position:fixed;inset:0;z-index:9999;',
+      'background:rgba(0,0,0,.92);',
+      'display:flex;align-items:center;justify-content:center;',
+      'flex-direction:column;gap:14px;',
+      'font-family:Boogaloo,cursive;color:#fff;',
+    ].join('');
+    document.body.appendChild(el);
+    if (!document.getElementById('adProgressStyle')) {
+      const s = document.createElement('style');
+      s.id = 'adProgressStyle';
+      s.textContent = '@keyframes adProg{from{width:0}to{width:100%}}';
+      document.head.appendChild(s);
+    }
+  }
+  const isSim = !gdSDKReady || reason === 'simulated';
+  const dur   = isSim ? 2 : 30; // seconds shown on bar
+  el.innerHTML = `
+    <div style="font-size:3.5rem">📺</div>
+    <div style="font-size:1.5rem;letter-spacing:2px">${isSim ? t('ad_simulation') : t('ad_advertisement')}</div>
+    <div style="font-size:.8rem;color:rgba(255,255,255,.55)">
+      ${isSim ? t('ad_dev_mode') : t('ad_wait')}
+    </div>
+    <div style="width:200px;height:5px;background:rgba(255,255,255,.15);border-radius:3px;overflow:hidden">
+      <div style="height:100%;background:linear-gradient(90deg,#ffcc00,#ff9500);border-radius:3px;
+        animation:adProg ${dur}s linear forwards"></div>
+    </div>
+    ${isSim ? '' : '<div style="font-size:.7rem;color:rgba(255,255,255,.35);margin-top:4px">Game paused during ad</div>'}
+  `;
+  el.style.display = 'flex';
+}
+
+function hideAdOverlay() {
+  const el = document.getElementById('ad-overlay');
+  if (el) el.style.display = 'none';
+}
+
+
+/* ══ MODULE: shop ══ */
+/* ══ ppPacSmile — Shop & Coins System ══ */
+const COINS_KEY   = 'pacsmile_coins';
+const PRICES_KEY  = 'pacsmile_prices';
+const OWNED_KEY   = 'pacsmile_owned';  // owned (bought but not yet used) inventory
+
+// Base prices for each power-up
+const BASE_PRICES = {
+  pill:      30,
+  turbo:     40,
+  candy:     40,
+  shield:    60,
+  bomb:      80,
+  ice:       50,
+  medikit:   45,
+  extralife: 120,
+};
+
+// Price increment each time you buy the same item (gets more expensive)
+const PRICE_INCREMENT = {
+  pill:      10,
+  turbo:     15,
+  candy:     15,
+  shield:    20,
+  bomb:      25,
+  ice:       18,
+  medikit:   15,
+  extralife: 40,
+};
+
+// No stack limit — players can accumulate unlimited power-ups
+const MAX_STACK = 999;
+
+// Power-up slot definitions — maps shop key → tile type & game property
+const PU_MAP = {
+  pill:      { tile: 3,  tKey: 'powerT',  dur: 28, emoji: '🔵' },
+  turbo:     { tile: 8,  tKey: 'turboT',  dur: 22, emoji: '⭐' },
+  candy:     { tile: 10, tKey: 'candyT',  dur: 28, emoji: '🍬' },
+  shield:    { tile: 11, tKey: 'shieldT', dur: 32, emoji: '🛡️' },
+  bomb:      { tile: 9,  tKey: null,      dur: 0,  emoji: '💣' },
+  ice:       { tile: 15, tKey: null,      dur: 0,  emoji: '🧊' },
+  medikit:   { tile: 5,  tKey: null,      dur: 0,  emoji: '💊' },
+  extralife: { tile: 14, tKey: null,      dur: 0,  emoji: '❤️' },
+};
+
+// Active slots displayed at bottom of screen (player chooses up to 4)
+// These are the 4 quick-use slots
+const QUICK_SLOTS_KEY = 'pacsmile_slots';
+let quickSlots = ['pill','turbo','candy','shield']; // default slots
+try {
+  const saved = JSON.parse(localStorage.getItem(QUICK_SLOTS_KEY));
+  if (Array.isArray(saved) && saved.length === 4) quickSlots = saved;
+} catch {}
+
+/* ══ Persistence ══ */
+function getCoins() {
+  return parseInt(localStorage.getItem(COINS_KEY) || '0', 10);
+}
+function setCoins(n) {
+  localStorage.setItem(COINS_KEY, Math.max(0, Math.floor(n)));
+}
+function addCoins(n) {
+  setCoins(getCoins() + n);
+  updateCoinHUD();
+}
+function spendCoins(n) {
+  const c = getCoins();
+  if (c < n) return false;
+  setCoins(c - n);
+  updateCoinHUD();
+  return true;
+}
+
+function getPrices() {
+  try { return JSON.parse(localStorage.getItem(PRICES_KEY)) || {}; } catch { return {}; }
+}
+function savePrices(p) { localStorage.setItem(PRICES_KEY, JSON.stringify(p)); }
+function getCurrentPrice(key) {
+  const prices = getPrices();
+  return prices[key] !== undefined ? prices[key] : BASE_PRICES[key];
+}
+function bumpPrice(key) {
+  const prices = getPrices();
+  prices[key] = getCurrentPrice(key) + (PRICE_INCREMENT[key] || 10);
+  savePrices(prices);
+}
+function resetPrices() {
+  localStorage.removeItem(PRICES_KEY);
+}
+
+function getOwned() {
+  try { return JSON.parse(localStorage.getItem(OWNED_KEY)) || {}; } catch { return {}; }
+}
+function saveOwned(o) { localStorage.setItem(OWNED_KEY, JSON.stringify(o)); }
+function getOwnedCount(key) {
+  return getOwned()[key] || 0;
+}
+function addOwned(key, n = 1) {
+  const o = getOwned();
+  o[key] = Math.min((o[key] || 0) + n, MAX_STACK);
+  saveOwned(o);
+}
+function useOwned(key) {
+  const o = getOwned();
+  if (!o[key] || o[key] <= 0) return false;
+  o[key]--;
+  saveOwned(o);
+  return true;
+}
+
+/* ══ Coins earned in game ══ */
+// Called during gameplay to award coins
+function awardGameCoins(amount, multiply2x = false) {
+  const final = multiply2x ? amount * 2 : amount;
+  addCoins(final);
+  return final;
+}
+
+/* ══ Shop UI ══ */
+function openShop(returnScreen = 'ss') {
+  const overlay = document.getElementById('shop-overlay');
+  overlay.classList.remove('hidden');
+  renderShop();
+  SFX.shop();
+
+  document.getElementById('shop-close-btn').onclick = () => {
+    overlay.classList.add('hidden');
+  };
+  document.getElementById('shop-reset-btn').onclick = () => {
+    confirm2('🔄', t('conf_reset_prices'), t('conf_reset_text'), t('shop_reset_yes'), () => {
+      resetPrices();
+      renderShop();
+      toast('🔄 ' + t('shop_reset') + ' OK');
+    });
+  };
+  document.getElementById('shop-ads-btn').onclick = () => {
+    showAd('shop_coins', () => {
+      addCoins(50);
+      toast(t('toast_coins_earned') + ' +50');
+      SFX.coin();
+      renderShop();
+    });
+  };
+}
+
+function renderShop() {
+  updateCoinHUD();
+  const coins = getCoins();
+  document.getElementById('shop-coins-display').textContent = coins;
+
+  const items = [
+    { key: 'pill',      nameKey: 'pu_pill_name',      descKey: 'pu_pill_desc' },
+    { key: 'turbo',     nameKey: 'pu_turbo_name',     descKey: 'pu_turbo_desc' },
+    { key: 'candy',     nameKey: 'pu_candy_name',     descKey: 'pu_candy_desc' },
+    { key: 'shield',    nameKey: 'pu_shield_name',    descKey: 'pu_shield_desc' },
+    { key: 'bomb',      nameKey: 'pu_bomb_name',      descKey: 'pu_bomb_desc' },
+    { key: 'ice',       nameKey: 'pu_ice_name',       descKey: 'pu_ice_desc' },
+    { key: 'medikit',   nameKey: 'pu_medikit_name',   descKey: 'pu_medikit_desc' },
+    { key: 'extralife', nameKey: 'pu_extralife_name', descKey: 'pu_extralife_desc' },
+  ];
+
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = items.map(item => {
+    const price = getCurrentPrice(item.key);
+    const owned = getOwnedCount(item.key);
+    const canAfford = coins >= price;
+    const pu = PU_MAP[item.key];
+    return `<div class="shop-item ${!canAfford ? 'cant-afford' : ''}">
+      <div class="shop-item-emoji">${pu.emoji}</div>
+      <div class="shop-item-name">${t(item.nameKey)}</div>
+      <div class="shop-item-desc">${t(item.descKey)}</div>
+      <div class="shop-item-owned">x${owned}</div>
+      <div class="shop-item-footer">
+        <button class="shop-buy-btn ${!canAfford ? 'broke' : ''}"
+          onclick="shopBuy('${item.key}')">
+          🪙 ${price}
+        </button>
+        <button class="shop-buy-btn shop-ads-pu-btn"
+          onclick="shopBuyWithAd('${item.key}')">
+          📺 Free
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function shopBuy(key) {
+  const price = getCurrentPrice(key);
+  if (!spendCoins(price)) { toast(t('shop_not_enough')); SFX.hit(); return; }
+  addOwned(key);
+  bumpPrice(key);
+  toast(`${PU_MAP[key].emoji} ${t('shop_purchased')} (x${getOwnedCount(key)})`);
+  SFX.shop();
+  renderShop();
+  updateQuickSlotBar();
+}
+
+function shopBuyWithAd(key) {
+  const pu = PU_MAP[key];
+  // Pause game if running
+  const wasPlaying = window.G && G.player && !G.over && !G.paused;
+  if (wasPlaying) G.paused = true;
+  showRewardedAd(() => {
+    addOwned(key);
+    // Don't bump price for ad purchases
+    toast(`${pu.emoji} ${t('shop_purchased')} FREE! (x${getOwnedCount(key)})`);
+    SFX.shop(); SFX.coin();
+    renderShop();
+    updateQuickSlotBar();
+    if (wasPlaying) { G.paused = false; lastTs=0; tickAcc=0; loop(); }
+  });
+}
+
+/* ══ Quick Slot Bar ══ */
+const ALL_SLOTS=['pill','turbo','candy','shield','bomb','ice','medikit','extralife'];
+
+function updateQuickSlotBar(){
+  const bar=document.getElementById('pu-bar');
+  if(!bar)return;
+  const TICK_MS=160;
+  bar.innerHTML=ALL_SLOTS.map((key,idx)=>{
+    const pu=PU_MAP[key];
+    const owned=getOwnedCount(key);
+    let activeTimer=0;
+    if(window.G&&G.player){
+      if(key==='pill')  activeTimer=G.powerT ||0;
+      if(key==='turbo') activeTimer=G.turboT ||0;
+      if(key==='candy') activeTimer=G.candyT ||0;
+      if(key==='shield')activeTimer=G.shieldT||0;
+    }
+    const isActive=activeTimer>0;
+    const secs=isActive?Math.ceil(activeTimer*TICK_MS/1000):0;
+    const countTxt=isActive?secs+'s':(owned>0?'x'+owned:'');
+    const cls='pu-slot-btn'+(owned>0?' has-item':'  empty')+(isActive?' active':'');
+    return `<button class="${cls}" data-slotkey="${key}"
+      title="${pu?pu.emoji+' '+t('pu_'+key+'_name'):''}">
+      <span class="pu-slot-emoji">${pu?pu.emoji:'—'}</span>
+      <span class="pu-slot-count">${countTxt}</span>
+    </button>`;
+  }).join('');
+}
+
+/* Event delegation — handles both click and touch on pu-bar */
+(function(){
+  function onSlot(e){
+    const btn=e.target.closest('[data-slotkey]');
+    if(!btn)return;
+    e.preventDefault();e.stopPropagation();
+    activateSlot(btn.dataset.slotkey);
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    const bar=document.getElementById('pu-bar');
+    if(bar){
+      bar.addEventListener('pointerdown',onSlot);
+    }
+  });
+  // Also bind immediately in case DOM is already loaded
+  const bar=document.getElementById('pu-bar');
+  if(bar) bar.addEventListener('pointerdown',onSlot);
+})();
+
+function activateSlot(key){
+  // Guard: only block if genuinely not in a game (G.player is null/undefined)
+  const inGame = window.G && G.player && G.player.x !== undefined && !G.over;
+  if(!key) return;
+  //if(!inGame){ toast(t('toast_start_first')); return; }
+  const pu=PU_MAP[key]; if(!pu) return;
+  if(pu.tKey && G[pu.tKey]>0){ toast(t('toast_already_active')); return; }
+  if(!useOwned(key)){ toast(t('toast_no_pu')); SFX.hit(); return; }
+  const wasPaused = G.paused;
+  switch(key){
+    case'pill':
+      G.powerT=28;G.enemies.forEach(e=>{if(!e.dead){e.scared=true;e.scaredT=28;}});
+      G.comboK=0;toast('😱 '+t('toast_frightened'));G.score+=20;SFX.scared();break;
+    case'turbo':G.turboT=22;toast(t('toast_turbo'));G.score+=20;SFX.powerup();break;
+    case'candy':G.candyT=28;toast(t('toast_x2'));G.score+=10;SFX.powerup();break;
+    case'shield':G.shieldT=32;toast(t('toast_shield'));G.score+=25;SFX.shield();break;
+    case'bomb':
+      G.explosions=G.explosions||[];
+      G.enemies.forEach(e=>{if(!e.dead){G.explosions.push({x:e.x,y:e.y,t:12});e.dead=true;e.scared=false;e.frozen=false;e.respawnT=40;}});
+      toast(t('toast_boom'));G.score+=80;SFX.bomb();break;
+    case'ice':
+      G.enemies.forEach(e=>{if(!e.dead){e.frozen=true;e.frozenT=30;e.scared=false;}});
+      toast(t('toast_frozen'));G.score+=40;SFX.ice();break;
+    case'medikit':G.hp=Math.min(100,G.hp+38);toast(t('toast_hp'));G.score+=15;SFX.shield();break;
+    case'extralife':G.lives=Math.min(G.lives+1,5);toast(t('toast_extralife'));G.score+=100;SFX.powerup();updateHUD();break;
+  }
+  updateQuickSlotBar(); updateHUD();
+  G.paused = wasPaused;
+}
+
+/* ══ Coin HUD update ══ */
+function updateCoinHUD() {
+  const el = document.getElementById('hcoins');
+  if (el) el.textContent = getCoins();
+  const el2 = document.getElementById('shop-coins-display');
+  if (el2) el2.textContent = getCoins();
+}
+
+</script>
+
+<div id="sf"></div>
+<div id="light-bg"></div>
+<div id="toast"></div>
+
+<!-- ══ TOP TOOLBAR: sound + lang + theme + shop ══ -->
+<div id="top-toolbar">
+  <button class="toolbar-btn" id="sound-btn" title="Toggle sound">🔊</button>
+  <button class="toolbar-btn" id="lang-btn">🌐 EN</button>
+  <button id="theme-toggle" class="toolbar-btn" title="Toggle theme" aria-label="Toggle theme" style="width:36px;padding:3px 4px;">
+    <span id="theme-icon">🌙</span>
+  </button>
+  <button class="toolbar-btn" id="shop-toolbar-btn" title="Shop" style="background:linear-gradient(135deg,rgba(70,170,255,.2),rgba(26,122,204,.2));border-color:rgba(70,170,255,.4);color:var(--blue)">🛒</button>
+</div>
+<div id="lang-selector" class="hidden"></div>
+
+
+<!-- ══ START SCREEN ══ -->
+<div id="ss" class="screen">
+  <div style="text-align:center">
+    <div class="logo"><span style="-webkit-text-fill-color:initial;background:none;font-size:inherit">😊</span>PacSmile<span style="-webkit-text-fill-color:initial;background:none;font-size:inherit">😊</span></div>
+    <div class="tagline" id="i18n-tagline">✨ The Smiley Maze ✨</div>
+  </div>
+  <div class="card">
+    <div style="font-family:'Boogaloo',cursive;font-size:1.1rem;color:var(--accent);margin-bottom:14px;text-align:center;letter-spacing:1px" id="i18n-setup-title">🎮 Set up your Smile</div>
+    <label class="clbl" for="pn" id="i18n-your-name">Your name</label>
+    <input type="text" id="pn" class="cinp" placeholder="e.g. Paolo…" maxlength="14" autocomplete="off"/>
+    <label class="clbl" id="i18n-choose">Choose your PacSmile</label>
+    <div class="grow" id="chars-grid"></div>
+  </div>
+  <button class="playbtn" id="pbtn">🚀 PLAY!</button>
+  <button class="playbtn" id="shop-ss-btn"
+    style="background:linear-gradient(135deg,#4af,#1a7acc);color:#fff;box-shadow:0 5px 28px rgba(70,170,255,.4);font-size:1.1rem;padding:13px 40px">
+    🛒 <span id="i18n-shop-btn">Shop</span>
+  </button>
+  <button class="playbtn" id="hist-btn"
+    style="background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);box-shadow:none;font-size:1rem;padding:12px 40px">
+    🏆 <span id="i18n-hist-btn">Game History</span>
+  </button>
+  <button class="playbtn" id="help-ss-btn"
+    style="background:var(--hist-item);color:var(--text);border:1.5px solid var(--border);box-shadow:none;font-size:1rem;padding:12px 40px">
+    ❓ <span id="i18n-howto-btn">How to Play</span>
+  </button>
+  <div class="hint" id="i18n-hint">⌨️ Arrows/WASD · 📱 D-Pad touch · 👆 Swipe<br>Collect 🍎 fruits and bring them to your counterpart!</div>
+</div>
+
+<!-- ══ HISTORY SCREEN ══ -->
+<div id="hs-screen" class="screen hidden">
+  <div class="hs-title" id="i18n-hist-title">🏆 Game History</div>
+  <div class="hs-subtitle" id="i18n-hist-sub">Your PacSmile adventures</div>
+  <div id="hs-list"></div>
+  <div class="hs-actions">
+    <button class="hs-btn hs-btn-back" id="hs-back">← Back</button>
+    <button class="hs-btn hs-btn-del" id="hs-clear">🗑️ Clear history</button>
+  </div>
+</div>
+
+<!-- ══ CONFIRM OVERLAY ══ -->
+<div id="conf-ov" class="hidden">
+  <div class="conf-box">
+    <div class="conf-icon" id="conf-icon">⚠️</div>
+    <div class="conf-title" id="conf-title">Are you sure?</div>
+    <div class="conf-text" id="conf-text">Message</div>
+    <div class="conf-btns">
+      <button class="conf-btn conf-no" id="conf-no">Cancel</button>
+      <button class="conf-btn conf-yes" id="conf-yes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHOP OVERLAY ══ -->
+<div id="shop-overlay" class="hidden">
+  <div class="shop-box">
+    <div class="shop-title" id="i18n-shop-title">🛒 Shop</div>
+    <div class="shop-subtitle" id="i18n-shop-sub">Spend your coins wisely!</div>
+    <div class="shop-coins-row">
+      <span class="shop-coins-label">🪙 <span id="i18n-shop-coins">Coins</span>:</span>
+      <span class="shop-coins-val" id="shop-coins-display">0</span>
+    </div>
+    <div id="shop-grid"></div>
+    <div class="shop-actions">
+      <button class="shop-action-btn shop-btn-ads" id="shop-ads-btn">📺 +50 coins</button>
+      <button class="shop-action-btn shop-btn-reset" id="shop-reset-btn">🔄 Reset</button>
+      <button class="shop-action-btn shop-btn-close" id="shop-close-btn">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME SCREEN ══ -->
+<div id="gs" class="screen hidden">
+  <div id="hud">
+    <div class="hs"><span id="hpi" style="font-size:1.1rem">😊</span>
+      <span class="hv" id="hn" style="font-size:.85rem;color:var(--blue)">Name</span></div>
+    <div class="hs"><span class="hl" id="i18n-hud-lvl">LVL</span><span class="hv" id="hlvl">1</span></div>
+    <div class="hs"><span class="hl" id="i18n-hud-score">SCORE</span><span class="hv" id="hsc">0</span></div>
+    <div class="hs"><span class="hl">🪙</span><span class="hv" id="hcoins">0</span></div>
+    <div class="hs"><span class="hl">🍎</span><span class="hv" id="hfr">0/3</span></div>
+    <div class="hs"><span class="hl">❤️</span><div id="hpw"><div id="hpf"></div></div></div>
+    <div class="hs"><span id="hliv">❤️❤️❤️</span></div>
+    <div id="fxs"></div>
+    <button class="hud-iconbtn" id="shop-hud-btn" title="Shop" style="margin-left:auto;margin-right:2px">🛒</button>
+    <button class="hud-iconbtn danger" id="quit-btn" title="Quit game" style="margin-right:2px">🚪</button>
+    <button class="hud-iconbtn" id="pause-btn" title="Pause" style="margin-right:2px">⏸</button>
+    <button class="hud-iconbtn" id="hist-hud-btn" title="History" style="margin-right:2px">🏆</button>
+    <button class="hud-iconbtn" id="help-btn" title="Help" style="margin-right:4px">❓</button>
+  </div>
+  <div id="cw"><canvas id="cv"></canvas></div>
+
+  <!-- ══ BOTTOM ZONE: PU bar + DPAD ══ -->
+  <div id="bottom-zone">
+    <div id="pu-bar"></div>
+    <div id="jz">
+      <!-- Single row dpad: ◀ ▲ ▼ ▶ -->
+      <div class="dpad-row">
+        <button class="db" id="bl">◀</button>
+        <button class="db" id="bu">▲</button>
+        <button class="db" id="bd">▼</button>
+        <button class="db" id="br">▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY (level up / game over) ══ -->
+<div id="ov" class="hidden">
+  <div class="ovb">
+    <div class="oe" id="oe">🎉</div>
+    <div class="ot" id="ot">Title</div>
+    <div class="ox" id="ox">Message</div>
+    <button class="obtn" id="ob">OK</button>
+    <button class="obtn ads-btn hidden" id="ob-ads">📺 Watch Ad</button>
+    <button class="obtn secondary hidden" id="ob2">Continue</button>
+  </div>
+</div>
+
+<!-- ══ COPYRIGHT BAR ══ -->
+<div id="copyright-bar">
+  <span id="copyright-span">© 2026 PISTINO DEVELOPMENT — ppPacSMILE v.02.00 — click for info &amp; license</span>
+</div>
+
+<!-- ══ ABOUT POPUP ══ -->
+<div id="about-popup" class="hidden">
+  <div class="about-box">
+    <div class="about-title" id="i18n-about-title">😊 PacSMILE 😊</div>
+    <div class="about-row"><strong id="i18n-about-ver">Version:</strong> 02.00 — March 2026</div>
+    <div class="about-row"><strong id="i18n-about-genre">Genre:</strong> <span id="i18n-about-genre-val">Maze / Arcade smile-style</span></div>
+    <div class="about-row"><strong id="i18n-about-author">Author:</strong> Paolo Pista.</div>
+    <div class="about-row"><strong id="i18n-about-platform">Platform:</strong> <span id="i18n-about-platform-val">Single-file HTML5 — works on any modern browser and smartphone</span></div>
+    <div class="about-license">
+      <span class="lic-title">⚖ SOFTWARE LICENSE</span>
+      <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
+      <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
+      <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
+      <p>4. OWNERSHIP: All rights, title, and interest in the software remain exclusively with the author.</p>
+      <p>5. DISCLAIMER: The software is provided "AS IS", without warranty of any kind. The author shall not be liable for any damages or claims.</p>
+      <p>By accessing or using this software, you agree to these terms.</p>
+      <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
+    </div>
+    <button class="about-close" id="about-close-btn">✕ Close</button>
+  </div>
+</div>
+
+<!-- ══ HELP POPUP ══ -->
+<div id="help-popup" class="hidden">
+  <div class="about-box" style="max-width:420px">
+    <div class="about-title" id="i18n-help-title">❓ PacSmile Guide</div>
+    <div class="about-row"><strong id="i18n-help-obj-lbl">🎯 Objective:</strong> <span id="i18n-help-obj">Collect fruits 🍎 in the maze and deliver them to your counterpart.</span></div>
+    <div class="about-row"><strong id="i18n-help-ctrl-lbl">🕹️ Controls:</strong> <span id="i18n-help-ctrl">⌨️ Arrows / WASD — 📱 D-Pad touch — 👆 Swipe — ⏸ Space/Esc to pause</span></div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent);font-weight:700" id="i18n-help-pu-lbl">⚡ POWER-UPS</span></div>
+    <div class="about-row" id="i18n-help-pill">🔵 <strong>Pill</strong> — Enemies frightened for a few seconds, you can eat them!</div>
+    <div class="about-row" id="i18n-help-turbo">⭐ <strong>Turbo</strong> — Speed doubled temporarily</div>
+    <div class="about-row" id="i18n-help-candy">🍬 <strong>Candy</strong> — Score x2 for a few seconds</div>
+    <div class="about-row" id="i18n-help-shield">🛡️ <strong>Shield</strong> — Absorbs one enemy hit</div>
+    <div class="about-row" id="i18n-help-medikit">💊 <strong>Medikit</strong> — Restores 38 HP</div>
+    <div class="about-row" id="i18n-help-extralife">❤️ <strong>Extra life</strong> — Gain an additional life</div>
+    <div class="about-row" id="i18n-help-key">🗝️ <strong>Key</strong> — Unlocks a locked passage 🔒</div>
+    <div class="about-row" id="i18n-help-bulb">💡 <strong>Bulb</strong> — Reveals secret passages</div>
+    <div class="about-row" id="i18n-help-bomb">💣 <strong>Bomb</strong> — Eliminates all visible enemies</div>
+    <div class="about-row" id="i18n-help-ice">🧊 <strong>Ice</strong> — Freezes all enemies for a few seconds</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent2);font-weight:700" id="i18n-help-en-lbl">😠 ENEMIES</span></div>
+    <div class="about-row" id="i18n-help-enemies">Level 1 has 2 angry enemies. Each level adds one, up to 10.</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--pink);font-weight:700" id="i18n-help-lv7-lbl">💨 FROM LEVEL 7</span></div>
+    <div class="about-row" id="i18n-help-lv7">The counterpart runs away!</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--blue);font-weight:700" id="i18n-help-shop-lbl">🛒 SHOP &amp; COINS</span></div>
+    <div class="about-row" id="i18n-help-shop">Earn 🪙 coins by collecting fruits, eating enemies, and completing levels. Open the Shop from the toolbar (🛒) to buy power-ups — prices rise each purchase. Each item has a <strong>📺 Free</strong> button to get one via Ad watch.</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--accent);font-weight:700">⚡ POWER-UP BAR</span></div>
+    <div class="about-row">The 8 slots at the bottom of the game screen show your inventory. Power-ups collected in the maze <strong>stack</strong> with purchased ones. <strong>Tap a slot</strong> (or press keys <strong>1–8</strong> on keyboard) to activate. An active effect shows a countdown timer.</div>
+    <div class="about-row" style="margin-top:4px"><span style="color:var(--green);font-weight:700" id="i18n-help-tips-lbl">💡 TIPS</span></div>
+    <div class="about-row" id="i18n-help-tips">• Enemies hide at the start — use the time to grab power-ups!<br>• Use 💣 Bomb when surrounded<br>• Use ⭐ Turbo to escape or chase the counterpart<br>• Combo: eat enemies back-to-back for multiplied points<br>• 📺 Watch Ads to get free power-ups, extra coins, or revive on Game Over!</div>
+    <button class="about-close" id="help-close-btn">✕ Close</button>
+  </div>
+</div>
+
+<script>
+/* ══ THEME SYSTEM ══ */
+const THEME_KEY = 'pacsmile_theme';
+let isDark = localStorage.getItem(THEME_KEY) !== 'light';
+let G = {}, animID = null, pGender = null, pName = '';
+
+function applyTheme(dark) {
+  isDark = dark;
+  document.body.classList.toggle('light', !dark);
+  document.getElementById('theme-icon').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+  if (G && G.grid && G.grid.length && G.player) render();
+}
+document.getElementById('theme-toggle').addEventListener('click', () => applyTheme(!isDark));
+applyTheme(isDark);
+
+/* ══ SOUND BUTTON ══ */
+document.getElementById('sound-btn').addEventListener('click', () => {
+  const on = toggleSound();
+  document.getElementById('sound-btn').textContent = on ? '🔊' : '🔇';
+  if (on) SFX.coin();
+});
+document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+
+/* ══ LANGUAGE SELECTOR ══ */
+function buildLangMenu() {
+  const sel = document.getElementById('lang-selector');
+  sel.innerHTML = getLangList().map(l =>
+    `<button class="lang-opt ${l.code === currentLang ? 'active' : ''}" onclick="chooseLang('${l.code}')">${l.label}</button>`
+  ).join('');
+}
+function chooseLang(code) {
+  setLang(code);
+  buildLangMenu();
+  document.getElementById('lang-btn').textContent = `🌐 ${code.toUpperCase()}`;
+  document.getElementById('lang-selector').classList.add('hidden');
+}
+document.getElementById('lang-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  buildLangMenu();
+  document.getElementById('lang-selector').classList.toggle('hidden');
+});
+document.addEventListener('click', () => document.getElementById('lang-selector').classList.add('hidden'));
+document.getElementById('lang-selector').addEventListener('click', e => e.stopPropagation());
+document.getElementById('lang-btn').textContent = `🌐 ${currentLang.toUpperCase()}`;
+
+/* ══ i18n apply ══ */
+function applyI18n() {
+  const map = {
+    'i18n-tagline': 'tagline',
+    'i18n-setup-title': 'setup_title',
+    'i18n-your-name': 'your_name',
+    'i18n-choose': 'choose_pacsmile',
+    'i18n-shop-btn': 'shop_btn',
+    'i18n-hist-btn': 'history_btn',
+    'i18n-howto-btn': 'howtoplay_btn',
+    'i18n-hud-lvl': 'hud_lvl',
+    'i18n-hud-score': 'hud_score',
+    'i18n-shop-title': 'shop_title',
+    'i18n-shop-sub': 'shop_subtitle',
+    'i18n-shop-coins': 'shop_coins',
+    'i18n-hist-title': 'hist_title',
+    'i18n-hist-sub': 'hist_subtitle',
+    'i18n-about-title': 'about_title',
+    'i18n-about-ver': 'about_version',
+    'i18n-about-genre': 'about_genre',
+    'i18n-about-genre-val': 'about_genre_val',
+    'i18n-about-author': 'about_author',
+    'i18n-about-platform': 'about_platform',
+    'i18n-about-platform-val': 'about_platform_val',
+    'i18n-help-title': 'help_title',
+    'i18n-help-obj-lbl': 'help_objective_label',
+    'i18n-help-obj': 'help_objective',
+    'i18n-help-ctrl-lbl': 'help_controls_label',
+    'i18n-help-ctrl': 'help_controls',
+    'i18n-help-pu-lbl': 'help_powerups_label',
+    'i18n-help-pill': 'help_pill',
+    'i18n-help-turbo': 'help_turbo',
+    'i18n-help-candy': 'help_candy',
+    'i18n-help-shield': 'help_shield',
+    'i18n-help-medikit': 'help_medikit',
+    'i18n-help-extralife': 'help_extralife',
+    'i18n-help-key': 'help_key',
+    'i18n-help-bulb': 'help_bulb',
+    'i18n-help-bomb': 'help_bomb',
+    'i18n-help-ice': 'help_ice',
+    'i18n-help-en-lbl': 'help_enemies_label',
+    'i18n-help-enemies': 'help_enemies',
+    'i18n-help-lv7-lbl': 'help_level7_label',
+    'i18n-help-lv7': 'help_level7',
+    'i18n-help-shop-lbl': 'help_shop_label',
+    'i18n-help-shop': 'help_shop',
+    'i18n-help-tips-lbl': 'help_tips_label',
+    'i18n-help-tips': 'help_tips',
+  };
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = t(key);
+  });
+  // Input placeholder
+  const pn = document.getElementById('pn');
+  if (pn) pn.placeholder = t('name_placeholder');
+  // Play button
+  document.getElementById('pbtn').textContent = t('play_btn');
+  // Buttons with spans
+  document.getElementById('hs-back').textContent = t('hist_back');
+  document.getElementById('hs-clear').textContent = t('hist_clear');
+  document.getElementById('help-close-btn').textContent = t('help_close');
+  document.getElementById('about-close-btn').textContent = '✕ ' + t('help_close').replace('✕ ','');
+  // D-pad hint
+  const ah = document.getElementById('ah');
+  if (ah) ah.innerHTML = t('dpad_hint') + '<br><br><span style="font-size:.6rem;color:var(--text4)">' + t('dpad_hint2') + '</span>';
+  // shop ads btn
+  const sads = document.getElementById('shop-ads-btn');
+  if (sads) sads.textContent = t('shop_ads_coins');
+  // Rebuild history if visible
+  if (!document.getElementById('hs-screen').classList.contains('hidden')) renderHistoryList();
+  if (!document.getElementById('shop-overlay').classList.contains('hidden')) renderShop();
+}
+applyI18n();
+
+/* ══ STARFIELD ══ */
+(()=>{
+  const sf=document.getElementById('sf');
+  for(let i=0;i<100;i++){
+    const s=document.createElement('div');s.className='st';
+    const sz=(Math.random()*1.8+.4).toFixed(1);
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      --a:${(Math.random()*.15).toFixed(2)};--b:${(Math.random()*.5+.2).toFixed(2)};
+      --d:${(Math.random()*4+2).toFixed(1)}s;animation-delay:${(Math.random()*5).toFixed(1)}s`;
+    sf.appendChild(s);
+  }
+})();
+
+/* ══ CONSTANTS ══ */
+const TILE={WALL:0,EMPTY:1,DOT:2,PILL:3,FRUIT:4,MEDIKIT:5,KEY:6,BULB:7,TURBO:8,BOMB:9,CANDY:10,SHIELD:11,LOCKED:12,SECRET:13,EXTRALIFE:14,ICE:15};
+const COLS=19,ROWS=19;
+const CHARS={
+  man:   {emoji:'👨',label:'Man',   color:'#6bcbff',cpEmoji:'👩',cpName:'Woman'},
+  woman: {emoji:'👩',label:'Woman', color:'#ffb3d9',cpEmoji:'👨',cpName:'Man'},
+  male:  {emoji:'😀',label:'Sun',   color:'#ffe566',cpEmoji:'😍',cpName:'Moon'},
+  female:{emoji:'😍',label:'Moon',  color:'#ffb3d9',cpEmoji:'😀',cpName:'Sun'},
+  monkey:{emoji:'🐵',label:'Monkey',color:'#f4a460',cpEmoji:'🦊',cpName:'Fox'},
+  devil: {emoji:'😈',label:'Devil', color:'#ff6b6b',cpEmoji:'😇',cpName:'Angel'},
+  cool:  {emoji:'😎',label:'Cool',  color:'#a8e6a3',cpEmoji:'🤓',cpName:'Nerd'},
+  alien: {emoji:'👽',label:'Alien', color:'#c3b1e1',cpEmoji:'🤖',cpName:'Robot'},
+  robot: {emoji:'🤖',label:'Robot', color:'#88ddff',cpEmoji:'👽',cpName:'Alien'},
+};
+const FRUITS=['🍎','🍊','🍇','🍓','🍑','🫐','🍋','🍒'];
+const IEMOJI={[TILE.PILL]:'🔵',[TILE.MEDIKIT]:'💊',[TILE.KEY]:'🗝️',
+  [TILE.BULB]:'💡',[TILE.TURBO]:'⭐',[TILE.BOMB]:'💣',[TILE.CANDY]:'🍬',[TILE.SHIELD]:'🛡️',[TILE.EXTRALIFE]:'❤️',[TILE.ICE]:'🧊'};
+const HISTORY_KEY='pacsmile_history';
+// Coins per event
+const COIN_REWARDS={fruit_pick:2,fruit_deliver:5,enemy_eat:8,dot:0,level_up:15,powerup_collect:3};
+
+/* ══ CANVAS COLORS ══ */
+function tc(dark,light){return isDark?dark:light;}
+
+/* ══ HISTORY ══ */
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch{return[];}}
+function saveHistory(h){try{localStorage.setItem(HISTORY_KEY,JSON.stringify(h));}catch{}}
+function addHistoryEntry(result){
+  const h=loadHistory();
+  const dur=G.startTime?Math.floor((Date.now()-G.startTime)/1000):0;
+  const mm=Math.floor(dur/60).toString().padStart(2,'0');
+  const ss=(dur%60).toString().padStart(2,'0');
+  h.unshift({name:G.name,gender:G.gender,emoji:G.char.emoji,score:G.score,level:G.level,result,
+    date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+    duration:`${mm}:${ss}`,fruitsTotal:G.fruitsDelivered,coins:getCoins()});
+  if(h.length>50)h.length=50;
+  saveHistory(h);
+}
+
+/* ══ HISTORY SCREEN ══ */
+function showHistoryScreen(returnTo='ss'){
+  hideAll();document.getElementById('hs-screen').classList.remove('hidden');
+  renderHistoryList();
+  document.getElementById('hs-back').onclick=()=>{hideAll();document.getElementById(returnTo).classList.remove('hidden');};
+}
+function renderHistoryList(){
+  const h=loadHistory();const el=document.getElementById('hs-list');
+  if(!h.length){el.innerHTML=`<div class="hs-empty">${t('hist_empty').replace('\\n','<br>')}</div>`;return;}
+  const medals=['🥇','🥈','🥉'];
+  el.innerHTML=h.map((e,i)=>{
+    const badge=e.result==='gameover'
+      ?`<span class="hs-badge badge-go">${t('hist_gameover')}</span>`
+      :`<span class="hs-badge badge-ab">${t('hist_abandoned')}</span>`;
+    const rank=medals[i]||`<span style="color:var(--text3);font-size:1rem">${i+1}</span>`;
+    return`<div class="hs-item ${e.result==='gameover'?'gameover':'abandon'}">
+      <div class="hs-rank">${rank}</div>
+      <div class="hs-main">
+        <div class="hs-name">${e.emoji} ${e.name}</div>
+        <div class="hs-detail">Lv.${e.level} · 🍎 ${e.fruitsTotal} · ⏱ ${e.duration} · ${e.date}</div>
+        <div>${badge}</div></div>
+      <div class="hs-score">${e.score.toLocaleString('en')}<br>
+        <span style="font-size:.65rem;color:var(--text3)">${t('hist_pts')}</span></div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('hs-back').addEventListener('click',()=>{});
+document.getElementById('hist-btn').addEventListener('click',()=>showHistoryScreen('ss'));
+document.getElementById('hs-clear').addEventListener('click',()=>{
+  confirm2('🗑️',t('conf_clear_title'),t('conf_clear_text'),t('conf_delete'),()=>{
+    saveHistory([]);renderHistoryList();toast('🗑️ '+t('hist_clear'));});
+});
+
+/* ══ CONFIRM DIALOG ══ */
+function confirm2(icon,title,text,yesTxt,cb){
+  document.getElementById('conf-icon').textContent=icon;
+  document.getElementById('conf-title').textContent=title;
+  document.getElementById('conf-text').textContent=text;
+  document.getElementById('conf-yes').textContent=yesTxt;
+  document.getElementById('conf-no').textContent=t('conf_cancel_btn');
+  document.getElementById('conf-ov').classList.remove('hidden');
+  const yes=document.getElementById('conf-yes');const no=document.getElementById('conf-no');
+  const cleanup=()=>document.getElementById('conf-ov').classList.add('hidden');
+  const yh=()=>{cleanup();yes.removeEventListener('click',yh);no.removeEventListener('click',nh);cb();};
+  const nh=()=>{cleanup();yes.removeEventListener('click',yh);no.removeEventListener('click',nh);};
+  yes.addEventListener('click',yh);no.addEventListener('click',nh);
+}
+
+/* ══ CHAR SELECT ══ */
+(()=>{
+  const grid=document.getElementById('chars-grid');
+  Object.entries(CHARS).forEach(([key,ch])=>{
+    const b=document.createElement('button');b.className='gbtn';b.dataset.g=key;
+    b.innerHTML=`<span class="ge">${ch.emoji}</span><span>${ch.label||key}</span>`;
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');pGender=key;SFX.collect();
+    });
+    grid.appendChild(b);
+  });
+})();
+
+document.getElementById('pbtn').addEventListener('click',()=>{
+  pName=document.getElementById('pn').value.trim();
+  if(!pName){toast(t('toast_enter_name'));return;}
+  if(!pGender){toast(t('toast_choose_char'));return;}
+  SFX.powerup();startGame();
+});
+
+/* ══ SHOP BUTTONS ══ */
+document.getElementById('shop-ss-btn').addEventListener('click',()=>openShop('ss'));
+document.getElementById('shop-toolbar-btn').addEventListener('click',()=>{
+  if(window.G&&G.player&&!G.over){
+    G.paused=true;
+    openShop('gs');
+    const origClose=document.getElementById('shop-close-btn').onclick;
+    document.getElementById('shop-close-btn').onclick=()=>{
+      document.getElementById('shop-overlay').classList.add('hidden');
+      G.paused=false;lastTs=0;tickAcc=0;loop();
+    };
+  } else {
+    openShop('ss');
+  }
+});
+document.getElementById('shop-hud-btn').addEventListener('click',()=>{
+  if(!G.player||G.over)return;
+  G.paused=true;openShop('gs');
+  document.getElementById('shop-close-btn').onclick=()=>{
+    document.getElementById('shop-overlay').classList.add('hidden');
+    G.paused=false;lastTs=0;tickAcc=0;loop();
+  };
+});
+
+/* ══ QUIT BUTTON ══ */
+document.getElementById('quit-btn').addEventListener('click',()=>{
+  if(G.over||!G.player)return;
+  G.paused=true;
+  confirm2('🚪',t('conf_quit_title'),t('conf_quit_text'),t('conf_quit_yes'),()=>{
+    addHistoryEntry('abandon');cancelAnimationFrame(animID);
+    hideAll();document.getElementById('ss').classList.remove('hidden');
+    toast(t('toast_quit_saved'));G={};updateQuickSlotBar();
+  });
+});
+
+/* ══ HISTORY FROM HUD ══ */
+document.getElementById('hist-hud-btn').addEventListener('click',()=>{
+  if(!G.player||G.over)return;
+  const wasPaused=G.paused;G.paused=true;
+  document.getElementById('pause-btn').textContent='▶';
+  showHistoryScreen('gs-resume');
+  document.getElementById('hs-back').onclick=()=>{
+    hideAll();document.getElementById('gs').classList.remove('hidden');
+    if(!wasPaused){G.paused=false;document.getElementById('pause-btn').textContent='⏸';lastTs=0;tickAcc=0;loop();}
+  };
+});
+
+/* ══ PAUSE ══ */
+document.getElementById('pause-btn').addEventListener('click',()=>{
+  if(G.over||!G.player)return;
+  G.paused=!G.paused;const btn=document.getElementById('pause-btn');
+  if(G.paused){btn.textContent='▶';btn.title='Resume';toast(t('toast_paused'));}
+  else{btn.textContent='⏸';btn.title='Pause';lastTs=0;tickAcc=0;loop();}
+});
+
+/* ══ HELP / ABOUT ══ */
+document.getElementById('copyright-span').addEventListener('click',()=>document.getElementById('about-popup').classList.remove('hidden'));
+document.getElementById('about-close-btn').addEventListener('click',()=>document.getElementById('about-popup').classList.add('hidden'));
+document.getElementById('help-btn').addEventListener('click',()=>{
+  if(G.player&&!G.over)G.paused=true;
+  document.getElementById('help-popup').classList.remove('hidden');
+});
+document.getElementById('help-close-btn').addEventListener('click',()=>{
+  document.getElementById('help-popup').classList.add('hidden');
+  if(G.player&&!G.over){G.paused=false;lastTs=0;tickAcc=0;loop();}
+});
+document.getElementById('help-ss-btn').addEventListener('click',()=>document.getElementById('help-popup').classList.remove('hidden'));
+
+function hideAll(){
+  ['ss','gs','hs-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+}
+
+/* ══ TOAST ══ */
+let toastT=null;
+function toast(m,d=2300){
+  const el=document.getElementById('toast');el.textContent=m;el.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),d);
+}
+
+/* ══ GD SDK INIT ══ */
+initGameDistribution();
+
+/* ══ START GAME ══ */
+function startGame(){
+  hideAll();document.getElementById('gs').classList.remove('hidden');
+  detectTouch();
+  G={
+    name:pName,gender:pGender,char:CHARS[pGender],
+    level:1,score:0,lives:3,hp:100,
+    fruitsHeld:0,fruitsDelivered:0,fruitsGoal:3,
+    keys:0,powerT:0,turboT:0,candyT:0,shieldT:0,hitCooldown:0,respawnT:0,bulbOn:false,
+    grid:[],items:[],player:null,cp:null,enemies:[],explosions:[],
+    cellSize:28,frame:0,mA:.3,mDir:1,
+    paused:false,over:false,comboK:0,
+    startTime:Date.now(),enemyHideT:40,
+    coinsThisLevel:0,
+  };
+  cancelAnimationFrame(animID);lastTs=0;tickAcc=0;enemyTickAcc=0;cpTickAcc=0;
+  initLevel();updateHUD();updateCoinHUD();updateQuickSlotBar();loop();
+}
+
+/* ══ MAZE ══ */
+function genMaze(){
+  const g=Array.from({length:ROWS},()=>Array(COLS).fill(TILE.WALL));
+  function carve(x,y){
+    g[y][x]=TILE.EMPTY;
+    const dirs=shuf([[0,-2],[0,2],[-2,0],[2,0]]);
+    for(const[dx,dy]of dirs){
+      const nx=x+dx,ny=y+dy;
+      if(nx>0&&nx<COLS-1&&ny>0&&ny<ROWS-1&&g[ny][nx]===TILE.WALL){g[y+dy/2][x+dx/2]=TILE.EMPTY;carve(nx,ny);}
+    }
+  }
+  carve(1,1);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(g[y][x]===TILE.EMPTY)g[y][x]=TILE.DOT;
+  return g;
+}
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function initLevel(){
+  G.grid=genMaze();G.items=[];
+  G.fruitsDelivered=0;G.fruitsHeld=0;G.fruitsGoal=2+G.level;
+  G.powerT=0;G.turboT=0;G.candyT=0;G.enemyHideT=40;G.coinsThisLevel=0;
+  const pool=shuf(emptyCells());
+  plN(pool,TILE.PILL,4);
+  plN(pool,TILE.FRUIT,G.fruitsGoal+Math.ceil(G.level/2));
+  if(G.level>=2){plN(pool,TILE.TURBO,2);plN(pool,TILE.CANDY,2);plN(pool,TILE.MEDIKIT,2);}
+  if(G.level>=3){plN(pool,TILE.SHIELD,1);plN(pool,TILE.KEY,2);addLocked(2);}
+  if(G.level>=4){plN(pool,TILE.BULB,1);addSecret(3);}
+  if(G.level>=3)plN(pool,TILE.BOMB,1);
+  if(G.level>=2)plN(pool,TILE.ICE,1);
+  if(G.level>=2&&Math.random()<0.6)plN(pool,TILE.EXTRALIFE,1);
+  spawnPlayer();spawnCP();spawnEnemies(Math.min(1+G.level,10));
+  resizeCvs();
+}
+function emptyCells(){const r=[];for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(G.grid[y][x]===TILE.DOT)r.push({x,y});return r;}
+function plN(pool,t,n){for(let i=0;i<n&&pool.length;i++){const c=pool.pop();G.items.push({x:c.x,y:c.y,type:t,col:false});}}
+function addLocked(n){let p=0;for(let y=1;y<ROWS-1&&p<n;y++)for(let x=1;x<COLS-1&&p<n;x++)if(G.grid[y][x]===TILE.WALL&&Math.random()<.04){const adj=[[0,1],[0,-1],[1,0],[-1,0]].filter(([dx,dy])=>G.grid[y+dy]?.[x+dx]===TILE.DOT);if(adj.length>=2){G.grid[y][x]=TILE.LOCKED;p++;}}}
+function addSecret(n){let p=0;for(let y=1;y<ROWS-1&&p<n;y++)for(let x=1;x<COLS-1&&p<n;x++)if(G.grid[y][x]===TILE.WALL&&Math.random()<.04){G.grid[y][x]=TILE.SECRET;p++;}}
+function freeCell(ex=[]){const excl=new Set(ex.map(p=>`${p.x},${p.y}`));for(let t=0;t<500;t++){const x=~~(Math.random()*COLS),y=~~(Math.random()*ROWS);if((G.grid[y][x]===TILE.DOT||G.grid[y][x]===TILE.EMPTY)&&!excl.has(`${x},${y}`))return{x,y};}return{x:1,y:1};}
+function spawnPlayer(){const p=freeCell();G.player={x:p.x,y:p.y,dx:1,dy:0,ndx:1,ndy:0};}
+function spawnCP(){const p=freeCell([G.player]);G.cp={x:p.x,y:p.y,dx:0,dy:0,tickAcc:0};}
+function spawnEnemies(n){G.enemies=[];for(let i=0;i<n;i++){const p=freeCell([G.player,G.cp,...G.enemies]);G.enemies.push({x:p.x,y:p.y,dx:[1,-1,0,0][i%4],dy:[0,0,1,-1][i%4],scared:false,scaredT:0,frozen:false,frozenT:0,dead:false,respawnT:0});}}
+function respawnCollectedFruits(){const col=G.items.filter(it=>it.type===TILE.FRUIT&&it.col);if(!col.length)return;const pool=shuf(emptyCells());col.forEach(it=>{it.col=false;const pos=pool.pop()||freeCell([G.player,G.cp]);it.x=pos.x;it.y=pos.y;});toast(t('toast_fruits_respawn'));}
+
+/* ══ CANVAS ══ */
+function resizeCvs(){
+  const cwEl=document.getElementById('cw');
+  const avW=cwEl.clientWidth||window.innerWidth;
+  const avH=cwEl.clientHeight||window.innerHeight*0.5;
+  const cw=Math.floor(avW/COLS), ch=Math.floor(avH/ROWS);
+  G.cellSize=Math.max(12,Math.min(cw,ch,40));
+  const cv=document.getElementById('cv');
+  cv.width=COLS*G.cellSize; cv.height=ROWS*G.cellSize;
+}
+window.addEventListener('resize',()=>{if(G.grid)setTimeout(resizeCvs,40);});
+
+/* ══ INPUT ══ */
+document.addEventListener('keydown',e=>{
+  if(!G.player||G.over)return;
+  const m={'ArrowLeft':'L','a':'L','A':'L','ArrowRight':'R','d':'R','D':'R',
+    'ArrowUp':'U','w':'U','W':'U','ArrowDown':'D','s':'D','S':'D'};
+  if(m[e.key]){e.preventDefault();applyDir(m[e.key]);}
+  if(e.key===' '||e.key==='Escape'){e.preventDefault();document.getElementById('pause-btn').click();}
+  // Number keys 1-8 activate power-up slots
+  if(e.key>='1'&&e.key<='8')activateSlot(ALL_SLOTS[parseInt(e.key)-1]);
+});
+function applyDir(d){
+  if(!G.player)return;const p=G.player;
+  if(d==='L'){p.ndx=-1;p.ndy=0;}if(d==='R'){p.ndx=1;p.ndy=0;}
+  if(d==='U'){p.ndx=0;p.ndy=-1;}if(d==='D'){p.ndx=0;p.ndy=1;}
+}
+function detectTouch(){
+  // D-pad always shown — also on desktop (mouse drag works too)
+  document.getElementById('jz').classList.add('vis');
+  resizeCvs();
+}
+[['bu','U'],['bd','D'],['bl','L'],['br','R']].forEach(([id,dir])=>{
+  const btn=document.getElementById(id);
+  const on=e=>{e.preventDefault();applyDir(dir);btn.classList.add('pr');};
+  const off=()=>btn.classList.remove('pr');
+  btn.addEventListener('touchstart',on,{passive:false});btn.addEventListener('touchend',off,{passive:false});
+  btn.addEventListener('mousedown',on);btn.addEventListener('mouseup',off);
+});
+let sx=0,sy=0;
+document.getElementById('cv').addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+document.getElementById('cv').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)+Math.abs(dy)<12)return;
+  if(Math.abs(dx)>Math.abs(dy))applyDir(dx>0?'R':'L');else applyDir(dy>0?'D':'U');
+},{passive:true});
+
+/* ══ MOVEMENT ══ */
+function passable(x,y){
+  if(x<0||x>=COLS||y<0||y>=ROWS)return false;
+  const t=G.grid[y][x];
+  return t!==TILE.WALL&&t!==TILE.LOCKED&&!(t===TILE.SECRET&&!G.bulbOn);
+}
+function movePlayer(){const p=G.player;if(passable(p.x+p.ndx,p.y+p.ndy)){p.dx=p.ndx;p.dy=p.ndy;p.x+=p.dx;p.y+=p.dy;}else if(passable(p.x+p.dx,p.y+p.dy)){p.x+=p.dx;p.y+=p.dy;}}
+function dist(x1,y1,x2,y2){return Math.abs(x1-x2)+Math.abs(y1-y2);}
+function moveEnemies(){
+  if(G.enemyHideT>0)return;
+  G.enemies.forEach(e=>{
+    if(e.dead){if(--e.respawnT<=0){e.dead=false;const p=freeCell([G.player,G.cp]);e.x=p.x;e.y=p.y;}return;}
+    if(e.frozen){if(--e.frozenT<=0)e.frozen=false;return;}
+    const tgt=e.scared?{x:2*e.x-G.player.x,y:2*e.y-G.player.y}:G.player;
+    const dirs=shuf([[1,0],[-1,0],[0,1],[0,-1]]);
+    dirs.sort((a,b)=>{const da=dist(e.x+a[0],e.y+a[1],tgt.x,tgt.y);const db=dist(e.x+b[0],e.y+b[1],tgt.x,tgt.y);return(e.scared?1:-1)*(da-db)+(Math.random()-.5)*2.5;});
+    const ok=dirs.filter(([dx,dy])=>passable(e.x+dx,e.y+dy));
+    const nr=ok.filter(([dx,dy])=>!(dx===-e.dx&&dy===-e.dy));
+    const ch=(nr.length?nr:ok)[0];if(ch){e.x+=ch[0];e.y+=ch[1];e.dx=ch[0];e.dy=ch[1];}
+  });
+}
+let cpTickAcc=0;
+function moveCP(){
+  if(G.level<7)return;
+  const cp=G.cp,p=G.player;cpTickAcc++;if(cpTickAcc<3)return;cpTickAcc=0;
+  const awayX=cp.x-p.x,awayY=cp.y-p.y;
+  const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  dirs.sort((a,b)=>{const da=-(a[0]*awayX+a[1]*awayY);const db=-(b[0]*awayX+b[1]*awayY);return da-db+(Math.random()-.5)*1.5;});
+  const ok=dirs.filter(([dx,dy])=>passable(cp.x+dx,cp.y+dy));
+  const nr=ok.filter(([dx,dy])=>!(dx===-cp.dx&&dy===-cp.dy));
+  const ch=(nr.length?nr:ok)[0];if(ch){cp.x+=ch[0];cp.y+=ch[1];cp.dx=ch[0];cp.dy=ch[1];}
+}
+
+/* ══ PICKUPS ══ */
+function checkPickups(){
+  const p=G.player;
+  if(G.grid[p.y][p.x]===TILE.DOT){
+    G.grid[p.y][p.x]=TILE.EMPTY;
+    const pts=G.candyT>0?2:1;G.score+=pts;
+    // Rare coin from dots
+    if(Math.random()<0.05){const c=awardGameCoins(1);G.coinsThisLevel+=1;}
+    SFX.dot();
+  }
+  G.items.forEach(it=>{if(it.col)return;if(it.x===p.x&&it.y===p.y){it.col=true;collectItem(it.type);}});
+  if(G.fruitsHeld>0&&p.x===G.cp.x&&p.y===G.cp.y){
+    const n=G.fruitsHeld;G.fruitsDelivered+=n;
+    const pts=50*G.level*n*(G.candyT>0?2:1);G.score+=pts;
+    const coins=awardGameCoins(COIN_REWARDS.fruit_deliver*n);G.coinsThisLevel+=coins;
+    toast(`💝 ${t('toast_delivered')} ${n} ${t('toast_fruits')} (${G.fruitsDelivered}/${G.fruitsGoal})`);
+    SFX.deliver();G.fruitsHeld=0;
+    if(G.fruitsDelivered>=G.fruitsGoal)setTimeout(levelUp,600);
+  }
+}
+
+// Map tile types to shop keys for inventory system
+const TILE_TO_SHOP={'3':'pill','8':'turbo','10':'candy','11':'shield','9':'bomb','15':'ice'};
+
+function collectItem(type){
+  // Power-ups that go into inventory (player activates manually)
+  const shopKey = TILE_TO_SHOP[String(type)];
+  if(shopKey){
+    addOwned(shopKey, 1); // adds to shared inventory (stacks with shop purchases)
+    const names={'pill':t('pu_pill_name'),'turbo':t('pu_turbo_name'),'candy':t('pu_candy_name'),
+      'shield':t('pu_shield_name'),'bomb':t('pu_bomb_name'),'ice':t('pu_ice_name')};
+    const cnt = getOwnedCount(shopKey);
+    toast(`${PU_MAP[shopKey].emoji} ${names[shopKey]} → x${cnt} — ${t('toast_tap_to_use')}`);
+    G.score+=15; awardGameCoins(COIN_REWARDS.powerup_collect); SFX.collect();
+    updateQuickSlotBar(); return;
+  }
+  // Instant-use items
+  switch(type){
+    case TILE.FRUIT:
+      G.fruitsHeld++;
+      toast(`🍎 ${t('toast_fruit_pick')} (${G.fruitsHeld} ${t('toast_held')}) ${t('toast_fruit_go')}`);
+      G.score+=10;awardGameCoins(COIN_REWARDS.fruit_pick);SFX.collect();break;
+    case TILE.MEDIKIT:G.hp=Math.min(100,G.hp+38);toast(t('toast_hp'));G.score+=15;SFX.shield();break;
+    case TILE.KEY:
+      G.keys++;outer:for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(G.grid[y][x]===TILE.LOCKED){G.grid[y][x]=TILE.DOT;break outer;}
+      toast(t('toast_unlocked'));G.score+=30;SFX.powerup();break;
+    case TILE.BULB:
+      G.bulbOn=true;for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++)if(G.grid[y][x]===TILE.SECRET)G.grid[y][x]=TILE.DOT;
+      toast(t('toast_secrets'));G.score+=40;SFX.powerup();break;
+    case TILE.EXTRALIFE:G.lives=Math.min(G.lives+1,5);toast(t('toast_extralife'));G.score+=100;SFX.powerup();updateHUD();break;
+  }
+  updateQuickSlotBar();
+}
+
+function checkCollisions(){
+  if(G.enemyHideT>0)return;const p=G.player;
+  if(G.hitCooldown>0)return;
+  G.enemies.forEach(e=>{
+    if(e.dead||e.frozen)return;
+    if(e.x===p.x&&e.y===p.y){
+      if(e.scared){
+        e.dead=true;e.scared=false;e.scaredT=0;e.respawnT=24;G.comboK++;
+        const pts=200*G.comboK*(G.candyT>0?2:1);G.score+=pts;
+        const coins=awardGameCoins(COIN_REWARDS.enemy_eat);G.coinsThisLevel+=coins;
+        toast(`😋 ${t('toast_eaten')} +${pts} ${t('toast_pts')}`);SFX.eat();
+      }else{
+        if(G.shieldT>0){G.shieldT=0;toast(t('toast_shield_absorbed'));G.hitCooldown=20;SFX.shield();return;}
+        G.hp=Math.max(0,G.hp-28);toast(t('toast_hit'));G.hitCooldown=20;SFX.hit();
+        if(G.hp<=0){
+          G.lives--;
+          if(G.lives<=0){G.hp=0;gameOver();}
+          else{G.hp=100;G.fruitsHeld=0;G.hitCooldown=31;G.respawnT=31;G.enemyHideT=35;respawnCollectedFruits();toast(t('toast_life_lost'));spawnPlayer();}
+        }
+      }
+    }
+  });
+}
+
+function tickTimers(){
+  if(G.powerT>0){G.powerT--;if(G.powerT===0)G.enemies.forEach(e=>e.scared=false);}
+  if(G.turboT>0)G.turboT--;if(G.candyT>0)G.candyT--;if(G.shieldT>0)G.shieldT--;
+  if(G.hitCooldown>0)G.hitCooldown--;if(G.respawnT>0)G.respawnT--;
+  if(G.enemyHideT>0)G.enemyHideT--;G.enemies.forEach(e=>{if(e.scaredT>0)e.scaredT--;});
+}
+
+/* ══ LEVEL / GAME OVER ══ */
+function levelUp(){
+  G.level++;G.paused=true;
+  SFX.levelup();
+  const coinsEarned=COIN_REWARDS.level_up+G.level*2;
+  // Show overlay with optional 2x Ad
+  document.getElementById('oe').textContent='🎉';
+  document.getElementById('ot').textContent=`${t('level_title')} ${G.level}!`;
+  // Stats line: score + coins earned this level
+  const statsLine = `🏆 ${G.score.toLocaleString()} pts  ·  🪙 +${G.coinsThisLevel} coins`;
+  const nextLine = `${t('level_goal')} ${2+G.level} ${t('level_fruits')} · ${Math.min(1+G.level,10)} ${t('level_enemies')}`+
+    (G.level>=3?`\n🗝️ ${t('level_locked').replace('🗝️ ','')}`:'')+
+    (G.level>=4?` · 💡 ${t('level_secret').replace('💡 ','')}`:'')+
+    (G.level>=7?`\n${t('level_runaway')}`:'');
+  document.getElementById('ox').innerHTML =
+    `<span style="font-family:'Boogaloo',cursive;font-size:1.1rem;color:var(--accent)">${statsLine}</span>`+
+    `<br><span style="font-size:.85rem">${nextLine.replace(/\n/g,'<br>')}</span>`;
+  // Main continue btn
+  const ob=document.getElementById('ob');ob.textContent=t('levelend_continue');ob.className='obtn';
+  // Ads 2x btn
+  const obAds=document.getElementById('ob-ads');
+  obAds.textContent=t('levelend_2x');obAds.className='obtn ads-btn';obAds.classList.remove('hidden');
+  // Hide secondary
+  document.getElementById('ob2').classList.add('hidden');
+  document.getElementById('ov').classList.remove('hidden');
+
+  const doStart=()=>{
+    document.getElementById('ov').classList.add('hidden');
+    awardGameCoins(coinsEarned);updateCoinHUD();
+    G.paused=false;initLevel();updateHUD();updateQuickSlotBar();
+  };
+
+  ob.onclick=()=>{obAds.onclick=null;doStart();};
+  obAds.onclick=()=>{
+    obAds.onclick=null;ob.onclick=null;
+    document.getElementById('ov').classList.add('hidden');
+    showRewardedAd(()=>{
+      const bonus=awardGameCoins(coinsEarned*2);
+      toast(t('toast_2x_coins')+` +${bonus}`);SFX.coin();
+      G.paused=false;initLevel();updateHUD();updateQuickSlotBar();
+    });
+  };
+}
+
+function gameOver(){
+  G.over=true;G.paused=true;cancelAnimationFrame(animID);
+  addHistoryEntry('gameover');SFX.gameover();
+  document.getElementById('oe').textContent='💀';
+  document.getElementById('ot').textContent=t('gameover_title');
+  document.getElementById('ox').textContent=`${G.name} ${t('gameover_scored')} ${G.score} ${t('gameover_points')} ${G.level}! ${t('gameover_saved')}`;
+  const ob=document.getElementById('ob');ob.textContent=t('gameover_try');ob.className='obtn';
+  // Revive via Ad btn
+  const obAds=document.getElementById('ob-ads');
+  obAds.textContent=t('gameover_ads');obAds.className='obtn ads-btn';obAds.classList.remove('hidden');
+  document.getElementById('ob2').classList.add('hidden');
+  document.getElementById('ov').classList.remove('hidden');
+
+  const doRetry=()=>{hideAll();document.getElementById('ss').classList.remove('hidden');G={};updateQuickSlotBar();};
+  ob.onclick=()=>{obAds.onclick=null;doRetry();};
+  obAds.onclick=()=>{
+    obAds.onclick=null;ob.onclick=null;
+    document.getElementById('ov').classList.add('hidden');
+    showRewardedAd(()=>{
+      // Revive: restore 1 life
+      G.over=false;G.paused=false;G.lives=1;G.hp=100;G.hitCooldown=31;G.respawnT=31;G.enemyHideT=40;
+      spawnPlayer();respawnCollectedFruits();
+      document.getElementById('ov').classList.add('hidden');
+      toast(t('toast_revived'));SFX.powerup();
+      lastTs=0;tickAcc=0;updateHUD();updateQuickSlotBar();loop();
+    });
+  };
+}
+
+/* ══ HUD ══ */
+function updateHUD(){
+  document.getElementById('hpi').textContent=G.char.emoji;
+  document.getElementById('hn').textContent=G.name;
+  document.getElementById('hlvl').textContent=G.level;
+  document.getElementById('hsc').textContent=G.score;
+  document.getElementById('hfr').textContent=(G.fruitsHeld>0?`✊${G.fruitsHeld}+`:'')+`${G.fruitsDelivered}/${G.fruitsGoal}`;
+  document.getElementById('hliv').textContent='❤️'.repeat(Math.max(0,G.lives));
+  const hp=document.getElementById('hpf');
+  hp.style.width=G.hp+'%';
+  hp.style.background=G.hp>60?'linear-gradient(90deg,#ff6b6b,#4ec970)':G.hp>30?'linear-gradient(90deg,#ff9500,#ffcc00)':'#ff3333';
+  const TICK_MS=160;
+  function fxBadge(emoji,ticks){
+    const secs=Math.ceil(ticks*TICK_MS/1000);
+    return`<span style="display:inline-flex;align-items:center;gap:2px;background:rgba(255,204,0,.15);border:1px solid rgba(255,204,0,.3);border-radius:20px;padding:1px 6px;font-size:.75rem;line-height:1.6">${emoji}<span style="font-family:'Boogaloo',cursive;color:var(--accent);font-size:.8rem">${secs}s</span></span>`;
+  }
+  const fxEl=document.getElementById('fxs');let fxHtml='';
+  if(G.powerT>0)fxHtml+=fxBadge('🔵',G.powerT);if(G.turboT>0)fxHtml+=fxBadge('⭐',G.turboT);
+  if(G.candyT>0)fxHtml+=fxBadge('🍬',G.candyT);if(G.shieldT>0)fxHtml+=fxBadge('🛡️',G.shieldT);
+  if(G.respawnT>0)fxHtml+=fxBadge('✨',G.respawnT);
+  fxEl.innerHTML=fxHtml;
+  updateCoinHUD();
+  // Update pu bar timer display
+  updateQuickSlotBar();
+}
+
+/* ══ MAIN LOOP ══ */
+let lastTs=0,tickAcc=0,enemyTickAcc=0;
+const BASE_TICK=160,ENEMY_TICK_EXTRA=40;
+function loop(ts=0){
+  animID=requestAnimationFrame(loop);
+  if(G.over||G.paused)return;
+  const dt=Math.min(ts-lastTs,100);lastTs=ts;
+  const tickMs=BASE_TICK-(G.turboT>0?65:0);
+  tickAcc+=dt;enemyTickAcc+=dt;
+  const moveEn=enemyTickAcc>=tickMs+ENEMY_TICK_EXTRA;
+  if(tickAcc>=tickMs){
+    tickAcc-=tickMs;G.frame++;movePlayer();
+    if(moveEn){enemyTickAcc-=(tickMs+ENEMY_TICK_EXTRA);moveEnemies();}
+    moveCP();checkPickups();checkCollisions();tickTimers();updateHUD();
+  }
+  G.mA+=G.mDir*.05;if(G.mA>=.38)G.mDir=-1;if(G.mA<=.03)G.mDir=1;
+  render();
+}
+
+/* ══ RENDER ══ */
+function render(){
+  const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),C=G.cellSize;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle=tc('#07071a','#e8eeff');ctx.fillRect(0,0,cv.width,cv.height);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    const t=G.grid[y][x],px=x*C,py=y*C;
+    if(t===TILE.WALL){drawWall(ctx,px,py,C,tc('#181848','#c8d0ee'),tc('#28288a','#a0aad8'));}
+    else if(t===TILE.LOCKED){drawWall(ctx,px,py,C,tc('#38106a','#d8c0f0'),tc('#7828a8','#b090d8'));drawEmoji(ctx,'🔒',px+C/2,py+C/2,C*.55);}
+    else if(t===TILE.SECRET){drawWall(ctx,px,py,C,tc('#081e3e','#c0d4f0'),tc('#183870','#90b0e0'));ctx.globalAlpha=.28;ctx.fillStyle=tc('#4af','#1a7acc');ctx.font=`bold ${C*.44}px Quicksand`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('?',px+C/2,py+C/2);ctx.globalAlpha=1;}
+    else if(t===TILE.DOT){ctx.fillStyle=tc('rgba(110,110,190,.32)','rgba(80,80,180,.28)');ctx.beginPath();ctx.arc(px+C/2,py+C/2,C*.09,0,Math.PI*2);ctx.fill();}
+  }
+  G.items.forEach((it,i)=>{
+    if(it.col)return;const bob=Math.sin(G.frame*.1+i*.8)*2.2;
+    if(it.type===TILE.FRUIT)drawEmoji(ctx,FRUITS[(it.x+it.y)%FRUITS.length],it.x*C+C/2,it.y*C+C/2+bob,C*.78);
+    else drawEmoji(ctx,IEMOJI[it.type]||'?',it.x*C+C/2,it.y*C+C/2+bob,C*.78);
+  });
+  drawCP(ctx,C);G.enemies.forEach(e=>drawEnemy(ctx,e,C));drawPlayer(ctx,C);
+  if(G.explosions&&G.explosions.length){
+    G.explosions.forEach(ex=>{
+      const px=ex.x*C+C/2,py=ex.y*C+C/2,prog=1-(ex.t/12);
+      ctx.globalAlpha=1-prog;ctx.font=`${C*(0.9+prog*1.2)}px serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('💥',px,py);ctx.globalAlpha=1;
+    });
+    G.explosions=G.explosions.map(ex=>({...ex,t:ex.t-1})).filter(ex=>ex.t>0);
+  }
+}
+
+function drawWall(ctx,x,y,C,fill,stroke){ctx.fillStyle=fill;ctx.fillRect(x,y,C,C);ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.strokeRect(x+.5,y+.5,C-1,C-1);}
+function drawEmoji(ctx,em,x,y,size){ctx.font=`${size}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(em,x,y);}
+
+function drawPlayer(ctx,C){
+  const p=G.player,px=p.x*C+C/2,py=p.y*C+C/2,r=C*.42;
+  if(G.respawnT>0&&G.frame%4<2)return;
+  ctx.save();ctx.translate(px,py);
+  if(G.shieldT>0){ctx.shadowBlur=22;ctx.shadowColor=`rgba(100,200,255,${.3+.2*Math.sin(G.frame*.3)})`;const sg=ctx.createRadialGradient(0,0,r*.8,0,0,r*1.5);sg.addColorStop(0,'rgba(100,200,255,0)');sg.addColorStop(.7,'rgba(100,200,255,.18)');sg.addColorStop(1,'rgba(100,200,255,0)');ctx.fillStyle=sg;ctx.beginPath();ctx.arc(0,0,r*1.5,0,Math.PI*2);ctx.fill();}
+  if(G.turboT>0){ctx.shadowBlur=18;ctx.shadowColor='#ffcc00';}
+  if(G.candyT>0){ctx.shadowBlur=16;ctx.shadowColor='#ff69b4';}
+  const sc=1+0.06*Math.sin(G.frame*0.35);ctx.scale(sc,sc);
+  ctx.font=`${C*1.05}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(G.char.emoji,0,0);ctx.restore();
+  if(G.fruitsHeld>0){ctx.font=`${C*.52}px serif`;ctx.textAlign='center';ctx.fillText('🍎'.repeat(Math.min(G.fruitsHeld,4)),px,py-r-4);}
+  if(G.frame<80){ctx.fillStyle=tc('rgba(255,255,255,.7)','rgba(20,20,60,.7)');ctx.font=`bold ${Math.max(9,C*.33)}px Quicksand`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(G.name,px,py-r-10);}
+}
+
+function drawCP(ctx,C){
+  const cp=G.cp,px=cp.x*C+C/2,py=cp.y*C+C/2,bob=Math.sin(G.frame*.07)*3;
+  ctx.save();ctx.translate(px,py+bob);
+  const h=ctx.createRadialGradient(0,0,C*.25,0,0,C*.95);h.addColorStop(0,tc('rgba(255,240,80,.22)','rgba(255,200,50,.18)'));h.addColorStop(1,'rgba(255,240,80,0)');
+  ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,0,C*.95,0,Math.PI*2);ctx.fill();
+  drawEmoji(ctx,G.char.cpEmoji,0,0,C*1.05);
+  const nd=Math.max(0,G.fruitsGoal-G.fruitsDelivered);if(nd>0)drawEmoji(ctx,'🍎'.repeat(Math.min(nd,4)),0,-C*.88,C*.46);
+  ctx.fillStyle=tc('rgba(255,255,255,.72)','rgba(20,20,60,.72)');ctx.font=`bold ${Math.max(8,C*.3)}px Quicksand`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(G.char.cpName,0,C*.82);
+  if(G.level>=7){const angle=G.frame*.18;ctx.globalAlpha=0.55+0.3*Math.sin(G.frame*.25);ctx.font=`${C*.5}px serif`;ctx.fillText('💨',Math.cos(angle)*C*.7,Math.sin(angle)*C*.5-C*.6);ctx.globalAlpha=1;}
+  ctx.restore();
+}
+
+function drawEnemy(ctx,e,C){
+  if(e.dead)return;
+  if(G.enemyHideT>0){if(G.enemyHideT>8)return;if(G.frame%6<3)return;}
+  const bob=Math.sin(G.frame*.12+e.x+e.y)*2.2;
+  ctx.save();ctx.translate(e.x*C+C/2,e.y*C+C/2+bob);
+  if(e.frozen){drawEmoji(ctx,'🥶',0,0,C*.92);ctx.fillStyle='rgba(100,200,255,.5)';ctx.fillRect(-C*.38,C*.5,C*.76*(e.frozenT/30),3);}
+  else if(e.scared){const fl=e.scaredT<9&&G.frame%4<2;ctx.globalAlpha=fl?.48:1;drawEmoji(ctx,'😨',0,0,C*.92);ctx.globalAlpha=1;if(e.scaredT>0){ctx.fillStyle=tc('rgba(70,160,255,.45)','rgba(20,100,200,.35)');ctx.fillRect(-C*.38,C*.5,C*.76*(e.scaredT/28),3);}}
+  else{drawEmoji(ctx,'😠',0,0,C*.92);}
+  ctx.restore();
+}
+
+/* ══ BOOT ══ */
+document.getElementById('ss').classList.remove('hidden');
+</script>
+</body>
+</html>
