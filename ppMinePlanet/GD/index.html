@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -154,12 +154,19 @@ body.light .start-input{background:rgba(0,120,60,.04);border-color:rgba(0,120,60
 .start-avatar-display{font-size:1.6rem;line-height:1;}
 
 /* ARCADE TIMER */
-#arcade-timer-wrap{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:85;display:none;align-items:center;gap:8px;padding:4px 14px;background:rgba(0,0,0,.7);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;pointer-events:none;}
+#arcade-timer-wrap{display:none;align-items:center;justify-content:center;gap:8px;padding:3px 10px;width:100%;border-top:1px solid var(--border);pointer-events:none;}
 #arcade-timer-bar{width:200px;height:6px;background:rgba(255,51,85,.15);border:1px solid rgba(255,51,85,.3);border-radius:3px;}
 #arcade-timer-fill{height:100%;background:var(--glow);border-radius:3px;transition:width .5s linear,background .5s;}
 #arcade-timer-txt{font-size:12px;color:var(--glow);letter-spacing:1px;min-width:38px;text-align:right;text-shadow:0 0 8px var(--glow);}
 #arcade-mode-badge{position:fixed;top:60px;right:8px;z-index:84;font-size:8px;color:var(--amber);letter-spacing:2px;text-shadow:0 0 8px var(--amber);background:rgba(0,0,0,.6);border:1px solid rgba(255,170,0,.3);padding:2px 6px;border-radius:3px;display:none;}
-
+@keyframes tick {
+  0%, 100% { transform: rotate(-15deg); }
+  50%      { transform: rotate(15deg); }
+}
+#arcade-timer-txt-icon {
+  display: inline-block;
+  animation: tick 1s ease-in-out infinite;
+}
 /* COINS HUD */
 #coins-hud{display:flex;flex-direction:column;align-items:center;gap:2px;}
 #coins-hud .top-label{color:var(--amber);}
@@ -201,7 +208,7 @@ body.light #shop-overlay{background:rgba(210,235,220,.96);}
 .shop-ads-btn{font-family:'Courier New',monospace;font-size:9px;padding:5px 10px;background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.3);border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all .12s;}
 .shop-ads-btn:hover{background:rgba(0,229,255,.16);box-shadow:0 0 10px rgba(0,229,255,.3);}
 .shop-ads-btn.hidden{display:none;}
-.shop-price{font-size:9px;color:var(--amber);letter-spacing:1px;text-align:right;}
+.shop-price{font-size:9px;color:var(--amber);letter-spacing:1px;text-align:right;display:flex;align-items:center;gap:5px;}
 #shop-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
 #shop-reset-btn{font-family:'Courier New',monospace;font-size:8px;padding:4px 8px;background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.3);border-radius:3px;cursor:pointer;}
 #shop-reset-btn:hover{background:rgba(255,51,85,.2);}
@@ -279,13 +286,20 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 .screen-ad-offer .btn-ad-retry{font-family:'Courier New',monospace;font-size:11px;padding:9px 20px;background:rgba(0,229,255,.12);color:var(--cyan);border:2px solid var(--cyan);border-radius:4px;cursor:pointer;letter-spacing:2px;transition:all .15s;animation:pulse 1.5s infinite;}
 .screen-ad-offer .btn-ad-retry:hover{background:rgba(0,229,255,.25);box-shadow:0 0 18px rgba(0,229,255,.4);}
 
+/* SOUND BUTTON */
+#sound-btn{font-family:'Courier New',monospace;font-size:14px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;line-height:1;}
+#sound-btn:hover{color:var(--glow);border-color:var(--glow);}
+
+/* Inventory qty badge inside shop items */
+.shop-inv-qty{display:inline-block;margin-left:5px;padding:1px 7px;background:rgba(0,255,136,.15);color:var(--glow);border:1px solid rgba(0,255,136,.35);border-radius:10px;font-size:9px;letter-spacing:1px;vertical-align:middle;min-width:18px;text-align:center;}
+.shop-inv-qty:empty{display:none;}
+.price-row{display:flex;align-items:center;gap:5px;}
+
 </style>
 </head>
 <body>
 
-<!-- GameDistribution requires this container div -->
 <div id="game-container" style="position:fixed;inset:0;z-index:-1;pointer-events:none;"></div>
-
 <div id="bg-layer"><canvas id="stars"></canvas></div>
 <div id="light-bg"></div>
 <div id="crt"></div><div id="vignette"></div>
@@ -302,9 +316,9 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <div class="start-tagline">HEX-GRID EXPLORATION · MINESWEEPER ADVENTURE ✦</div>
   </div>
   <div class="start-card">
-    <span class="start-label" data-i18n="start_name_label">YOUR NAME</span>
+    <span class="start-label">YOUR NAME</span>
     <input id="start-name" class="start-input" type="text" placeholder="Enter your name..." maxlength="14" autocomplete="off">
-    <span class="start-label" data-i18n="start_avatar_label">CHOOSE YOUR AVATAR</span>
+    <span class="start-label">CHOOSE YOUR AVATAR</span>
     <div class="avatar-grid" id="avatar-grid"></div>
   </div>
   <button class="start-playbtn" id="start-play-btn">🚀 PLAY!</button>
@@ -312,7 +326,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   <button class="start-secbtn" id="start-shop-btn" onclick="openShop()">🛒 SHOP</button>
   <button class="start-secbtn" id="start-help-btn">❓ HOW TO PLAY</button>
   <div style="display:flex;gap:8px;align-items:center;">
-    <select class="theme-btn" id="lang-select-start" onchange="setLang(this.value)">
+    <select class="theme-btn" id="lang-select-start" onchange="setLang(this.value)" >
       <option value="en">🇬🇧 EN</option>
       <option value="it">🇮🇹 IT</option>
       <option value="fr">🇫🇷 FR</option>
@@ -321,15 +335,16 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
       <option value="pt">🇵🇹 PT</option>
       <option value="zh">🇨🇳 ZH</option>
     </select>
-    <button class="theme-btn" id="arcade-toggle-btn" onclick="toggleArcadeMode()">⏱ ARCADE: OFF</button>
-    <button id="theme-btn" onclick="toggleTheme()">🌗</button>
+    <button class="theme-btn" id="arcade-toggle-btn" onclick="toggleArcadeMode()" >⏱ ARCADE: OFF</button>
+    <button id="sound-btn" onclick="toggleSound()"></button>
+<button id="theme-btn" onclick="toggleTheme()">🌗</button>
   </div>
   <div id="start-footer">
     <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — ppMinePlanet v01.03 — click for info &amp; license</span>
   </div>
 </div>
 
-<!-- HISTORY OVERLAY -->
+<!-- HISTORY OVERLAY (full-screen, from anywhere) -->
 <div id="history-overlay" class="hidden">
   <div id="history-overlay-box">
     <div id="history-overlay-header">
@@ -349,7 +364,6 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
 </div>
 
-<!-- TOP BAR -->
 <div id="topbar">
   <div id="game-title">🌍<U>MINE PLANET</U>🌍</div>
   <div id="player-block">
@@ -361,10 +375,8 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
   <div class="top-stat">
     <span class="top-label">HP</span>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-      <div id="hp-wrap"><div id="hp-fill" style="width:100%"></div></div>
-      <span class="top-val red" id="hp-num">12</span>
-    </div>
+    <div id="hp-wrap"><div id="hp-fill"></div></div>
+    <span class="top-val red" id="hp-num">12</span>
   </div>
   <div class="top-stat">
     <span class="top-label">LVL</span>
@@ -374,7 +386,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <span class="top-label">SCORE</span>
     <span class="top-val" id="score-num">0</span>
   </div>
-  <div id="coins-hud" class="top-stat">
+  <div class="top-stat" id="coins-hud">
     <span class="top-label">COINS</span>
     <span class="top-val amber" id="coins-num">0</span>
   </div>
@@ -387,15 +399,15 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <option value="pt">🇵🇹 PT</option>
     <option value="zh">🇨🇳 ZH</option>
   </select>
-  <button id="theme-btn" onclick="toggleTheme()">🌗</button>
-</div>
-
-<div id="arcade-timer-wrap">
-  <div id="arcade-timer-bar"><div id="arcade-timer-fill" style="width:100%"></div></div>
-  <span id="arcade-timer-txt">--:--</span>
+  <button id="sound-btn" onclick="toggleSound()"></button>
+<button id="theme-btn" onclick="toggleTheme()">🌗</button>
+  <div id="arcade-timer-wrap">
+    <span id="arcade-timer-txt-icon">⏱️</span>
+    <div id="arcade-timer-bar"><div id="arcade-timer-fill" style="width:100%"></div></div>
+    <span id="arcade-timer-txt">--:--</span>
+  </div>
 </div>
 <div id="arcade-mode-badge">⏱ ARCADE</div>
-
 <div id="left-panel">
   <div class="card"><div class="card-title">MINES</div><div class="card-val red" id="mines-val">?</div><div style="font-size:14px;margin-top:3px;color:var(--amber)" id="flags-val"></div><div style="font-size:14px;margin-top:2px;color:var(--red)" id="bombs-hit-val"></div></div>
   <div class="card"><div class="card-title">SAFE</div><div class="card-val" id="safe-val">?</div></div>
@@ -410,18 +422,18 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <div id="toast"></div>
 
 <div id="bottombar">
-  <div id="cell-info">— tap a cell —</div>
+<div id="cell-info">— tap a cell —</div>
   <div class="btn-row">
-    <button class="btn cyan off" id="b-reveal" onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
+    <button class="btn cyan off" id="b-reveal"  onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
     <button class="btn amber off" id="b-collect" onclick="doCollect()">⛏ <u>C</u>OLLECT</button>
-    <button class="btn red off" id="b-flag" onclick="doFlag()">🚩 <u>F</u>LAG</button>
+    <button class="btn red off"  id="b-flag"    onclick="doFlag()">🚩 <u>F</u>LAG</button>
   </div>
   <div id="shop-inv-bar" class="empty"></div>
   <div class="btn-row">
     <button class="zbtn" onclick="zoom(1.15)">🔍＋</button>
     <button class="zbtn" onclick="resetView()">⊙ RESET</button>
     <button class="zbtn" onclick="zoom(0.87)">🔍－</button>
-    <button class="btn" id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
+    <button class="btn " id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
     <button class="btn purple" style="padding:7px 10px;min-width:auto;" onclick="openHistoryOverlay()">📜 HISTORY</button>
     <button class="btn cyan" style="padding:7px 10px;min-width:auto;" onclick="openPopup('popup-help')">❓ HELP</button>
     <button class="btn red" id="b-quit" style="padding:7px 10px;min-width:auto;" onclick="onQuitOrStart()">🏳 QUIT</button>
@@ -439,7 +451,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     </div>
   </div>
   <div id="history-table-wrap">
-    <div id="history-empty">No games recorded yet.</div>
+    <div id="history-empty">No abandoned games recorded yet.</div>
     <table id="history-table" style="display:none;">
       <thead><tr><th>#</th><th>DATE</th><th>PLAYER</th><th>SCORE</th><th>LVL</th><th>RESULT</th></tr></thead>
       <tbody id="history-body"></tbody>
@@ -469,7 +481,6 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
     <button class="btn amber" onclick="backToStart()">🏠 MAIN MENU</button>
   </div>
 </div>
-
 <!-- GAME OVER SCREEN -->
 <div class="screen" id="sc-over">
   <h1 class="red">💀 GAME OVER</h1>
@@ -485,7 +496,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
 </div>
 
-<!-- POPUP: quit confirm -->
+<!-- CUSTOM POPUP: quit confirm -->
 <div class="popup-overlay" id="popup-quit">
   <div class="popup-box">
     <div class="popup-title">🏳 ABANDON GAME?</div>
@@ -500,7 +511,7 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
 </div>
 
-<!-- POPUP: clear history -->
+<!-- CUSTOM POPUP: clear history confirm -->
 <div class="popup-overlay" id="popup-clear">
   <div class="popup-box">
     <div class="popup-title">🗑 CLEAR HISTORY?</div>
@@ -517,17 +528,18 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   <div class="popup-box">
     <div class="popup-title">🌍MINE PLANET🌍</div>
     <div class="popup-body">
-      <p><strong>Version:</strong> 01.03 — March 2026</p>
+      <p><strong>Version:</strong> 01.02 — February 2026</p>
       <p><strong>Genre:</strong> Hex-grid exploration / minesweeper adventure</p>
       <p><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-body" href="mailto:pistino@libero.it">pistino@libero.it</a>)</p>
-      <p><strong>Platform:</strong> HTML5 — runs in any modern browser</p>
+      <p><strong>Platform:</strong> Single-file HTML5 — runs in any modern browser</p>
       <div class="license">
         <p style="color:var(--amber);margin-bottom:6px;letter-spacing:2px;">⚖ SOFTWARE LICENSE</p>
-        <p>1. LICENSE GRANT: Limited, revocable, non-exclusive license for personal, non-commercial use only.</p>
-        <p>2. COMMERCIAL USE: Requires prior written authorization from the author.</p>
-        <p>3. MODIFICATION: Prohibited without explicit written consent.</p>
-        <p>4. OWNERSHIP: All rights remain exclusively with the author.</p>
-        <p>5. DISCLAIMER: Provided "AS IS", without warranty of any kind.</p>
+        <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
+        <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
+        <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
+        <p>4. OWNERSHIP:All rights, title, and interest in the software remain exclusively with the author.</p>
+        <p>5. DISCLAIMER: The software is provided "AS IS", without warranty of any kind. The author shall not be liable for any damages or claims.</p>
+        <p>By accessing or using this software, you agree to these terms.</p>
         <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
       </div>
     </div>
@@ -541,9 +553,10 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
 <div class="popup-overlay" id="popup-help">
   <div class="popup-box" style="max-width:520px;max-height:88vh;overflow-y:auto;">
     <div class="popup-title" data-i18n="help_title">❓ HOW TO PLAY</div>
-    <div class="popup-body">
+    <div class="popup-body" id="help-body">
       <p><strong data-i18n="help_obj_head">🎯 OBJECTIVE</strong></p>
-      <p data-i18n="help_obj">Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level.</p>
+      <p data-i18n="help_obj">Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level. Each level increases in size and difficulty.</p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_ctrl_head">🖱 CONTROLS</strong></p>
       <p data-i18n="help_ctrl">Tap/click a cell to select it. On desktop use keyboard shortcuts:</p>
       <p>• <strong style="color:var(--cyan);">R</strong> — <span data-i18n="help_key_r">Reveal selected cell</span></p>
@@ -552,33 +565,38 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
       <p>• <strong>+/-</strong> — <span data-i18n="help_key_zoom">Zoom in/out</span></p>
       <p>• <strong>0 / ESC</strong> — <span data-i18n="help_key_reset">Reset view</span></p>
       <p>• <strong>Arrows</strong> — <span data-i18n="help_key_pan">Pan the map</span></p>
-      <p>• <strong style="color:#ff0;">CTRL+D</strong> — <span data-i18n="help_key_debug">Toggle Debug Mode</span></p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_actions_head">⚡ ACTIONS</strong></p>
       <p>• 🔍 <strong style="color:var(--cyan);" data-i18n="help_reveal">REVEAL</strong> — <span data-i18n="help_reveal_desc">Uncovers the selected cell. Mine cells cost HP!</span></p>
       <p>• ⛏ <strong style="color:var(--amber);" data-i18n="help_collect">COLLECT</strong> — <span data-i18n="help_collect_desc">Gathers a resource or activates a found item.</span></p>
-      <p>• 🚩 <strong style="color:var(--red);" data-i18n="help_flag">FLAG</strong> — <span data-i18n="help_flag_desc">Marks a suspected mine.</span></p>
+      <p>• 🚩 <strong style="color:var(--red);" data-i18n="help_flag">FLAG</strong> — <span data-i18n="help_flag_desc">Marks a suspected mine. Flagged cells cannot be revealed accidentally.</span></p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_mines_head">⚠ MINES</strong></p>
-      <p data-i18n="help_mines">Revealing a 💣 MINE costs HP. Numbers show adjacent mines. Water hides 💣 WATER MINES too!</p>
+      <p data-i18n="help_mines">Revealing a 💣 MINE costs HP. The number on each revealed cell shows how many mines are adjacent — use logic to find safe cells. Water hides 💣 WATER MINES too!</p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_res_head">📦 RESOURCES</strong></p>
       <p data-i18n="help_res_land">Land: 🌲 Wood · 🪨 Stone · ⚙️ Iron · 🪵 Coal · 🪙 Gold · 💎 Crystal · 🌿 Herbs · 🍄 Mushroom</p>
       <p data-i18n="help_res_water">Water: 🐠 Fish · 🦀 Crab · 🪸 Coral · 🫧 Pearl · 🐙 Octopus</p>
-      <p data-i18n="help_res_info">New resource types unlock as you advance levels.</p>
+      <p data-i18n="help_res_info">New resource types unlock as you advance levels. Collect the exact amounts shown in the right panel.</p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_special_head">✨ SPECIAL ITEMS</strong></p>
-      <p>• 💥 <strong data-i18n="help_bomb">BOMB</strong> — <span data-i18n="help_bomb_desc">Reveals all neighbors (mines = half damage)</span></p>
-      <p>• 🗺️ <strong data-i18n="help_map">MAP</strong> — <span data-i18n="help_map_desc">Reveals random safe terrain cells</span></p>
-      <p>• 🧪 <strong data-i18n="help_potion">POTION</strong> — <span data-i18n="help_potion_desc">60% heal, 40% damage</span></p>
-      <p>• 🔦 <strong data-i18n="help_lantern">LANTERN</strong> — <span data-i18n="help_lantern_desc">Safely illuminates adjacent cells</span></p>
+      <p>• 💥 <strong data-i18n="help_bomb">BOMB</strong> — <span data-i18n="help_bomb_desc">Reveals all neighbors (may hit mines for half damage)</span></p>
+      <p>• 🗺️ <strong data-i18n="help_map">MAP</strong> — <span data-i18n="help_map_desc">Reveals several random safe terrain cells</span></p>
+      <p>• 🧪 <strong data-i18n="help_potion">POTION</strong> — <span data-i18n="help_potion_desc">60% chance to heal, 40% chance to damage</span></p>
+      <p>• 🔦 <strong data-i18n="help_lantern">LANTERN</strong> — <span data-i18n="help_lantern_desc">Safely illuminates all adjacent cells (no mine damage)</span></p>
       <p>• 🩺 <strong data-i18n="help_medkit">MEDKIT</strong> — <span data-i18n="help_medkit_desc">Restores HP when collected</span></p>
-      <p>• 🤖 <strong>AI RESOLVER</strong> — <span data-i18n="item_ai_desc">Reveals the full board step by step</span></p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_shop_head">🛒 SHOP</strong></p>
-      <p data-i18n="help_shop">Earn 🪙 coins by revealing cells. Spend in the Shop or watch ads for free items!</p>
+      <p data-i18n="help_shop">Earn 🪙 coins by revealing cells and collecting resources. Spend them in the Shop to buy items or power-ups. Watch ads to get items for free! Prices increase with each purchase.</p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_arcade_head">⏱ ARCADE MODE</strong></p>
-      <p data-i18n="help_arcade">Complete the level before time runs out! Use ⏳ Time Slowdown to double your time.</p>
+      <p data-i18n="help_arcade">Enable Arcade Mode from the start screen. A countdown timer is set based on the number of cells and resources — complete the level before time runs out! Use ⏳ Time Slowdown from the shop to double your remaining time.</p>
+
       <p style="margin-top:8px;"><strong data-i18n="help_score_head">🏆 SCORING</strong></p>
       <p>• <span data-i18n="help_score_reveal">+5 per revealed cell</span></p>
       <p>• <span data-i18n="help_score_collect">+20×level per collected resource</span></p>
       <p>• <span data-i18n="help_score_level">+200×level for completing a level</span></p>
-      <p>• <span data-i18n="help_score_coins">+coins for reveals &amp; collects</span></p>
+      <p>• <span data-i18n="help_score_coins">+coins for reveals &amp; collects (used in Shop)</span></p>
     </div>
     <div class="popup-actions">
       <button class="btn green" onclick="closePopup('popup-help')" data-i18n="close">✕ CLOSE</button>
@@ -586,48 +604,144 @@ body.light #history-overlay{background:rgba(210,235,220,.96);}
   </div>
 </div>
 
-<!-- SHOP OVERLAY -->
-<div id="shop-overlay">
-  <div id="shop-box">
-    <div id="shop-header">
-      <span id="shop-title">🛒 SHOP</span>
-      <span id="shop-coins-display">🪙 <span id="shop-coins-val">0</span></span>
-    </div>
-    <div id="shop-body">
-      <div class="shop-section-title" data-i18n="shop_items">ITEMS</div>
-      <div class="shop-item"><div class="shop-icon">🩺</div><div class="shop-info"><div class="shop-name" data-i18n="item_medkit">MEDKIT</div><div class="shop-desc" data-i18n="item_medkit_desc">Restores HP immediately</div></div><div class="shop-actions"><div class="shop-price" id="price-medkit"></div><button class="shop-buy-btn" onclick="shopBuy('medkit')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('medkit')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-      <div class="shop-item"><div class="shop-icon">🔦</div><div class="shop-info"><div class="shop-name" data-i18n="item_lantern">LANTERN</div><div class="shop-desc" data-i18n="item_lantern_desc">Safely illuminates all adjacent cells</div></div><div class="shop-actions"><div class="shop-price" id="price-lantern"></div><button class="shop-buy-btn" onclick="shopBuy('lantern')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('lantern')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-      <div class="shop-item"><div class="shop-icon">🗺️</div><div class="shop-info"><div class="shop-name" data-i18n="item_map">MAP</div><div class="shop-desc" data-i18n="item_map_desc">Reveals several random safe terrain cells</div></div><div class="shop-actions"><div class="shop-price" id="price-map"></div><button class="shop-buy-btn" onclick="shopBuy('map')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('map')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-      <div class="shop-section-title" data-i18n="shop_powerups">POWER-UPS</div>
-      <div class="shop-item"><div class="shop-icon">🛡️</div><div class="shop-info"><div class="shop-name" data-i18n="item_invinc">INVINCIBILITY</div><div class="shop-desc" data-i18n="item_invinc_desc">No HP damage for the entire match</div></div><div class="shop-actions"><div class="shop-price" id="price-invincible"></div><button class="shop-buy-btn" onclick="shopBuy('invincible')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('invincible')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-      <div class="shop-item" id="shop-slowtime-item"><div class="shop-icon">⏳</div><div class="shop-info"><div class="shop-name" data-i18n="item_slowtime">TIME SLOWDOWN</div><div class="shop-desc" data-i18n="item_slowtime_desc">Doubles remaining time (Arcade only)</div></div><div class="shop-actions"><div class="shop-price" id="price-slowtime"></div><button class="shop-buy-btn" onclick="shopBuy('slowtime')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('slowtime')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-      <div class="shop-item"><div class="shop-icon">🤖</div><div class="shop-info"><div class="shop-name" data-i18n="item_ai">AI RESOLVER</div><div class="shop-desc" data-i18n="item_ai_desc">Reveals the full board step by step</div></div><div class="shop-actions"><div class="shop-price" id="price-ai"></div><button class="shop-buy-btn" onclick="shopBuy('ai')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('ai')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
-    </div>
-    <div id="shop-footer">
-      <button id="shop-reset-btn" onclick="shopReset()" data-i18n="shop_reset">↺ RESET PRICES &amp; WALLET</button>
-      <button class="btn green" style="font-size:9px;padding:5px 12px;min-width:auto;" onclick="closeShop()" data-i18n="close">✕ CLOSE</button>
-    </div>
-  </div>
-</div>
 
-<!-- AD OVERLAY (fallback simulation) -->
-<div id="ad-overlay">
-  <div id="ad-box">
-    <div id="ad-label">📺 ADVERTISEMENT</div>
-    <div id="ad-content">🎮</div>
-    <div id="ad-skip-wrap"><span id="ad-countdown"></span></div>
-    <button id="ad-skip-btn" onclick="adSkip()">✓ CLAIM REWARD</button>
-  </div>
-</div>
 
-<!-- AI RESOLVER OVERLAY -->
-<div id="ai-overlay">
-  <div id="ai-label">🤖 AI RESOLVING...</div>
-</div>
+<script>
+// GD_OPTIONS MUST be defined before main.min.js loads
+var GD_SDK_LOADED = true;
+const USE_ADS = true;
+var gdsdkRewardCallback = null;
+var gdsdkInterstitialCallback = null;
+var _adWatchStarted = false;      // flag: abbiamo avviato un rewarded?
+var _rewardTimeoutId = null;      // timeout di sicurezza
 
-<!-- GameDistribution SDK — must load before game scripts -->
+// ── Funzioni helper one-shot ──
+function _fireReward(){
+  clearTimeout(_rewardTimeoutId); _rewardTimeoutId = null; _adWatchStarted = false;
+  if(gdsdkRewardCallback){var f=gdsdkRewardCallback;gdsdkRewardCallback=null;f();}
+}
+function _fireInterstitial(){
+  if(gdsdkInterstitialCallback){var f=gdsdkInterstitialCallback;gdsdkInterstitialCallback=null;f();}
+}
+function _cancelReward(){
+  clearTimeout(_rewardTimeoutId); _rewardTimeoutId = null; _adWatchStarted = false;
+  gdsdkRewardCallback = null;
+}
+
+// ── Listener postMessage: canale diretto usato dal SDK GD in iframe ──
+// GD manda i suoi eventi sia tramite onEvent che tramite postMessage sul window.
+// Ascoltare entrambi garantisce la ricezione anche in contesti iframe isolati.
+window.addEventListener('message', function(e){
+  var d = e.data;
+  if(!d || typeof d !== 'object') return;
+  var name = d.name || d.type || d.eventName || '';
+  if(!name) return;
+  // Normalizza: accetta sia 'SDK_GAME_START' che 'gd_game_start' ecc.
+  var n = String(name).toUpperCase().replace(/-/g,'_');
+  if(n === 'SDK_GAME_START' || n === 'GD_GAME_START'){
+    if(_audioCtx) _audioCtx.resume();
+    if(_adWatchStarted) _fireReward();  // era un rewarded → dai il premio
+    else _fireInterstitial();           // era un interstitial
+  }
+  if(n === 'SDK_REWARDED_WATCH_COMPLETE' || n === 'GD_REWARDED_WATCH_COMPLETE'){
+    _fireReward();
+  }
+  if(n === 'SDK_ALL_ADS_COMPLETED' || n === 'GD_ALL_ADS_COMPLETED'){
+    if(_adWatchStarted) _fireReward(); else _fireInterstitial();
+  }
+  if(n === 'SDK_GAME_PAUSE' || n === 'GD_GAME_PAUSE'){
+    if(_audioCtx) _audioCtx.suspend();
+  }
+  if(n === 'SDK_REWARDED_WATCH_INCOMPLETE' || n === 'GD_REWARDED_WATCH_INCOMPLETE'){
+    toast('📺 Ad skipped — no reward');
+    _cancelReward();
+  }
+  if(n === 'SDK_ERROR' || n === 'GD_ERROR'){
+    if(gdsdkRewardCallback){var ecb=gdsdkRewardCallback;gdsdkRewardCallback=null;showAdSimulation(ecb,true);}
+    _adWatchStarted=false;
+  }
+  if(n === 'SDK_INTERSTITIAL_CLOSE' || n === 'SDK_INTERSTITIAL_DISMISSED'){
+    _fireInterstitial();
+  }
+});
+
+window['GD_OPTIONS'] = {
+  gameId: 'YOUR_GAME_ID_HERE', // ← Sostituisci con il tuo Game ID a 32 caratteri
+  advertisingEnabled: true,
+  onEvent: function(event) {
+    // IMPORTANTE: onEvent viene chiamato dal SDK GD con scope proprio.
+    // Non usare funzioni esterne — tutto inline con var globali dichiarate con var.
+    var n = (event && event.name) ? event.name : '';
+
+    if(n === 'SDK_READY'){
+      GD_SDK_LOADED = true;
+      return;
+    }
+
+    if(n === 'SDK_REWARDED_WATCH_COMPLETE'){
+      // Il video rewarded è stato guardato completamente — dai il premio
+      clearTimeout(_rewardTimeoutId);
+      _rewardTimeoutId = null;
+      _adWatchStarted = false;
+      var cb = gdsdkRewardCallback;
+      gdsdkRewardCallback = null;
+      if(cb) cb();
+      return;
+    }
+
+    if(n === 'SDK_GAME_START'){
+      // Ad terminato — riprendi il gioco
+      try { if(window._audioCtx) window._audioCtx.resume(); } catch(e){}
+      if(_adWatchStarted){
+        // Era un rewarded — ma il premio lo ha già dato SDK_REWARDED_WATCH_COMPLETE
+        // Se però quel evento non è arrivato, lo diamo ora come fallback
+        clearTimeout(_rewardTimeoutId);
+        _rewardTimeoutId = null;
+        _adWatchStarted = false;
+        var cb2 = gdsdkRewardCallback;
+        gdsdkRewardCallback = null;
+        if(cb2) cb2();
+      } else {
+        // Era un interstitial
+        var cb3 = gdsdkInterstitialCallback;
+        gdsdkInterstitialCallback = null;
+        if(cb3) cb3();
+      }
+      return;
+    }
+
+    if(n === 'SDK_REWARDED_WATCH_INCOMPLETE'){
+      clearTimeout(_rewardTimeoutId);
+      _rewardTimeoutId = null;
+      _adWatchStarted = false;
+      gdsdkRewardCallback = null;
+      return;
+    }
+
+    if(n === 'SDK_ERROR'){
+      clearTimeout(_rewardTimeoutId);
+      _rewardTimeoutId = null;
+      _adWatchStarted = false;
+      // In caso di errore lasciamo il timeout di sicurezza dare il premio
+      // Non chiamiamo showAdSimulation da qui perché potrebbe non essere definita ancora
+      return;
+    }
+
+    if(n === 'SDK_GAME_PAUSE'){
+      try { if(window._audioCtx) window._audioCtx.suspend(); } catch(e){}
+      return;
+    }
+
+    if(n === 'SDK_INTERSTITIAL_CLOSE' || n === 'SDK_INTERSTITIAL_DISMISSED'){
+      var cb4 = gdsdkInterstitialCallback;
+      gdsdkInterstitialCallback = null;
+      if(cb4) cb4();
+      return;
+    }
+  }
+};
+</script>
 <script src="https://html5.api.gamedistribution.com/main.min.js"></script>
-
 <script>
 // ════════════════════════════════════════════════════════════════════════════
 // ── MULTILANGUAGE SYSTEM
@@ -1123,60 +1237,45 @@ function applyI18n() {
 // ════════════════════════════════════════════════════════════════════════════
 // ── GAME DISTRIBUTION SDK INTEGRATION
 // ════════════════════════════════════════════════════════════════════════════
-var GD_SDK_LOADED = false;
-const USE_ADS = true; // GameDistribution handles real ads; simulation is fallback
-var gdsdkRewardCallback = null;
-var gdsdkInterstitialCallback = null;
+// GD vars + GD_OPTIONS defined in pre-script
 
-window['GD_OPTIONS'] = {
-  gameId: '7dee7cfb5a454ba8a7a89ad55e11a80c',
-  advertisingEnabled: true,
-  onEvent: function(event) {
-    switch (event.name) {
-      case 'SDK_GAME_START':   break;
-      case 'SDK_GAME_PAUSE':   break;
-      case 'SDK_READY':
-        GD_SDK_LOADED = true;
-        break;
-      case 'SDK_REWARDED_WATCH_COMPLETE':
-        if (gdsdkRewardCallback) { gdsdkRewardCallback(); gdsdkRewardCallback = null; }
-        break;
-      case 'SDK_REWARDED_WATCH_INCOMPLETE':
-      case 'SDK_ERROR':
-        if (gdsdkRewardCallback) { gdsdkRewardCallback(); gdsdkRewardCallback = null; }
-        break;
-      case 'SDK_INTERSTITIAL_CLOSE':
-      case 'SDK_INTERSTITIAL_DISMISSED':
-        if (gdsdkInterstitialCallback) { gdsdkInterstitialCallback(); gdsdkInterstitialCallback = null; }
-        break;
+
+// ── showRewardedAd ──
+function showRewardedAd(callback) {
+  if(GD_SDK_LOADED && typeof gdsdk !== 'undefined'){
+    try{
+      gdsdkRewardCallback = callback;
+      _adWatchStarted = true;
+      gdsdk.showAd(gdsdk.AdType.Rewarded);
+      // Timeout di sicurezza: se dopo 60s nessun evento arriva, diamo comunque il premio
+      // (può succedere se il SDK non manda eventi in certi contesti)
+      _rewardTimeoutId = setTimeout(function(){
+        if(gdsdkRewardCallback){
+          console.warn('GD reward timeout — forcing reward');
+          _fireReward();
+        }
+      }, 60000);
+      return;
+    }catch(e){
+      gdsdkRewardCallback=null; _adWatchStarted=false;
     }
   }
-};
-
-// Show a rewarded ad via GD SDK (falls back to simulation if SDK not loaded)
-function showRewardedAd(callback) {
-  gdsdkRewardCallback = callback;
-  if (GD_SDK_LOADED && typeof gdsdk !== 'undefined') {
-    try {
-      gdsdk.showAd(gdsdk.AdType.Rewarded);
-      return;
-    } catch(e) {}
-  }
-  // Fallback simulation
+  // Fallback: simulazione locale
   showAdSimulation(callback, true);
 }
 
-// Show an interstitial ad via GD SDK
+// ── showInterstitialAd ──
 function showInterstitialAd(callback) {
-  gdsdkInterstitialCallback = callback;
-  if (GD_SDK_LOADED && typeof gdsdk !== 'undefined') {
-    try {
+  if(GD_SDK_LOADED && typeof gdsdk !== 'undefined'){
+    try{
+      gdsdkInterstitialCallback = callback;
       gdsdk.showAd(gdsdk.AdType.Interstitial);
       return;
-    } catch(e) {}
+    }catch(e){
+      gdsdkInterstitialCallback=null;
+    }
   }
-  // Fallback simulation — fire immediately
-  if (callback) { setTimeout(callback, 200); gdsdkInterstitialCallback = null; }
+  if(callback) setTimeout(callback, 200);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1189,6 +1288,168 @@ function toggleTheme(){
   localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
 }
 if (!isDark) {document.body.classList.add('light');} else {document.body.classList.remove('light');}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── SOUND SYSTEM (Web Audio API — no external files)
+// ════════════════════════════════════════════════════════════════════════════
+const SOUND_KEY = 'mineplanet-sound';
+let soundEnabled = localStorage.getItem(SOUND_KEY) !== 'off';
+let _audioCtx = null;
+
+function _getAudioCtx() {
+  if (!_audioCtx) {
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  // Resume if suspended (browser autoplay policy)
+  if (_audioCtx && _audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  try { localStorage.setItem(SOUND_KEY, soundEnabled ? 'on' : 'off'); } catch(e) {}
+  document.querySelectorAll('#sound-btn').forEach(b => b.textContent = soundEnabled ? '🔊' : '🔇');
+  if (soundEnabled) sfx('click');
+}
+
+// Core synth: plays a shaped tone burst
+// type: 'sine'|'square'|'sawtooth'|'triangle'
+// freq: Hz, freq2: end Hz (for sweep), dur: seconds, vol: 0-1, delay: seconds
+function _tone(type, freq, freq2, dur, vol, delay) {
+  if (!soundEnabled) return;
+  const ctx = _getAudioCtx(); if (!ctx) return;
+  const t = ctx.currentTime + (delay || 0);
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, t);
+  if (freq2 !== freq) osc.frequency.exponentialRampToValueAtTime(Math.max(1, freq2), t + dur);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.start(t); osc.stop(t + dur + 0.01);
+}
+
+// Noise burst (for explosions)
+function _noise(dur, vol, delay) {
+  if (!soundEnabled) return;
+  const ctx = _getAudioCtx(); if (!ctx) return;
+  const t = ctx.currentTime + (delay || 0);
+  const bufSize = ctx.sampleRate * dur;
+  const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 400; filter.Q.value = 0.5;
+  const gain = ctx.createGain();
+  src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  gain.gain.setValueAtTime(vol, t);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.start(t); src.stop(t + dur + 0.01);
+}
+
+// ── Named sound effects ──
+function sfx(name) {
+  if (!soundEnabled) return;
+  switch(name) {
+
+    // UI
+    case 'click':      _tone('sine',  440, 480, 0.06, 0.15); break;
+    case 'flag':       _tone('square',220, 260, 0.08, 0.12);
+                       _tone('square',320, 360, 0.08, 0.10, 0.06); break;
+    case 'unflag':     _tone('square',320, 200, 0.10, 0.10); break;
+
+    // Reveal — safe terrain
+    case 'reveal':     _tone('sine',  600, 700, 0.07, 0.10); break;
+    // Reveal — water
+    case 'water':      _tone('sine',  320, 280, 0.12, 0.12);
+                       _tone('sine',  480, 520, 0.10, 0.08, 0.04); break;
+    // Reveal — flood fill (many cells at once)
+    case 'flood':      _tone('sine',  500, 900, 0.20, 0.10);
+                       _tone('sine',  700, 1100,0.18, 0.08, 0.05); break;
+
+    // Mine hit
+    case 'mine':       _noise(0.35, 0.5);
+                       _tone('sawtooth', 180, 60, 0.35, 0.30);
+                       _tone('square',   90,  40, 0.40, 0.20, 0.05); break;
+
+    // Collect resource
+    case 'collect':    _tone('sine',  660, 880, 0.08, 0.12);
+                       _tone('sine',  880, 1100,0.10, 0.10, 0.06); break;
+    // Collect gold/crystal (rarer = nicer sound)
+    case 'collect_rare': _tone('sine', 880, 1320, 0.10, 0.14);
+                         _tone('sine', 1100,1760, 0.10, 0.12, 0.06);
+                         _tone('sine', 1320,1760, 0.12, 0.10, 0.12); break;
+
+    // Portal found
+    case 'portal':     _tone('sine',  440, 880, 0.20, 0.14);
+                       _tone('sine',  660, 1320,0.22, 0.12, 0.08);
+                       _tone('triangle',880,1760,0.25, 0.10, 0.16); break;
+    // Portal activated (win)
+    case 'portal_go':  for(let i=0;i<6;i++) _tone('sine', 440*Math.pow(2,i/6), 440*Math.pow(2,(i+1)/6), 0.12, 0.15, i*0.10); break;
+
+    // Items found
+    case 'item_found': _tone('triangle',600, 900, 0.10, 0.14);
+                       _tone('sine',    900,1200, 0.10, 0.12, 0.08); break;
+
+    // Medkit used (heal)
+    case 'heal':       _tone('sine',  523, 659, 0.10, 0.14);
+                       _tone('sine',  659, 784, 0.10, 0.12, 0.08);
+                       _tone('sine',  784, 1046,0.14, 0.10, 0.16); break;
+    // Bad potion (damage)
+    case 'poison':     _tone('sawtooth',300, 150, 0.20, 0.15);
+                       _tone('sawtooth',200, 100, 0.25, 0.12, 0.10); break;
+
+    // Bomb detonation
+    case 'bomb':       _noise(0.25, 0.6);
+                       _tone('sawtooth',220, 80, 0.30, 0.25);
+                       _tone('square',  160, 60, 0.35, 0.20, 0.04); break;
+
+    // Map reveal
+    case 'map':        _tone('sine', 440, 660, 0.15, 0.10);
+                       _tone('sine', 550, 880, 0.18, 0.08, 0.07);
+                       _tone('sine', 660,1100, 0.20, 0.07, 0.14); break;
+
+    // Lantern
+    case 'lantern':    _tone('triangle',800,1200, 0.15, 0.10);
+                       _tone('sine',    600, 900, 0.18, 0.08, 0.06); break;
+
+    // Flag
+    case 'buy':        _tone('sine',  523, 659, 0.08, 0.12);
+                       _tone('sine',  784,1046, 0.10, 0.14, 0.07); break;
+
+    // Level start
+    case 'level_start': _tone('sine', 330, 440, 0.10, 0.12);
+                        _tone('sine', 440, 550, 0.10, 0.14, 0.10);
+                        _tone('sine', 550, 660, 0.14, 0.12, 0.20); break;
+
+    // Win!
+    case 'win':        [523,659,784,1046,1318].forEach((f,i)=>_tone('sine',f,f*1.02,0.18,0.18,i*0.12)); break;
+
+    // Game over
+    case 'gameover':   [440,370,330,220].forEach((f,i)=>_tone('sawtooth',f,f*0.95,0.22,0.20,i*0.18));
+                       _noise(0.4, 0.2, 0.20); break;
+
+    // Coins earned
+    case 'coins':      _tone('sine', 880,1320, 0.07, 0.12);
+                       _tone('sine',1320,1760, 0.07, 0.10, 0.05); break;
+
+    // AI resolver step
+    case 'ai_step':    _tone('sine', 400, 500, 0.04, 0.05); break;
+
+    // Error / can't do that
+    case 'error':      _tone('square',200, 180, 0.10, 0.12);
+                       _tone('square',180, 160, 0.10, 0.10, 0.08); break;
+  }
+}
+
+// Initialise button state on load
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('#sound-btn').forEach(b => b.textContent = soundEnabled ? '🔊' : '🔇');
+});
+
 
 // ── STARS ──
 (()=>{
@@ -1354,6 +1615,7 @@ function buildPlanet(){
   if(cfg2.octopusNeed)objective.octopus=cfg2.octopusNeed;
   sel=null;camX=0;camY=0;camZ=1;
   updateUI();drawAll();
+  sfx('level_start');
 }
 
 function findCell(q,r){return cells.find(c=>c.q===q&&c.r===r)||null;}
@@ -1376,12 +1638,20 @@ function hexPath(sx,sy,sz,gap){
 function drawAll(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
+  // Prima passata: tutte le celle NON selezionate
   cells.forEach(c=>{
+    if(c===sel)return;
     const sp=worldToScreen(c.px,c.py);
     const sz=hexSize*camZ;
     if(sp.x<-sz||sp.x>canvas.width+sz||sp.y<-sz||sp.y>canvas.height+sz)return;
     drawHex(c,sp.x,sp.y,sz);
   });
+  // Seconda passata: cella selezionata disegnata PER ULTIMA → sempre in primo piano
+  if(sel){
+    const sp=worldToScreen(sel.px,sel.py);
+    const sz=hexSize*camZ;
+    drawHex(sel,sp.x,sp.y,sz);
+  }
   ctx.restore();
 }
 
@@ -1447,16 +1717,16 @@ function doReveal(){
   const sp=worldToScreen(sel.px,sel.py);
   if(sel.type==='mine'||sel.type==='waterMine'){
     const dmg=Math.max(2,3+Math.floor(level/3));hp-=dmg;shakeT=450;bombsHit++;
-    flashFn('#ff1133','.3');spawnBurst(sp.x,sp.y,'#ff3355',20);spawnBurst(sp.x,sp.y,'#ff8800',8);
+    sfx('mine');flashFn('#ff1133','.3');spawnBurst(sp.x,sp.y,'#ff3355',20);spawnBurst(sp.x,sp.y,'#ff8800',8);
     toast(`💥 MINE! −${dmg} HP`);updateHpUI();updateMinesUI();if(hp<=0){gameOver();return;}
-  } else if(sel.type==='medkit'){spawnBurst(sp.x,sp.y,'#ff4444',8);toast(`🩺 MEDKIT found! Press ⛏ COLLECT to use it`);
-  } else if(sel.type==='bomb'){spawnBurst(sp.x,sp.y,'#ff8800',10);toast(`💥 BOMB found! Press ⛏ COLLECT to detonate`);
-  } else if(sel.type==='map'){spawnBurst(sp.x,sp.y,'#44ffff',10);toast(`🗺️ MAP found! Press ⛏ COLLECT to reveal terrain`);
-  } else if(sel.type==='potion'){spawnBurst(sp.x,sp.y,'#aa44ff',10);toast(`🧪 POTION found! Press ⛏ COLLECT to drink`);
-  } else if(sel.type==='lantern'){spawnBurst(sp.x,sp.y,'#ffee44',10);toast(`🔦 LANTERN found! Press ⛏ COLLECT to illuminate`);
-  } else if(sel.type==='portal'){spawnBurst(sp.x,sp.y,'#aa44ff',18);toast('🌀 PORTAL FOUND! Collect resources then use COLLECT here');
-  } else if(WATER_TYPES.includes(sel.type)){spawnBurst(sp.x,sp.y,'#0088ff',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);
-  } else {spawnBurst(sp.x,sp.y,isDark?'#00ff88':'#008844',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);}
+  } else if(sel.type==='medkit'){sfx('item_found');spawnBurst(sp.x,sp.y,'#ff4444',8);toast(`🩺 MEDKIT found! Press ⛏ COLLECT to use it`);
+  } else if(sel.type==='bomb'){sfx('item_found');spawnBurst(sp.x,sp.y,'#ff8800',10);toast(`💥 BOMB found! Press ⛏ COLLECT to detonate`);
+  } else if(sel.type==='map'){sfx('item_found');spawnBurst(sp.x,sp.y,'#44ffff',10);toast(`🗺️ MAP found! Press ⛏ COLLECT to reveal terrain`);
+  } else if(sel.type==='potion'){sfx('item_found');spawnBurst(sp.x,sp.y,'#aa44ff',10);toast(`🧪 POTION found! Press ⛏ COLLECT to drink`);
+  } else if(sel.type==='lantern'){sfx('item_found');spawnBurst(sp.x,sp.y,'#ffee44',10);toast(`🔦 LANTERN found! Press ⛏ COLLECT to illuminate`);
+  } else if(sel.type==='portal'){sfx('portal');spawnBurst(sp.x,sp.y,'#aa44ff',18);toast('🌀 PORTAL FOUND! Collect resources then use COLLECT here');
+  } else if(WATER_TYPES.includes(sel.type)){sfx(sel.adjacent===0?'flood':'water');spawnBurst(sp.x,sp.y,'#0088ff',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);
+  } else {sfx(sel.adjacent===0?'flood':'reveal');spawnBurst(sp.x,sp.y,isDark?'#00ff88':'#008844',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);}
   score+=5;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
 }
 
@@ -1476,11 +1746,11 @@ function floodFill(q,r){
 function doCollect(){
   if(gameAbandoned||!sel||!sel.revealed)return;
   const isSpecial=SPECIAL_COLLECT.includes(sel.type);
-  if(!COLLECT_TYPES.includes(sel.type)&&!isSpecial){toast('⚠ NOTHING TO COLLECT');return;}
+  if(!COLLECT_TYPES.includes(sel.type)&&!isSpecial){sfx('error');toast('⚠ NOTHING TO COLLECT');return;}
   if(sel.type==='medkit'){
     const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);
     const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#ff4444',12);spawnBurst(sp.x,sp.y,'#ffffff',8);
-    toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
+    sfx('heal');toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
     sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
     score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
   }
@@ -1491,19 +1761,19 @@ function doCollect(){
       const nc=findCell(q,r);if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;if(nc.type==='mine'||nc.type==='waterMine'){bombsHit++;const dmg=Math.max(1,Math.floor((3+Math.floor(level/3))/2));hp-=dmg;toast(`💥 BOMB HIT MINE! −${dmg} HP`);updateHpUI();if(hp<=0){sel.type='empty';gameOver();return;}}}
     });
     sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
-    toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();return;
+    sfx('bomb');toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();return;
   }
   if(sel.type==='map'){
     const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#44ffff',18);flashFn('#44ffff','.1');
     const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');
     const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);toReveal.forEach(c=>c.revealed=true);
     sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
-    toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+    sfx('map');toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
   }
   if(sel.type==='potion'){
     const sp=worldToScreen(sel.px,sel.py);const lucky=Math.random()<.6;
-    if(lucky){const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');}
-    else{const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;}
+    if(lucky){const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);sfx('heal');toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');}
+    else{const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);sfx('poison');toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;}
     sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
     updateHpUI();if(hp<=0){gameOver();return;}score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
   }
@@ -1511,18 +1781,19 @@ function doCollect(){
     const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#ffee44',16);flashFn('#ffee44','.08');
     let revealed=0;hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{const nc=findCell(q,r);if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}});
     sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
-    toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+    sfx('lantern');toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
   }
   if(sel.type==='portal'){
     if(!objDone()){toast('⚠ COLLECT ALL RESOURCES FIRST!');return;}
     score+=200*level;updateScoreUI();
-    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#aa44ff',28);flashFn('#aa44ff','.18');
+    const sp=worldToScreen(sel.px,sel.py);sfx('portal_go');spawnBurst(sp.x,sp.y,'#aa44ff',28);flashFn('#aa44ff','.18');
     setTimeout(()=>showWinScreen(),800);return;
   }
   // Normal resource collect
   inventory[sel.type]=(inventory[sel.type]||0)+1;
   const sp=worldToScreen(sel.px,sel.py);
   const cols={wood:'#44ff44',stone:'#aaaaaa',iron:'#4488ff',crystal:'#aa44ff',fish:'#44ccff',gold:'#ffdd00',coal:'#886644',herbs:'#44ff88',mushroom:'#ff8844',coral:'#ff6688',pearl:'#aaddff',crab:'#ff5522',octopus:'#cc44ff'};
+  sfx(['gold','crystal','pearl','coral'].includes(sel.type)?'collect_rare':'collect');
   spawnBurst(sp.x,sp.y,cols[sel.type]||'#ffaa00',14);flashFn(isDark?'#ffaa00':'#bb6600','.07');
   toast(`✓ +1 ${sel.type.toUpperCase()}`);score+=20*level;
   sel.type=WATER_TYPES.includes(sel.type)?'water':'empty';
@@ -1532,7 +1803,7 @@ function doCollect(){
 
 function doFlag(){
   if(gameAbandoned||!sel||sel.revealed)return;
-  sel.flagged=!sel.flagged;toast(sel.flagged?'🚩 FLAGGED':'🚩 REMOVED');
+  sfx(sel.flagged?'unflag':'flag');sel.flagged=!sel.flagged;toast(sel.flagged?'🚩 FLAGGED':'🚩 REMOVED');
   updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
 }
 
@@ -1545,6 +1816,7 @@ let _lastLevelCoins = 0;
 
 // ── WIN SCREEN WITH AD OFFER ──
 function showWinScreen(){
+  sfx('win');
   saveToHistory('✅ WIN LVL '+level);
   stopArcadeTimer();
   _lastLevelCoins = calcLevelCoins();
@@ -1569,7 +1841,7 @@ function showWinScreen(){
 function winWatchAdDouble(){
   showRewardedAd(()=>{
     addCoins(_lastLevelCoins); // double = give again
-    toast('🪙 COINS DOUBLED! +' + _lastLevelCoins);
+    sfx('coins');toast('🪙 COINS DOUBLED! +' + _lastLevelCoins);
     document.getElementById('win-ad-wrap').style.display = 'none';
     spawnBurst(canvas.width/2, canvas.height/2, '#ffaa00', 24);
   });
@@ -1577,6 +1849,7 @@ function winWatchAdDouble(){
 
 // ── GAME OVER SCREEN WITH AD RETRY OFFER ──
 function gameOver(){
+  sfx('gameover');
   saveToHistory('💀 GAME OVER');
   stopArcadeTimer();
   cells.forEach(c=>{c.revealed=true;c.flagged=false;});
@@ -1878,19 +2151,40 @@ async function loadShopPrices(){
 }
 function saveShopPrices(){try{window.storage&&window.storage.set(SHOP_KEY,JSON.stringify(shopPrices));}catch(e){}try{localStorage.setItem(SHOP_KEY,JSON.stringify(shopPrices));}catch(e){}}
 function openShop(){
-  updateCoinsUI();refreshShopPrices();
+  updateCoinsUI();refreshShopPrices();refreshShopInventoryBadges();
   const st=document.getElementById('shop-slowtime-item');if(st)st.style.display=arcadeMode?'':'none';
   document.querySelectorAll('.shop-ads-btn').forEach(b=>b.classList.toggle('hidden',!USE_ADS));
   document.getElementById('shop-overlay').classList.add('show');
 }
+// Aggiorna i badge qty dentro lo shop e il totale items nell'header
+function refreshShopInventoryBadges(){
+  let total = 0;
+  Object.keys(INV_CFG).forEach(key=>{
+    const qty = shopInventory[key]||0;
+    total += qty;
+    const el = document.getElementById('inv-badge-shop-'+key);
+    if(el) el.textContent = qty > 0 ? '×'+qty : '';
+  });
+
+}
 function closeShop(){document.getElementById('shop-overlay').classList.remove('show');}
 function refreshShopPrices(){Object.keys(shopPrices).forEach(key=>{const el=document.getElementById('price-'+key);if(el)el.textContent='🪙 '+shopPrices[key];});}
 function shopBuy(key){
+  sfx('buy');
   const price=shopPrices[key];if(coins<price){toast('🪙 Not enough coins ('+price+' needed)');return;}
   coins-=price;shopPrices[key]=Math.round(shopPrices[key]*1.5);
   saveCoins();saveShopPrices();updateCoinsUI();refreshShopPrices();applyShopItem(key);
 }
-function shopWatchAd(key){if(!USE_ADS)return;showRewardedAd(()=>applyShopItem(key));}
+function shopWatchAd(key){
+  if(!USE_ADS)return;
+  // NON chiudere lo shop — resta aperto durante e dopo il video
+  showRewardedAd(()=>{
+    sfx('buy');
+    stockItem(key);              // aggiunge item, salva, aggiorna inv bar
+    refreshShopInventoryBadges(); // aggiorna badge qty dentro lo shop
+    updateCoinsUI();
+  });
+}
 
 let shopInventory={map:0,lantern:0,medkit:0,invincible:0,slowtime:0,ai:0};
 const INV_KEY='mineplanet-shopinv';
@@ -1934,7 +2228,11 @@ function useInvItem(key){
   shopInventory[key]--;saveShopInventory();renderInvBar();
 }
 
-function applyShopItem(key){closeShop();stockItem(key);}
+function applyShopItem(key){
+  closeShop();
+  stockItem(key);
+  refreshShopInventoryBadges();
+}
 function shopReset(){
   shopPrices={...SHOP_DEFAULT_PRICES};shopInventory={map:0,lantern:0,medkit:0,invincible:0,slowtime:0,ai:0};coins=50;
   saveShopPrices();saveShopInventory();saveCoins();updateCoinsUI();refreshShopPrices();renderInvBar();
@@ -2001,6 +2299,7 @@ function runAIStep(){
       c.revealed=true;
       score+=5;
     });
+    sfx('ai_step');
     updateScoreUI();drawAll();updateMinesUI();
     setTimeout(runAIStep,100);return;
   }
@@ -2013,7 +2312,7 @@ function runAIStep(){
   // Done — show win screen only if objectives met; otherwise just show the board
   if(objDone()){
     score+=200*level;updateScoreUI();
-    spawnBurst(canvas.width/2,canvas.height/2,'#aa44ff',32);flashFn('#aa44ff','.2');
+    sfx('win');spawnBurst(canvas.width/2,canvas.height/2,'#aa44ff',32);flashFn('#aa44ff','.2');
     setTimeout(()=>{
       aiRunning=false;document.getElementById('ai-overlay').classList.remove('show');
       showWinScreen();saveToHistory('🤖 AI WIN LVL '+level);
@@ -2032,5 +2331,117 @@ loadShopPrices();
 loadShopInventory();
 
 </script>
+
+<!-- SHOP OVERLAY -->
+<div id="shop-overlay">
+  <div id="shop-box">
+    <div id="shop-header">
+      <span id="shop-title">🛒 SHOP</span>
+      <span id="shop-coins-display">🪙 <span id="shop-coins-val">0</span></span>
+    </div>
+    <div id="shop-body">
+      <div class="shop-section-title" data-i18n="shop_items">ITEMS</div>
+      <!-- MEDKIT -->
+      <div class="shop-item" data-key="medkit">
+        <div class="shop-icon">🩺</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_medkit">MEDKIT</div>
+          <div class="shop-desc" data-i18n="item_medkit_desc">Restores HP immediately</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-medkit"></span><span class="shop-inv-qty" id="inv-badge-shop-medkit"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('medkit')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('medkit')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- LANTERN -->
+      <div class="shop-item" data-key="lantern">
+        <div class="shop-icon">🔦</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_lantern">LANTERN</div>
+          <div class="shop-desc" data-i18n="item_lantern_desc">Safely illuminates all adjacent cells (no mine damage)</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-lantern"></span><span class="shop-inv-qty" id="inv-badge-shop-lantern"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('lantern')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('lantern')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- MAP -->
+      <div class="shop-item" data-key="map">
+        <div class="shop-icon">🗺️</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_map">MAP</div>
+          <div class="shop-desc" data-i18n="item_map_desc">Reveals several random safe terrain cells</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-map"></span><span class="shop-inv-qty" id="inv-badge-shop-map"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('map')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('map')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <div class="shop-section-title" data-i18n="shop_powerups">POWER-UPS</div>
+      <!-- INVINCIBILITY -->
+      <div class="shop-item" data-key="invincible">
+        <div class="shop-icon">🛡️</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_invinc">INVINCIBILITY</div>
+          <div class="shop-desc" data-i18n="item_invinc_desc">No HP damage for the entire current match</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-invincible"></span><span class="shop-inv-qty" id="inv-badge-shop-invincible"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('invincible')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('invincible')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- TIME SLOWDOWN (arcade only) -->
+      <div class="shop-item" data-key="slowtime" id="shop-slowtime-item">
+        <div class="shop-icon">⏳</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_slowtime">TIME SLOWDOWN</div>
+          <div class="shop-desc" data-i18n="item_slowtime_desc">Doubles remaining time (Arcade mode only)</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-slowtime"></span><span class="shop-inv-qty" id="inv-badge-shop-slowtime"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('slowtime')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('slowtime')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+      <!-- AI RESOLVER -->
+      <div class="shop-item" data-key="ai">
+        <div class="shop-icon">🤖</div>
+        <div class="shop-info">
+          <div class="shop-name" data-i18n="item_ai">AI RESOLVER</div>
+          <div class="shop-desc" data-i18n="item_ai_desc">Auto-completes the level with animated step-by-step resolution</div>
+        </div>
+        <div class="shop-actions">
+          <div class="price-row"><span class="shop-price" id="price-ai"></span><span class="shop-inv-qty" id="inv-badge-shop-ai"></span></div>
+          <button class="shop-buy-btn" onclick="shopBuy('ai')" data-i18n="shop_buy">BUY 🪙</button>
+          <button class="shop-ads-btn" onclick="shopWatchAd('ai')" data-i18n="shop_watch_ad">WATCH AD 📺</button>
+        </div>
+      </div>
+    </div>
+    <div id="shop-footer">
+      <button id="shop-reset-btn" onclick="shopReset()" data-i18n="shop_reset">↺ RESET PRICES &amp; WALLET</button>
+      <button class="btn green" style="font-size:9px;padding:5px 12px;min-width:auto;" onclick="closeShop()" data-i18n="close">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- AD SIMULATION OVERLAY -->
+<div id="ad-overlay">
+  <div id="ad-box">
+    <div id="ad-label">📺 ADVERTISEMENT</div>
+    <div id="ad-content">🎮</div>
+    <div id="ad-skip-wrap"><span id="ad-countdown"></span></div>
+    <button id="ad-skip-btn" onclick="adSkip()">✓ CLAIM REWARD</button>
+  </div>
+</div>
+
+<!-- AI RESOLVER OVERLAY -->
+<div id="ai-overlay">
+  <div id="ai-label">🤖 AI RESOLVING...</div>
+</div>
+
 </body>
 </html>
