@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌍ppMinePlanet🌍</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#04080c;--surface:rgba(4,12,8,.93);--border:rgba(0,255,136,.18);
+  --glow:#00ff88;--cyan:#00e5ff;--amber:#ffaa00;--red:#ff3355;--purple:#bb66ff;
+  --text-dim:#2ad040;--text-mid:#3ab050;--scanline:rgba(0,255,100,.022);
+  --vignette:rgba(0,0,0,.88);
+  --fs: 1.5;
+}
+body.light{
+  --bg:#e8f4ec;--surface:rgba(240,255,245,.95);--border:rgba(0,150,80,.25);
+  --glow:#008844;--cyan:#007799;--amber:#bb6600;--red:#cc1133;--purple:#663399;
+  --text-dim:#5a8060;--text-mid:#336644;--scanline:rgba(0,80,40,.012);
+  --vignette:rgba(200,230,210,.6);
+}
+body{background:var(--bg);overflow:hidden;width:100vw;height:100vh;font-family:'Courier New',monospace;font-weight: bold;touch-action:none;transition:background .3s;}
+#bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;transition:opacity .4s;}
+body.light #bg-layer{opacity:0;pointer-events:none;}
+#light-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 30% 20%,rgba(180,240,200,.6) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(160,220,255,.4) 0%,transparent 50%),#e8f4ec;transition:opacity .4s;}
+body.light #light-bg{opacity:1;}
+#crt{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,var(--scanline) 0,transparent 1px,transparent 4px);}
+#vignette{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,var(--vignette) 100%);}
+#gc{position:fixed;inset:0;z-index:5;display:block;cursor:crosshair;}
+#pc{position:fixed;inset:0;z-index:6;pointer-events:none;}
+#flash{position:fixed;inset:0;z-index:50;pointer-events:none;opacity:0;transition:opacity .12s;}
+#toast{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:90;font-size:11px;color:var(--amber);text-shadow:0 0 10px var(--amber);opacity:0;pointer-events:none;letter-spacing:2px;white-space:nowrap;transition:opacity .2s;}
+
+/* TOP BAR */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:5px 10px;gap:6px 10px;background:linear-gradient(180deg,rgba(0,0,0,.88) 0%,transparent 100%);border-bottom:1px solid var(--border);}
+body.light #topbar{background:linear-gradient(180deg,rgba(220,245,230,.95) 0%,transparent 100%);}
+#game-title{font-size:18px;color:var(--glow);text-shadow:0 0 12px var(--glow);letter-spacing:2px;animation:flicker 9s infinite;white-space:nowrap;}
+#player-block{display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+#player-label{font-size:10px;color:var(--glow);text-shadow:0 0 8px var(--glow);letter-spacing:1px;}
+#player-name{font-family:'Courier New',monospace;font-size:13px;padding:3px 6px;background:rgba(0,255,136,.08);color:var(--glow);border:2px solid var(--glow);border-radius:3px;width:90px;outline:none;letter-spacing:1px;text-shadow:0 0 6px var(--glow);box-shadow:0 0 10px rgba(0,255,136,.2);}
+#player-name::placeholder{color:rgba(0,255,136,.4);font-size:8px;}
+#player-name:focus{border-color:var(--glow);box-shadow:0 0 16px rgba(0,255,136,.45);}
+.top-stat{font-size:10px;display:flex;flex-direction:column;gap:2px;align-items:center;}
+.top-label{color:var(--glow);letter-spacing:1px;font-size:10px;}
+.top-val{font-size:18px;color:var(--cyan);text-shadow:0 0 8px var(--cyan);}
+.top-val.amber{color:var(--amber);text-shadow:0 0 8px var(--amber);}
+.top-val.red{color:var(--red);text-shadow:0 0 8px var(--red);}
+#hp-wrap{width:55px;height:5px;background:rgba(255,0,0,.12);border:1px solid rgba(255,51,85,.3);border-radius:2px;}
+#hp-fill{height:100%;background:var(--red);box-shadow:0 0 6px var(--red);border-radius:2px;transition:width .3s;}
+#theme-btn{font-family:'Courier New',monospace;font-size:11px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;}
+#theme-btn:hover{color:var(--glow);border-color:var(--glow);}
+.theme-btn{font-family:'Courier New',monospace;font-size:11px;padding:4px 7px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .15s;}
+.theme-btn:hover{color:var(--glow);border-color:var(--glow);}
+/* SIDE PANELS */
+#left-panel{position:fixed;left:8px;top:85px;z-index:80;display:flex;flex-direction:column;gap:6px;}
+#right-panel{position:fixed;right:8px;top:85px;z-index:80;display:flex;flex-direction:column;gap:6px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:7px 10px;min-width:80px;}
+.card-title{font-size:14px;color:var(--text-dim);letter-spacing:1px;margin-bottom:5px;}
+.card-val{font-size:14px;color:var(--glow);text-shadow:0 0 8px var(--glow);}
+.card-val.red{color:var(--red);text-shadow:0 0 8px var(--red);}
+.res-row{display:flex;justify-content:space-between;font-size:11px;margin:3px 0;color:var(--text-mid);}
+.res-row.done{color:var(--amber);text-shadow:0 0 6px var(--amber);}
+.res-num{color:var(--glow);}
+.res-row.done .res-num{color:var(--amber);}
+
+/* BOTTOM BAR */
+#bottombar{position:fixed;bottom:0;left:0;right:0;z-index:80;display:flex;flex-direction:column;align-items:center;gap:7px;padding:8px 10px 10px;background:linear-gradient(0deg,rgba(0,0,0,.88) 0%,transparent 100%);border-top:1px solid var(--border);transition:bottom .35s cubic-bezier(.4,0,.2,1);}
+body.light #bottombar{background:linear-gradient(0deg,rgba(220,245,230,.95) 0%,transparent 100%);}
+#cell-info{font-size:10px;color:var(--cyan);letter-spacing:1px;text-shadow:0 0 8px var(--cyan);height:16px;text-align:center;}
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.btn{font-family:'Courier New',monospace;font-size:11px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .08s;letter-spacing:1px;min-width:84px;text-align:center;-webkit-tap-highlight-color:transparent;}
+.btn.green{color:var(--glow);border-color:rgba(0,255,136,.3);}
+.btn.green:not(.off):hover,.btn.green:not(.off):active{background:rgba(0,255,136,.12);border-color:var(--glow);box-shadow:0 0 14px rgba(0,255,136,.3);}
+.btn.cyan{color:var(--cyan);border-color:rgba(0,229,255,.3);}
+.btn.cyan:not(.off):hover,.btn.cyan:not(.off):active{background:rgba(0,229,255,.1);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,229,255,.3);}
+.btn.amber{color:var(--amber);border-color:rgba(255,170,0,.3);}
+.btn.amber:not(.off):hover,.btn.amber:not(.off):active{background:rgba(255,170,0,.1);border-color:var(--amber);box-shadow:0 0 14px rgba(255,170,0,.3);}
+.btn.red{color:var(--red);border-color:rgba(255,51,85,.3);}
+.btn.red:not(.off):hover,.btn.red:not(.off):active{background:rgba(255,51,85,.1);border-color:var(--red);box-shadow:0 0 14px rgba(255,51,85,.3);}
+.btn.purple{color:var(--purple);border-color:rgba(187,102,255,.3);}
+.btn.purple:not(.off):hover,.btn.purple:not(.off):active{background:rgba(187,102,255,.1);border-color:var(--purple);box-shadow:0 0 14px rgba(187,102,255,.3);}
+.btn.off{opacity:.22;pointer-events:none;}
+.zbtn{font-family:'Courier New',monospace;font-size:11px;padding:7px 11px;background:var(--surface);color:var(--text-dim);border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all .08s;-webkit-tap-highlight-color:transparent;}
+.zbtn:hover,.zbtn:active{color:var(--glow);border-color:var(--glow);}
+
+/* HISTORY PANEL */
+#history-panel{position:fixed;bottom:0;left:0;right:0;z-index:75;background:rgba(2,8,6,.97);border-top:2px solid var(--border);transition:transform .35s cubic-bezier(.4,0,.2,1);transform:translateY(100%);}
+#history-panel.open{transform:translateY(0);}
+body.light #history-panel{background:rgba(230,248,235,.98);}
+#history-header{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--border);}
+#history-title{font-size:10px;color:var(--glow);letter-spacing:2px;}
+#history-close{font-family:'Courier New',monospace;font-size:10px;color:var(--text-dim);background:none;border:none;cursor:pointer;padding:4px 8px;}
+#history-close:hover{color:var(--glow);}
+#history-table-wrap{max-height:150px;overflow-y:auto;padding:5px 14px 8px;}
+#history-table{width:100%;border-collapse:collapse;font-size:8px;}
+#history-table th{color:var(--text-dim);padding:3px 6px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
+#history-table td{color:var(--text-mid);padding:4px 6px;border-bottom:1px solid rgba(0,255,136,.06);}
+#history-table tr:last-child td{border-bottom:none;}
+#history-table td.score-cell{color:var(--cyan);text-shadow:0 0 6px var(--cyan);}
+#history-table td.name-cell{color:var(--glow);}
+#history-empty{font-size:10px;color:var(--text-dim);text-align:center;padding:14px;letter-spacing:1px;}
+#history-table-wrap::-webkit-scrollbar{width:4px;}
+#history-table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* COPYRIGHT BAR */
+#copyright-bar{position:fixed;bottom:2px;left:0;right:0;z-index:201;text-align:center;font-size:8px;color:var(--text-dim);letter-spacing:1px;pointer-events:none;}
+#copyright-bar span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 4px;}
+#copyright-bar span:hover{color:var(--glow);text-shadow:0 0 8px var(--glow);}
+
+/* CUSTOM POPUP OVERLAY */
+.popup-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+body.light .popup-overlay{background:rgba(180,220,190,.7);}
+.popup-overlay.show{opacity:1;pointer-events:all;}
+.popup-box{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:22px 26px;max-width:480px;width:92%;box-shadow:0 0 40px rgba(0,255,136,.12);display:flex;flex-direction:column;gap:14px;}
+.popup-title{font-size:13px;color:var(--glow);text-shadow:0 0 12px var(--glow);letter-spacing:2px;text-align:center;}
+.popup-body{font-size:10px;color:var(--text-mid);line-height:2.3;letter-spacing:1px;}
+.popup-body p{margin-bottom:6px;}
+.popup-body .license{font-size:10px;color:var(--text-dim);border:1px solid var(--border);border-radius:3px;padding:10px;line-height:2.3;margin-top:6px;}
+.popup-body strong{color:var(--glow);}
+.popup-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;opacity:0;pointer-events:none;transition:opacity .35s;}
+body.light .screen{background:rgba(220,245,230,.97);}
+.screen.show{opacity:1;pointer-events:all;}
+.screen h1{font-size:18px;animation:pulse 1.2s infinite;}
+.screen h1.green{color:var(--glow);text-shadow:0 0 20px var(--glow);}
+.screen h1.red{color:var(--red);text-shadow:0 0 20px var(--red);}
+.screen .big{font-size:14px;color:var(--amber);text-shadow:0 0 12px var(--amber);}
+.screen p{font-size:10px;color:var(--text-mid);letter-spacing:2px;}
+.screen .sub{font-size:8px;color:var(--text-mid);letter-spacing:1px;}
+
+/* START SCREEN */
+#start-screen{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:16px 16px 40px;overflow-y:auto;background:var(--bg);}
+#start-screen.hidden{display:none!important;}
+.start-logo{font-family:'Courier New',monospace;font-size:clamp(1.6rem,8vw,3rem);font-weight:700;letter-spacing:4px;color:var(--glow);text-shadow:0 0 30px var(--glow),0 0 60px rgba(0,255,136,.3);animation:flicker 9s infinite;text-align:center;}
+.start-tagline{font-size:10px;letter-spacing:4px;color:var(--text-mid);text-align:center;margin-top:-8px;}
+.start-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;width:100%;max-width:400px;}
+.start-label{font-size:9px;font-weight:700;letter-spacing:3px;color:var(--glow);text-shadow:0 0 8px var(--glow);margin-bottom:8px;display:block;}
+.start-input{width:100%;background:rgba(0,255,136,.05);border:2px solid rgba(0,255,136,.3);border-radius:5px;padding:10px 14px;color:var(--glow);font-family:'Courier New',monospace;font-size:13px;font-weight:700;outline:none;transition:border-color .2s;margin-bottom:16px;letter-spacing:1px;}
+.start-input:focus{border-color:var(--glow);box-shadow:0 0 16px rgba(0,255,136,.25);}
+.start-input::placeholder{color:rgba(0,255,136,.3);font-size:10px;}
+body.light .start-input{background:rgba(0,120,60,.04);border-color:rgba(0,120,60,.3);color:var(--glow);}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.avbtn{background:rgba(0,255,136,.04);border:1.5px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--text-mid);font-family:'Courier New',monospace;font-size:8px;}
+.avbtn .ae{font-size:1.6rem;line-height:1;}
+.avbtn .al{font-size:8px;color:var(--text-dim);text-align:center;}
+.avbtn:hover{border-color:var(--glow);background:rgba(0,255,136,.10);}
+.avbtn.active{border-color:var(--glow);background:rgba(0,255,136,.18);box-shadow:0 0 14px rgba(0,255,136,.2);}
+.start-playbtn{background:linear-gradient(135deg,var(--glow),#008844);color:#000;border:none;border-radius:50px;padding:14px 44px;font-family:'Courier New',monospace;font-size:13px;letter-spacing:3px;cursor:pointer;box-shadow:0 5px 28px rgba(0,255,136,.4);transition:all .2s;width:100%;max-width:300px;font-weight:700;}
+.start-playbtn:hover{transform:translateY(-2px);box-shadow:0 9px 38px rgba(0,255,136,.6);}
+.start-secbtn{background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:50px;padding:10px 28px;font-family:'Courier New',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:300px;}
+.start-secbtn:hover{border-color:var(--glow);color:var(--glow);}
+.start-avatar-display{font-size:1.6rem;line-height:1;}
+
+/* ARCADE TIMER */
+#arcade-timer-wrap{position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:85;display:none;align-items:center;gap:8px;padding:4px 14px;background:rgba(0,0,0,.7);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;pointer-events:none;}
+#arcade-timer-bar{width:200px;height:6px;background:rgba(255,51,85,.15);border:1px solid rgba(255,51,85,.3);border-radius:3px;}
+#arcade-timer-fill{height:100%;background:var(--glow);border-radius:3px;transition:width .5s linear,background .5s;}
+#arcade-timer-txt{font-size:12px;color:var(--glow);letter-spacing:1px;min-width:38px;text-align:right;text-shadow:0 0 8px var(--glow);}
+#arcade-mode-badge{position:fixed;top:60px;right:8px;z-index:84;font-size:8px;color:var(--amber);letter-spacing:2px;text-shadow:0 0 8px var(--amber);background:rgba(0,0,0,.6);border:1px solid rgba(255,170,0,.3);padding:2px 6px;border-radius:3px;display:none;}
+
+/* COINS HUD */
+#coins-hud{display:flex;flex-direction:column;align-items:center;gap:2px;}
+#coins-hud .top-label{color:var(--amber);}
+#coins-hud .top-val{color:var(--amber);text-shadow:0 0 8px var(--amber);}
+
+/* DEBUG BADGE */
+#debug-badge{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:200;font-size:9px;color:#ff0;background:rgba(0,0,0,.8);border:1px solid #ff0;border-radius:3px;padding:2px 10px;letter-spacing:2px;display:none;pointer-events:none;}
+
+/* LANG SELECTOR */
+#lang-select{font-family:'Courier New',monospace;font-size:10px;padding:3px 6px;background:var(--surface);color:var(--text-mid);border:1px solid var(--border);border-radius:3px;cursor:pointer;outline:none;transition:all .15s;}
+#lang-select:hover{color:var(--glow);border-color:var(--glow);}
+#lang-select option{background:#0a1a10;color:#3ab050;}
+
+/* SHOP BUTTON in topbar */
+#shop-btn-hud{font-family:'Courier New',monospace;font-size:10px;padding:5px 9px;background:var(--surface);color:var(--amber);border:1px solid rgba(255,170,0,.3);border-radius:3px;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+#shop-btn-hud:hover{border-color:var(--amber);box-shadow:0 0 10px rgba(255,170,0,.3);}
+
+/* SHOP OVERLAY */
+#shop-overlay{position:fixed;inset:0;z-index:550;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s;}
+body.light #shop-overlay{background:rgba(210,235,220,.96);}
+#shop-overlay.show{opacity:1;pointer-events:all;}
+#shop-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0;max-width:560px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(255,170,0,.12);}
+#shop-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);}
+#shop-title{font-size:14px;color:var(--amber);letter-spacing:3px;text-shadow:0 0 10px var(--amber);}
+#shop-coins-display{font-size:13px;color:var(--amber);letter-spacing:1px;}
+#shop-body{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
+#shop-body::-webkit-scrollbar{width:4px;}
+#shop-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.shop-item{background:rgba(255,170,0,.04);border:1px solid rgba(255,170,0,.15);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:12px;}
+.shop-item:hover{border-color:rgba(255,170,0,.4);}
+.shop-icon{font-size:1.8rem;line-height:1;flex-shrink:0;}
+.shop-info{flex:1;}
+.shop-name{font-size:11px;color:var(--glow);letter-spacing:1px;margin-bottom:3px;}
+.shop-desc{font-size:9px;color:var(--text-dim);letter-spacing:1px;line-height:1.7;}
+.shop-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
+.shop-buy-btn{font-family:'Courier New',monospace;font-size:9px;padding:5px 10px;background:rgba(255,170,0,.1);color:var(--amber);border:1px solid rgba(255,170,0,.4);border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all .12s;}
+.shop-buy-btn:hover{background:rgba(255,170,0,.2);box-shadow:0 0 10px rgba(255,170,0,.3);}
+.shop-buy-btn:disabled{opacity:.3;pointer-events:none;}
+.shop-ads-btn{font-family:'Courier New',monospace;font-size:9px;padding:5px 10px;background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.3);border-radius:3px;cursor:pointer;letter-spacing:1px;white-space:nowrap;transition:all .12s;}
+.shop-ads-btn:hover{background:rgba(0,229,255,.16);box-shadow:0 0 10px rgba(0,229,255,.3);}
+.shop-ads-btn.hidden{display:none;}
+.shop-price{font-size:9px;color:var(--amber);letter-spacing:1px;text-align:right;}
+#shop-footer{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+#shop-reset-btn{font-family:'Courier New',monospace;font-size:8px;padding:4px 8px;background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.3);border-radius:3px;cursor:pointer;}
+#shop-reset-btn:hover{background:rgba(255,51,85,.2);}
+.shop-section-title{font-size:9px;color:var(--text-dim);letter-spacing:3px;padding:4px 0 2px;border-bottom:1px solid var(--border);margin-bottom:2px;}
+
+/* AD SIMULATION OVERLAY */
+#ad-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;}
+#ad-overlay.show{display:flex;}
+#ad-box{background:#111;border:2px solid var(--amber);border-radius:8px;padding:28px 36px;max-width:400px;width:90%;text-align:center;display:flex;flex-direction:column;gap:14px;}
+#ad-label{font-size:11px;color:var(--amber);letter-spacing:3px;}
+#ad-content{font-size:28px;padding:20px;}
+#ad-skip-wrap{font-size:10px;color:var(--text-dim);letter-spacing:1px;}
+#ad-skip-btn{font-family:'Courier New',monospace;font-size:11px;padding:8px 20px;background:rgba(0,255,136,.12);color:var(--glow);border:1px solid var(--glow);border-radius:3px;cursor:pointer;display:none;}
+
+/* AI RESOLVER ANIMATION */
+#ai-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;pointer-events:none;}
+#ai-overlay.show{display:flex;}
+#ai-label{font-size:13px;color:var(--purple);letter-spacing:3px;text-shadow:0 0 16px var(--purple);animation:pulse 1s infinite;}
+
+/* INVINCIBILITY BADGE */
+#invinc-badge{position:fixed;top:60px;left:8px;z-index:84;font-size:8px;color:#ffdd00;letter-spacing:2px;background:rgba(0,0,0,.6);border:1px solid rgba(255,221,0,.4);padding:2px 6px;border-radius:3px;display:none;pointer-events:none;}
+
+/* SHOP INVENTORY BAR */
+#shop-inv-bar{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;min-height:0;}
+#shop-inv-bar.empty{display:none;}
+.inv-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;transition:transform .1s;}
+.inv-item button{font-family:'Courier New',monospace;font-size:9px;padding:5px 8px;border-radius:3px;cursor:pointer;transition:all .1s;letter-spacing:0.5px;white-space:nowrap;border:1px solid;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent;}
+.inv-item button.inv-btn-map    {background:rgba(0,229,255,.08);color:var(--cyan);border-color:rgba(0,229,255,.3);}
+.inv-item button.inv-btn-lantern{background:rgba(255,238,68,.08);color:#ffee44;border-color:rgba(255,238,68,.3);}
+.inv-item button.inv-btn-medkit {background:rgba(255,68,102,.08);color:#ff4466;border-color:rgba(255,68,102,.3);}
+.inv-item button.inv-btn-invincible{background:rgba(255,221,0,.08);color:#ffdd00;border-color:rgba(255,221,0,.3);}
+.inv-item button.inv-btn-slowtime{background:rgba(187,102,255,.08);color:var(--purple);border-color:rgba(187,102,255,.3);}
+.inv-item button.inv-btn-ai     {background:rgba(187,102,255,.08);color:var(--purple);border-color:rgba(187,102,255,.3);}
+.inv-item button:not(.off):hover,.inv-item button:not(.off):active{filter:brightness(1.3);transform:scale(1.05);}
+.inv-item button.off{opacity:.25;pointer-events:none;}
+.inv-badge{position:absolute;top:-4px;right:-4px;background:var(--amber);color:#000;font-size:8px;font-weight:bold;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.inv-item button.needs-cell{opacity:.45;}
+.inv-item button.needs-cell:hover{filter:none;transform:none;}
+
+@keyframes flicker{0%,93%,96%,100%{opacity:1;}94%{opacity:.7;}95%{opacity:1;}97%{opacity:.6;}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+
+/* HISTORY OVERLAY (full-screen) */
+#history-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;transition:opacity .25s;}
+body.light #history-overlay{background:rgba(210,235,220,.96);}
+#history-overlay.hidden{display:none!important;}
+#history-overlay-box{width:100%;max-width:640px;flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#history-overlay-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid var(--border);}
+#history-overlay-title{font-size:13px;color:var(--glow);letter-spacing:3px;text-shadow:0 0 8px var(--glow);}
+#history-overlay-close{font-family:'Courier New',monospace;font-size:10px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:3px;cursor:pointer;padding:5px 10px;transition:all .15s;}
+#history-overlay-close:hover{color:var(--glow);border-color:var(--glow);}
+#history-overlay-body{flex:1;overflow-y:auto;padding:10px 18px 14px;}
+#history-overlay-body::-webkit-scrollbar{width:4px;}
+#history-overlay-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+#history-overlay-table{width:100%;border-collapse:collapse;font-size:9px;}
+#history-overlay-table th{color:var(--text-dim);padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);letter-spacing:1px;}
+#history-overlay-table td{color:var(--text-mid);padding:5px 6px;border-bottom:1px solid rgba(0,255,136,.06);}
+#history-overlay-table tr:last-child td{border-bottom:none;}
+#history-overlay-table td.score-cell{color:var(--cyan);text-shadow:0 0 6px var(--cyan);}
+#history-overlay-table td.name-cell{color:var(--glow);}
+#history-overlay-empty{font-size:10px;color:var(--text-dim);text-align:center;padding:28px;letter-spacing:1px;}
+#history-overlay-footer{padding:10px 18px 14px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* START SCREEN FOOTER */
+#start-footer{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:8px;color:var(--text-dim);letter-spacing:1px;padding:5px 0 6px;pointer-events:none;}
+#start-footer span{cursor:pointer;pointer-events:all;transition:color .15s;padding:2px 4px;}
+#start-footer span:hover{color:var(--glow);text-shadow:0 0 8px var(--glow);}
+
+/* ── WIN/LOSE AD OFFER ── */
+.screen-ad-offer{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:10px;}
+.screen-ad-offer .coins-won{font-size:22px;color:var(--amber);text-shadow:0 0 16px var(--amber);letter-spacing:2px;font-family:'Courier New',monospace;font-weight:bold;}
+.screen-ad-offer .ad-offer-label{font-size:10px;color:var(--text-mid);letter-spacing:2px;}
+.screen-ad-offer .btn-ad-double{font-family:'Courier New',monospace;font-size:11px;padding:9px 20px;background:rgba(255,170,0,.15);color:var(--amber);border:2px solid var(--amber);border-radius:4px;cursor:pointer;letter-spacing:2px;transition:all .15s;animation:pulse 1.5s infinite;}
+.screen-ad-offer .btn-ad-double:hover{background:rgba(255,170,0,.3);box-shadow:0 0 18px rgba(255,170,0,.5);}
+.screen-ad-offer .btn-ad-retry{font-family:'Courier New',monospace;font-size:11px;padding:9px 20px;background:rgba(0,229,255,.12);color:var(--cyan);border:2px solid var(--cyan);border-radius:4px;cursor:pointer;letter-spacing:2px;transition:all .15s;animation:pulse 1.5s infinite;}
+.screen-ad-offer .btn-ad-retry:hover{background:rgba(0,229,255,.25);box-shadow:0 0 18px rgba(0,229,255,.4);}
+
+</style>
+</head>
+<body>
+
+<!-- GameDistribution requires this container div -->
+<div id="game-container" style="position:fixed;inset:0;z-index:-1;pointer-events:none;"></div>
+
+<div id="bg-layer"><canvas id="stars"></canvas></div>
+<div id="light-bg"></div>
+<div id="crt"></div><div id="vignette"></div>
+<div id="debug-badge">⚡ DEBUG MODE</div>
+<div id="invinc-badge">🛡️ INVINCIBLE</div>
+<div id="flash"></div>
+<canvas id="pc"></canvas>
+<canvas id="gc"></canvas>
+
+<!-- START SCREEN -->
+<div id="start-screen">
+  <div style="text-align:center;margin-bottom:4px;">
+    <div class="start-logo">🌍MINE PLANET🌍</div>
+    <div class="start-tagline">HEX-GRID EXPLORATION · MINESWEEPER ADVENTURE ✦</div>
+  </div>
+  <div class="start-card">
+    <span class="start-label" data-i18n="start_name_label">YOUR NAME</span>
+    <input id="start-name" class="start-input" type="text" placeholder="Enter your name..." maxlength="14" autocomplete="off">
+    <span class="start-label" data-i18n="start_avatar_label">CHOOSE YOUR AVATAR</span>
+    <div class="avatar-grid" id="avatar-grid"></div>
+  </div>
+  <button class="start-playbtn" id="start-play-btn">🚀 PLAY!</button>
+  <button class="start-secbtn" id="start-hist-btn">📜 GAME HISTORY</button>
+  <button class="start-secbtn" id="start-shop-btn" onclick="openShop()">🛒 SHOP</button>
+  <button class="start-secbtn" id="start-help-btn">❓ HOW TO PLAY</button>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <select class="theme-btn" id="lang-select-start" onchange="setLang(this.value)">
+      <option value="en">🇬🇧 EN</option>
+      <option value="it">🇮🇹 IT</option>
+      <option value="fr">🇫🇷 FR</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="es">🇪🇸 ES</option>
+      <option value="pt">🇵🇹 PT</option>
+      <option value="zh">🇨🇳 ZH</option>
+    </select>
+    <button class="theme-btn" id="arcade-toggle-btn" onclick="toggleArcadeMode()">⏱ ARCADE: OFF</button>
+    <button id="theme-btn" onclick="toggleTheme()">🌗</button>
+  </div>
+  <div id="start-footer">
+    <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — ppMinePlanet v01.03 — click for info &amp; license</span>
+  </div>
+</div>
+
+<!-- HISTORY OVERLAY -->
+<div id="history-overlay" class="hidden">
+  <div id="history-overlay-box">
+    <div id="history-overlay-header">
+      <span id="history-overlay-title">📜 GAMES HISTORY</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn red" style="font-size:8px;padding:4px 8px;min-width:auto;" onclick="doClearHistoryOverlay()">🗑 CLEAR</button>
+        <button id="history-overlay-close" onclick="closeHistoryOverlay()">✕ CLOSE</button>
+      </div>
+    </div>
+    <div id="history-overlay-body">
+      <div id="history-overlay-empty">No games recorded yet.</div>
+      <table id="history-overlay-table" style="display:none;">
+        <thead><tr><th>#</th><th>DATE</th><th>PLAYER</th><th>SCORE</th><th>LVL</th><th>RESULT</th></tr></thead>
+        <tbody id="history-overlay-body-rows"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div id="game-title">🌍<U>MINE PLANET</U>🌍</div>
+  <div id="player-block">
+    <span id="player-label">PLAYER</span>
+    <div style="display:flex;align-items:center;gap:5px;">
+      <span id="player-avatar-hud" style="font-size:1.4rem;line-height:1;"></span>
+      <span id="player-name-hud" style="font-family:'Courier New',monospace;font-size:13px;color:var(--glow);text-shadow:0 0 6px var(--glow);letter-spacing:1px;"></span>
+    </div>
+  </div>
+  <div class="top-stat">
+    <span class="top-label">HP</span>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <div id="hp-wrap"><div id="hp-fill" style="width:100%"></div></div>
+      <span class="top-val red" id="hp-num">12</span>
+    </div>
+  </div>
+  <div class="top-stat">
+    <span class="top-label">LVL</span>
+    <span class="top-val amber" id="lv-num">1</span>
+  </div>
+  <div class="top-stat">
+    <span class="top-label">SCORE</span>
+    <span class="top-val" id="score-num">0</span>
+  </div>
+  <div id="coins-hud" class="top-stat">
+    <span class="top-label">COINS</span>
+    <span class="top-val amber" id="coins-num">0</span>
+  </div>
+  <select id="lang-select" onchange="setLang(this.value)">
+    <option value="en">🇬🇧 EN</option>
+    <option value="it">🇮🇹 IT</option>
+    <option value="fr">🇫🇷 FR</option>
+    <option value="de">🇩🇪 DE</option>
+    <option value="es">🇪🇸 ES</option>
+    <option value="pt">🇵🇹 PT</option>
+    <option value="zh">🇨🇳 ZH</option>
+  </select>
+  <button id="theme-btn" onclick="toggleTheme()">🌗</button>
+</div>
+
+<div id="arcade-timer-wrap">
+  <div id="arcade-timer-bar"><div id="arcade-timer-fill" style="width:100%"></div></div>
+  <span id="arcade-timer-txt">--:--</span>
+</div>
+<div id="arcade-mode-badge">⏱ ARCADE</div>
+
+<div id="left-panel">
+  <div class="card"><div class="card-title">MINES</div><div class="card-val red" id="mines-val">?</div><div style="font-size:14px;margin-top:3px;color:var(--amber)" id="flags-val"></div><div style="font-size:14px;margin-top:2px;color:var(--red)" id="bombs-hit-val"></div></div>
+  <div class="card"><div class="card-title">SAFE</div><div class="card-val" id="safe-val">?</div></div>
+</div>
+<div id="right-panel">
+  <div class="card">
+    <div class="card-title">OBJECTIVE</div>
+    <div id="res-list"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="bottombar">
+  <div id="cell-info">— tap a cell —</div>
+  <div class="btn-row">
+    <button class="btn cyan off" id="b-reveal" onclick="doReveal()">🔍 <u>R</u>EVEAL</button>
+    <button class="btn amber off" id="b-collect" onclick="doCollect()">⛏ <u>C</u>OLLECT</button>
+    <button class="btn red off" id="b-flag" onclick="doFlag()">🚩 <u>F</u>LAG</button>
+  </div>
+  <div id="shop-inv-bar" class="empty"></div>
+  <div class="btn-row">
+    <button class="zbtn" onclick="zoom(1.15)">🔍＋</button>
+    <button class="zbtn" onclick="resetView()">⊙ RESET</button>
+    <button class="zbtn" onclick="zoom(0.87)">🔍－</button>
+    <button class="btn" id="shop-btn-hud" onclick="openShop()">🛒 SHOP</button>
+    <button class="btn purple" style="padding:7px 10px;min-width:auto;" onclick="openHistoryOverlay()">📜 HISTORY</button>
+    <button class="btn cyan" style="padding:7px 10px;min-width:auto;" onclick="openPopup('popup-help')">❓ HELP</button>
+    <button class="btn red" id="b-quit" style="padding:7px 10px;min-width:auto;" onclick="onQuitOrStart()">🏳 QUIT</button>
+    <button class="btn amber" id="b-menu" style="padding:7px 10px;min-width:auto;display:none;" onclick="backToStart()">🏠 MENU</button>
+  </div>
+</div>
+
+<!-- HISTORY PANEL -->
+<div id="history-panel">
+  <div id="history-header">
+    <span id="history-title">📜 GAMES HISTORY</span>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn red" style="font-size:8px;padding:4px 8px;min-width:auto;" onclick="clearHistory()">🗑 CLEAR</button>
+      <button id="history-close" onclick="toggleHistory()">✕ CLOSE</button>
+    </div>
+  </div>
+  <div id="history-table-wrap">
+    <div id="history-empty">No games recorded yet.</div>
+    <table id="history-table" style="display:none;">
+      <thead><tr><th>#</th><th>DATE</th><th>PLAYER</th><th>SCORE</th><th>LVL</th><th>RESULT</th></tr></thead>
+      <tbody id="history-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- COPYRIGHT BAR -->
+<div id="copyright-bar">
+  <span onclick="openPopup('popup-about')">© 2026 PISTINO DEVELOPMENT — v01.03 — click for info &amp; license</span>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen" id="sc-level">
+  <h1 class="green">🌍 PLANET SOLVED!</h1>
+  <div class="big" id="sc-score"></div>
+  <p id="sc-next"></p>
+  <div class="sub" id="sc-diff"></div>
+  <div id="win-ad-wrap" class="screen-ad-offer" style="display:none;">
+    <div class="coins-won" id="win-coins-earned">🪙 COINS EARNED: 0</div>
+    <div class="ad-offer-label" id="win-double-offer-text">📺 WATCH AN AD TO DOUBLE YOUR COINS!</div>
+    <button class="btn-ad-double" id="win-double-btn" onclick="winWatchAdDouble()">📺 DOUBLE COINS</button>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn green" onclick="nextLevel()">▶ NEXT LEVEL</button>
+    <button class="btn red" onclick="endGameFromWin()">🏁 END GAME</button>
+    <button class="btn amber" onclick="backToStart()">🏠 MAIN MENU</button>
+  </div>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div class="screen" id="sc-over">
+  <h1 class="red">💀 GAME OVER</h1>
+  <div class="big" id="go-score"></div>
+  <p>HP DEPLETED — board revealed to show your mistakes</p>
+  <div id="go-ad-wrap" class="screen-ad-offer" style="display:none;">
+    <div class="ad-offer-label" id="go-retry-offer-text">📺 WATCH AN AD TO RETRY THIS LEVEL!</div>
+    <button class="btn-ad-retry" id="go-retry-btn" onclick="goWatchAdRetry()">📺 RETRY LEVEL</button>
+  </div>
+  <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
+    <button class="btn green" onclick="restartGame()">↺ RESTART</button>
+    <button class="btn amber" onclick="backToStart()">🏠 MAIN MENU</button>
+  </div>
+</div>
+
+<!-- POPUP: quit confirm -->
+<div class="popup-overlay" id="popup-quit">
+  <div class="popup-box">
+    <div class="popup-title">🏳 ABANDON GAME?</div>
+    <div class="popup-body">
+      <p>All cells will be revealed, exposing mines, fish, portals and all hidden elements.</p>
+      <p>This match will be saved to the history log.</p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn amber" onclick="doAbandon()">✓ YES, ABANDON</button>
+      <button class="btn" style="color:var(--text-mid);" onclick="closePopup('popup-quit')">✕ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPUP: clear history -->
+<div class="popup-overlay" id="popup-clear">
+  <div class="popup-box">
+    <div class="popup-title">🗑 CLEAR HISTORY?</div>
+    <div class="popup-body"><p>All match records will be permanently deleted.</p></div>
+    <div class="popup-actions">
+      <button class="btn red" onclick="doClearHistory()">✓ YES, CLEAR</button>
+      <button class="btn" style="color:var(--text-mid);" onclick="closePopup('popup-clear')">✕ CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT POPUP -->
+<div class="popup-overlay" id="popup-about">
+  <div class="popup-box">
+    <div class="popup-title">🌍MINE PLANET🌍</div>
+    <div class="popup-body">
+      <p><strong>Version:</strong> 01.03 — March 2026</p>
+      <p><strong>Genre:</strong> Hex-grid exploration / minesweeper adventure</p>
+      <p><strong>Author:</strong> Paolo Pista. — (✉:<a class="popup-body" href="mailto:pistino@libero.it">pistino@libero.it</a>)</p>
+      <p><strong>Platform:</strong> HTML5 — runs in any modern browser</p>
+      <div class="license">
+        <p style="color:var(--amber);margin-bottom:6px;letter-spacing:2px;">⚖ SOFTWARE LICENSE</p>
+        <p>1. LICENSE GRANT: Limited, revocable, non-exclusive license for personal, non-commercial use only.</p>
+        <p>2. COMMERCIAL USE: Requires prior written authorization from the author.</p>
+        <p>3. MODIFICATION: Prohibited without explicit written consent.</p>
+        <p>4. OWNERSHIP: All rights remain exclusively with the author.</p>
+        <p>5. DISCLAIMER: Provided "AS IS", without warranty of any kind.</p>
+        <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn green" onclick="closePopup('popup-about')">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- HELP POPUP -->
+<div class="popup-overlay" id="popup-help">
+  <div class="popup-box" style="max-width:520px;max-height:88vh;overflow-y:auto;">
+    <div class="popup-title" data-i18n="help_title">❓ HOW TO PLAY</div>
+    <div class="popup-body">
+      <p><strong data-i18n="help_obj_head">🎯 OBJECTIVE</strong></p>
+      <p data-i18n="help_obj">Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level.</p>
+      <p style="margin-top:8px;"><strong data-i18n="help_ctrl_head">🖱 CONTROLS</strong></p>
+      <p data-i18n="help_ctrl">Tap/click a cell to select it. On desktop use keyboard shortcuts:</p>
+      <p>• <strong style="color:var(--cyan);">R</strong> — <span data-i18n="help_key_r">Reveal selected cell</span></p>
+      <p>• <strong style="color:var(--amber);">C</strong> — <span data-i18n="help_key_c">Collect resource / use item</span></p>
+      <p>• <strong style="color:var(--red);">F</strong> — <span data-i18n="help_key_f">Flag suspected mine</span></p>
+      <p>• <strong>+/-</strong> — <span data-i18n="help_key_zoom">Zoom in/out</span></p>
+      <p>• <strong>0 / ESC</strong> — <span data-i18n="help_key_reset">Reset view</span></p>
+      <p>• <strong>Arrows</strong> — <span data-i18n="help_key_pan">Pan the map</span></p>
+      <p>• <strong style="color:#ff0;">CTRL+D</strong> — <span data-i18n="help_key_debug">Toggle Debug Mode</span></p>
+      <p style="margin-top:8px;"><strong data-i18n="help_actions_head">⚡ ACTIONS</strong></p>
+      <p>• 🔍 <strong style="color:var(--cyan);" data-i18n="help_reveal">REVEAL</strong> — <span data-i18n="help_reveal_desc">Uncovers the selected cell. Mine cells cost HP!</span></p>
+      <p>• ⛏ <strong style="color:var(--amber);" data-i18n="help_collect">COLLECT</strong> — <span data-i18n="help_collect_desc">Gathers a resource or activates a found item.</span></p>
+      <p>• 🚩 <strong style="color:var(--red);" data-i18n="help_flag">FLAG</strong> — <span data-i18n="help_flag_desc">Marks a suspected mine.</span></p>
+      <p style="margin-top:8px;"><strong data-i18n="help_mines_head">⚠ MINES</strong></p>
+      <p data-i18n="help_mines">Revealing a 💣 MINE costs HP. Numbers show adjacent mines. Water hides 💣 WATER MINES too!</p>
+      <p style="margin-top:8px;"><strong data-i18n="help_res_head">📦 RESOURCES</strong></p>
+      <p data-i18n="help_res_land">Land: 🌲 Wood · 🪨 Stone · ⚙️ Iron · 🪵 Coal · 🪙 Gold · 💎 Crystal · 🌿 Herbs · 🍄 Mushroom</p>
+      <p data-i18n="help_res_water">Water: 🐠 Fish · 🦀 Crab · 🪸 Coral · 🫧 Pearl · 🐙 Octopus</p>
+      <p data-i18n="help_res_info">New resource types unlock as you advance levels.</p>
+      <p style="margin-top:8px;"><strong data-i18n="help_special_head">✨ SPECIAL ITEMS</strong></p>
+      <p>• 💥 <strong data-i18n="help_bomb">BOMB</strong> — <span data-i18n="help_bomb_desc">Reveals all neighbors (mines = half damage)</span></p>
+      <p>• 🗺️ <strong data-i18n="help_map">MAP</strong> — <span data-i18n="help_map_desc">Reveals random safe terrain cells</span></p>
+      <p>• 🧪 <strong data-i18n="help_potion">POTION</strong> — <span data-i18n="help_potion_desc">60% heal, 40% damage</span></p>
+      <p>• 🔦 <strong data-i18n="help_lantern">LANTERN</strong> — <span data-i18n="help_lantern_desc">Safely illuminates adjacent cells</span></p>
+      <p>• 🩺 <strong data-i18n="help_medkit">MEDKIT</strong> — <span data-i18n="help_medkit_desc">Restores HP when collected</span></p>
+      <p>• 🤖 <strong>AI RESOLVER</strong> — <span data-i18n="item_ai_desc">Reveals the full board step by step</span></p>
+      <p style="margin-top:8px;"><strong data-i18n="help_shop_head">🛒 SHOP</strong></p>
+      <p data-i18n="help_shop">Earn 🪙 coins by revealing cells. Spend in the Shop or watch ads for free items!</p>
+      <p style="margin-top:8px;"><strong data-i18n="help_arcade_head">⏱ ARCADE MODE</strong></p>
+      <p data-i18n="help_arcade">Complete the level before time runs out! Use ⏳ Time Slowdown to double your time.</p>
+      <p style="margin-top:8px;"><strong data-i18n="help_score_head">🏆 SCORING</strong></p>
+      <p>• <span data-i18n="help_score_reveal">+5 per revealed cell</span></p>
+      <p>• <span data-i18n="help_score_collect">+20×level per collected resource</span></p>
+      <p>• <span data-i18n="help_score_level">+200×level for completing a level</span></p>
+      <p>• <span data-i18n="help_score_coins">+coins for reveals &amp; collects</span></p>
+    </div>
+    <div class="popup-actions">
+      <button class="btn green" onclick="closePopup('popup-help')" data-i18n="close">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP OVERLAY -->
+<div id="shop-overlay">
+  <div id="shop-box">
+    <div id="shop-header">
+      <span id="shop-title">🛒 SHOP</span>
+      <span id="shop-coins-display">🪙 <span id="shop-coins-val">0</span></span>
+    </div>
+    <div id="shop-body">
+      <div class="shop-section-title" data-i18n="shop_items">ITEMS</div>
+      <div class="shop-item"><div class="shop-icon">🩺</div><div class="shop-info"><div class="shop-name" data-i18n="item_medkit">MEDKIT</div><div class="shop-desc" data-i18n="item_medkit_desc">Restores HP immediately</div></div><div class="shop-actions"><div class="shop-price" id="price-medkit"></div><button class="shop-buy-btn" onclick="shopBuy('medkit')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('medkit')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+      <div class="shop-item"><div class="shop-icon">🔦</div><div class="shop-info"><div class="shop-name" data-i18n="item_lantern">LANTERN</div><div class="shop-desc" data-i18n="item_lantern_desc">Safely illuminates all adjacent cells</div></div><div class="shop-actions"><div class="shop-price" id="price-lantern"></div><button class="shop-buy-btn" onclick="shopBuy('lantern')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('lantern')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+      <div class="shop-item"><div class="shop-icon">🗺️</div><div class="shop-info"><div class="shop-name" data-i18n="item_map">MAP</div><div class="shop-desc" data-i18n="item_map_desc">Reveals several random safe terrain cells</div></div><div class="shop-actions"><div class="shop-price" id="price-map"></div><button class="shop-buy-btn" onclick="shopBuy('map')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('map')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+      <div class="shop-section-title" data-i18n="shop_powerups">POWER-UPS</div>
+      <div class="shop-item"><div class="shop-icon">🛡️</div><div class="shop-info"><div class="shop-name" data-i18n="item_invinc">INVINCIBILITY</div><div class="shop-desc" data-i18n="item_invinc_desc">No HP damage for the entire match</div></div><div class="shop-actions"><div class="shop-price" id="price-invincible"></div><button class="shop-buy-btn" onclick="shopBuy('invincible')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('invincible')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+      <div class="shop-item" id="shop-slowtime-item"><div class="shop-icon">⏳</div><div class="shop-info"><div class="shop-name" data-i18n="item_slowtime">TIME SLOWDOWN</div><div class="shop-desc" data-i18n="item_slowtime_desc">Doubles remaining time (Arcade only)</div></div><div class="shop-actions"><div class="shop-price" id="price-slowtime"></div><button class="shop-buy-btn" onclick="shopBuy('slowtime')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('slowtime')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+      <div class="shop-item"><div class="shop-icon">🤖</div><div class="shop-info"><div class="shop-name" data-i18n="item_ai">AI RESOLVER</div><div class="shop-desc" data-i18n="item_ai_desc">Reveals the full board step by step</div></div><div class="shop-actions"><div class="shop-price" id="price-ai"></div><button class="shop-buy-btn" onclick="shopBuy('ai')" data-i18n="shop_buy">BUY 🪙</button><button class="shop-ads-btn" onclick="shopWatchAd('ai')" data-i18n="shop_watch_ad">WATCH AD 📺</button></div></div>
+    </div>
+    <div id="shop-footer">
+      <button id="shop-reset-btn" onclick="shopReset()" data-i18n="shop_reset">↺ RESET PRICES &amp; WALLET</button>
+      <button class="btn green" style="font-size:9px;padding:5px 12px;min-width:auto;" onclick="closeShop()" data-i18n="close">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- AD OVERLAY (fallback simulation) -->
+<div id="ad-overlay">
+  <div id="ad-box">
+    <div id="ad-label">📺 ADVERTISEMENT</div>
+    <div id="ad-content">🎮</div>
+    <div id="ad-skip-wrap"><span id="ad-countdown"></span></div>
+    <button id="ad-skip-btn" onclick="adSkip()">✓ CLAIM REWARD</button>
+  </div>
+</div>
+
+<!-- AI RESOLVER OVERLAY -->
+<div id="ai-overlay">
+  <div id="ai-label">🤖 AI RESOLVING...</div>
+</div>
+
+<!-- GameDistribution SDK — must load before game scripts -->
+<script src="https://html5.api.gamedistribution.com/main.min.js"></script>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// ── MULTILANGUAGE SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+const LANG_KEY = 'mineplanet-lang';
+let currentLang = 'en';
+
+const STRINGS = {
+  en: {
+    'btn_reveal':'🔍 <u>R</u>EVEAL','btn_collect':'⛏ <u>C</u>OLLECT','btn_flag':'🚩 <u>F</u>LAG',
+    'btn_quit':'🏳 QUIT','btn_menu':'🏠 MENU',
+    'hud_player':'PLAYER','hud_coins':'COINS',
+    'start_play':'🚀 PLAY!','start_hist':'📜 GAME HISTORY','start_shop':'🛒 SHOP','start_help':'❓ HOW TO PLAY',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Enter your name...','start_name_label':'YOUR NAME','start_avatar_label':'CHOOSE YOUR AVATAR',
+    'shop_title':'🛒 SHOP','shop_items':'ITEMS','shop_powerups':'POWER-UPS',
+    'shop_buy':'BUY 🪙','shop_watch_ad':'WATCH AD 📺','shop_reset':'↺ RESET PRICES & WALLET',
+    'item_map':'MAP','item_map_desc':'Reveals several random safe terrain cells',
+    'item_lantern':'LANTERN','item_lantern_desc':'Safely illuminates all adjacent cells (no mine damage)',
+    'item_medkit':'MEDKIT','item_medkit_desc':'Restores HP immediately',
+    'item_invinc':'INVINCIBILITY','item_invinc_desc':'No HP damage for the entire current match',
+    'item_slowtime':'TIME SLOWDOWN','item_slowtime_desc':'Doubles remaining time (Arcade mode only)',
+    'item_ai':'AI RESOLVER','item_ai_desc':'Reveals the full board with animated step-by-step display',
+    'win_title':'🌍 PLANET SOLVED!','go_title':'💀 GAME OVER',
+    'go_msg':'HP DEPLETED — board revealed to show your mistakes',
+    'btn_next':'▶ NEXT LEVEL','btn_end':'🏁 END GAME','btn_restart':'↺ RESTART','btn_mainmenu':'🏠 MAIN MENU',
+    'close':'✕ CLOSE',
+    'win_coins_earned':'🪙 COINS EARNED:',
+    'win_double_offer':'📺 WATCH AN AD TO DOUBLE YOUR COINS!',
+    'win_double_btn':'📺 DOUBLE COINS',
+    'go_retry_offer':'📺 WATCH AN AD TO RETRY THIS LEVEL!',
+    'go_retry_btn':'📺 RETRY LEVEL',
+    'help_title':'❓ HOW TO PLAY',
+    'help_obj_head':'🎯 OBJECTIVE',
+    'help_obj':'Explore the hex planet, collect all required resources shown in the right panel, then reach the 🌀 PORTAL and press COLLECT to complete the level. Each level increases in size and difficulty.',
+    'help_ctrl_head':'🖱 CONTROLS',
+    'help_ctrl':'Tap/click a cell to select it. On desktop use keyboard shortcuts:',
+    'help_key_r':'Reveal selected cell',
+    'help_key_c':'Collect resource / use item',
+    'help_key_f':'Flag suspected mine',
+    'help_key_zoom':'Zoom in/out',
+    'help_key_reset':'Reset view',
+    'help_key_pan':'Pan the map',
+    'help_key_debug':'Toggle Debug Mode (infinite resources)',
+    'help_actions_head':'⚡ ACTIONS',
+    'help_reveal':'REVEAL',
+    'help_reveal_desc':'Uncovers the selected cell. Mine cells cost HP!',
+    'help_collect':'COLLECT',
+    'help_collect_desc':'Gathers a resource or activates a found item.',
+    'help_flag':'FLAG',
+    'help_flag_desc':'Marks a suspected mine. Flagged cells cannot be revealed accidentally.',
+    'help_mines_head':'⚠ MINES',
+    'help_mines':'Revealing a 💣 MINE costs HP. The number on each revealed cell shows how many mines are adjacent — use logic to find safe cells. Water hides 💣 WATER MINES too!',
+    'help_res_head':'📦 RESOURCES',
+    'help_res_land':'Land: 🌲 Wood · 🪨 Stone · ⚙️ Iron · 🪵 Coal · 🪙 Gold · 💎 Crystal · 🌿 Herbs · 🍄 Mushroom',
+    'help_res_water':'Water: 🐠 Fish · 🦀 Crab · 🪸 Coral · 🫧 Pearl · 🐙 Octopus',
+    'help_res_info':'New resource types unlock as you advance levels. Collect the exact amounts shown in the right panel.',
+    'help_special_head':'✨ SPECIAL ITEMS',
+    'help_bomb':'BOMB','help_bomb_desc':'Reveals all neighbors (may hit mines for half damage)',
+    'help_map':'MAP','help_map_desc':'Reveals several random safe terrain cells',
+    'help_potion':'POTION','help_potion_desc':'60% chance to heal, 40% chance to damage',
+    'help_lantern':'LANTERN','help_lantern_desc':'Safely illuminates all adjacent cells (no mine damage)',
+    'help_medkit':'MEDKIT','help_medkit_desc':'Restores HP when collected',
+    'help_shop_head':'🛒 SHOP',
+    'help_shop':'Earn 🪙 coins by revealing cells and collecting resources. Spend them in the Shop to buy items or power-ups. Watch ads to get items for free! Prices increase with each purchase.',
+    'help_arcade_head':'⏱ ARCADE MODE',
+    'help_arcade':'Enable Arcade Mode from the start screen. A countdown timer is set based on the number of cells and resources — complete the level before time runs out! Use ⏳ Time Slowdown from the shop to double your remaining time.',
+    'help_score_head':'🏆 SCORING',
+    'help_score_reveal':'+5 per revealed cell',
+    'help_score_collect':'+20×level per collected resource',
+    'help_score_level':'+200×level for completing a level',
+    'help_score_coins':'+coins for reveals & collects (used in Shop)',
+  },
+  it: {
+    'btn_reveal':'🔍 <u>R</u>IVELA','btn_collect':'⛏ <u>C</u>OLLEZIONE','btn_flag':'🚩 <u>F</u>LAG',
+    'btn_quit':'🏳 ABBANDONA','btn_menu':'🏠 MENU',
+    'hud_player':'GIOCATORE','hud_coins':'MONETE',
+    'start_play':'🚀 GIOCA!','start_hist':'📜 CRONOLOGIA','start_shop':'🛒 NEGOZIO','start_help':'❓ COME GIOCARE',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Inserisci il tuo nome...','start_name_label':'IL TUO NOME','start_avatar_label':'SCEGLI IL TUO AVATAR',
+    'shop_title':'🛒 NEGOZIO','shop_items':'OGGETTI','shop_powerups':'POTENZIAMENTI',
+    'shop_buy':'COMPRA 🪙','shop_watch_ad':'📺 GUARDA PUBBLICITÀ','shop_reset':'↺ RESET PREZZI E PORTAFOGLIO',
+    'item_map':'MAPPA','item_map_desc':'Rivela caselle di terreno sicure a caso',
+    'item_lantern':'LANTERNA','item_lantern_desc':'Illumina le celle adiacenti senza danni da mine',
+    'item_medkit':'KIT MEDICO','item_medkit_desc':'Ripristina la vita immediatamente',
+    'item_invinc':'INVINCIBILITÀ','item_invinc_desc':'Nessun danno per tutta la partita',
+    'item_slowtime':'RALLENTATORE','item_slowtime_desc':'Raddoppia il tempo rimanente (solo Arcade)',
+    'item_ai':'AI RESOLVER','item_ai_desc':'Rivela il campo completo con animazione passo-passo',
+    'win_title':'🌍 PIANETA RISOLTO!','go_title':'💀 GAME OVER',
+    'go_msg':'VITA ESAURITA — il campo viene rivelato per mostrare gli errori',
+    'btn_next':'▶ LIVELLO SUCCESSIVO','btn_end':'🏁 FINE GIOCO','btn_restart':'↺ RIAVVIA','btn_mainmenu':'🏠 MENU PRINCIPALE',
+    'close':'✕ CHIUDI',
+    'win_coins_earned':'🪙 MONETE GUADAGNATE:',
+    'win_double_offer':'📺 GUARDA UNA PUBBLICITÀ PER RADDOPPIARE LE MONETE!',
+    'win_double_btn':'📺 RADDOPPIA MONETE',
+    'go_retry_offer':'📺 GUARDA UNA PUBBLICITÀ PER RIPETERE IL LIVELLO!',
+    'go_retry_btn':'📺 RIPROVA LIVELLO',
+    'help_title':'❓ COME GIOCARE',
+    'help_obj_head':'🎯 OBIETTIVO',
+    'help_obj':'Esplora il pianeta esagonale, raccogli tutte le risorse richieste nel pannello di destra, poi raggiungi il 🌀 PORTALE e premi RACCOGLI per completare il livello. Ogni livello aumenta di dimensione e difficoltà.',
+    'help_ctrl_head':'🖱 CONTROLLI',
+    'help_ctrl':'Tocca/clicca una cella per selezionarla. Su desktop usa i tasti rapidi:',
+    'help_key_r':'Rivela la cella selezionata',
+    'help_key_c':'Raccogli risorsa / usa oggetto',
+    'help_key_f':'Segna mina sospetta',
+    'help_key_zoom':'Zoom avanti/indietro',
+    'help_key_reset':'Reimposta la vista',
+    'help_key_pan':'Sposta la mappa',
+    'help_key_debug':'Attiva modalità debug (risorse infinite)',
+    'help_actions_head':'⚡ AZIONI',
+    'help_reveal':'RIVELA',
+    'help_reveal_desc':'Scopre la cella selezionata. Le mine tolgono vita!',
+    'help_collect':'RACCOGLI',
+    'help_collect_desc':'Raccoglie una risorsa o attiva un oggetto trovato.',
+    'help_flag':'SEGNA',
+    'help_flag_desc':'Marca una mina sospetta. Le celle segnate non possono essere rivelate accidentalmente.',
+    'help_mines_head':'⚠ MINE',
+    'help_mines':'Rivelare una 💣 MINA costa vita. Il numero su ogni cella rivelata indica quante mine sono adiacenti — usa la logica per trovare celle sicure. Anche le acque nascondono 💣 MINE ACQUATICHE!',
+    'help_res_head':'📦 RISORSE',
+    'help_res_land':'Terra: 🌲 Legno · 🪨 Pietra · ⚙️ Ferro · 🪵 Carbone · 🪙 Oro · 💎 Cristallo · 🌿 Erbe · 🍄 Fungo',
+    'help_res_water':'Acqua: 🐠 Pesce · 🦀 Granchio · 🪸 Corallo · 🫧 Perla · 🐙 Polpo',
+    'help_res_info':'Nuovi tipi di risorse si sbloccano avanzando di livello. Raccogli le quantità esatte indicate nel pannello di destra.',
+    'help_special_head':'✨ OGGETTI SPECIALI',
+    'help_bomb':'BOMBA','help_bomb_desc':'Rivela tutti i vicini (può colpire mine per metà danno)',
+    'help_map':'MAPPA','help_map_desc':'Rivela diverse caselle di terreno sicure a caso',
+    'help_potion':'POZIONE','help_potion_desc':'60% di possibilità di guarire, 40% di danno',
+    'help_lantern':'LANTERNA','help_lantern_desc':'Illumina tutte le celle adiacenti senza danni da mine',
+    'help_medkit':'KIT MEDICO','help_medkit_desc':'Ripristina vita quando raccolto',
+    'help_shop_head':'🛒 NEGOZIO',
+    'help_shop':'Guadagna 🪙 monete rivelando celle e raccogliendo risorse. Usale nel Negozio per acquistare oggetti o potenziamenti. Guarda le pubblicità per ottenerli gratis! I prezzi aumentano ad ogni acquisto.',
+    'help_arcade_head':'⏱ MODALITÀ ARCADE',
+    'help_arcade':'Attiva la modalità Arcade dalla schermata iniziale. Un conto alla rovescia viene calcolato in base al numero di celle e risorse — completa il livello prima che scada il tempo! Usa ⏳ Rallentatore dal negozio per raddoppiare il tempo rimasto.',
+    'help_score_head':'🏆 PUNTEGGIO',
+    'help_score_reveal':'+5 per cella rivelata',
+    'help_score_collect':'+20×livello per risorsa raccolta',
+    'help_score_level':'+200×livello per completare un livello',
+    'help_score_coins':'+monete per rivelare e raccogliere (usate nel Negozio)',
+  },
+  fr: {
+    'btn_reveal':'🔍 <u>R</u>ÉVÉLER','btn_collect':'⛏ <u>C</u>OLLECTER','btn_flag':'🚩 <u>F</u>LAQUER',
+    'btn_quit':'🏳 QUITTER','btn_menu':'🏠 MENU',
+    'hud_player':'JOUEUR','hud_coins':'PIÈCES',
+    'start_play':'🚀 JOUER!','start_hist':'📜 HISTORIQUE','start_shop':'🛒 BOUTIQUE','start_help':'❓ COMMENT JOUER',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Entrez votre nom...','start_name_label':'VOTRE NOM','start_avatar_label':'CHOISISSEZ VOTRE AVATAR',
+    'shop_title':'🛒 BOUTIQUE','shop_items':'OBJETS','shop_powerups':'AMÉLIORATIONS',
+    'shop_buy':'ACHETER 🪙','shop_watch_ad':'📺 VOIR PUBLICITÉ','shop_reset':'↺ RÉINITIALISER',
+    'item_map':'CARTE','item_map_desc':'Révèle plusieurs cases de terrain sûres au hasard',
+    'item_lantern':'LANTERNE','item_lantern_desc':'Éclaire les cases adjacentes sans dégâts de mines',
+    'item_medkit':'TROUSSE MÉD.','item_medkit_desc':'Restaure la vie immédiatement',
+    'item_invinc':'INVINCIBILITÉ','item_invinc_desc':'Aucun dégât pendant toute la partie',
+    'item_slowtime':'RALENTISSEMENT','item_slowtime_desc':'Double le temps restant (Arcade uniquement)',
+    'item_ai':'IA SOLVEUR','item_ai_desc':'Révèle le plateau complet avec animation pas à pas',
+    'win_title':'🌍 PLANÈTE RÉSOLUE!','go_title':'💀 GAME OVER',
+    'go_msg':'VIE ÉPUISÉE — plateau révélé pour montrer les erreurs',
+    'btn_next':'▶ NIVEAU SUIVANT','btn_end':'🏁 FIN','btn_restart':'↺ RECOMMENCER','btn_mainmenu':'🏠 MENU PRINCIPAL',
+    'close':'✕ FERMER',
+    'win_coins_earned':'🪙 PIÈCES GAGNÉES:',
+    'win_double_offer':'📺 REGARDEZ UNE PUB POUR DOUBLER VOS PIÈCES!',
+    'win_double_btn':'📺 DOUBLER LES PIÈCES',
+    'go_retry_offer':'📺 REGARDEZ UNE PUB POUR REJOUER CE NIVEAU!',
+    'go_retry_btn':'📺 REJOUER LE NIVEAU',
+    'help_title':'❓ COMMENT JOUER',
+    'help_obj_head':'🎯 OBJECTIF',
+    'help_obj':'Explorez la planète hexagonale, collectez toutes les ressources requises dans le panneau de droite, puis atteignez le 🌀 PORTAIL et appuyez sur COLLECTER pour terminer le niveau.',
+    'help_ctrl_head':'🖱 CONTRÔLES',
+    'help_ctrl':'Touchez/cliquez une case pour la sélectionner. Raccourcis clavier:',
+    'help_key_r':'Révéler la case sélectionnée',
+    'help_key_c':'Collecter / utiliser un objet',
+    'help_key_f':'Marquer une mine suspectée',
+    'help_key_zoom':'Zoom avant/arrière',
+    'help_key_reset':'Réinitialiser la vue',
+    'help_key_pan':'Déplacer la carte',
+    'help_key_debug':'Activer le mode debug (ressources infinies)',
+    'help_actions_head':'⚡ ACTIONS',
+    'help_reveal':'RÉVÉLER','help_reveal_desc':'Découvre la case sélectionnée. Les mines coûtent de la vie!',
+    'help_collect':'COLLECTER','help_collect_desc':'Ramasse une ressource ou active un objet trouvé.',
+    'help_flag':'MARQUER','help_flag_desc':'Marque une mine suspectée. Les cases marquées ne peuvent pas être révélées accidentellement.',
+    'help_mines_head':'⚠ MINES',
+    'help_mines':'Révéler une 💣 MINE coûte de la vie. Le chiffre indique le nombre de mines adjacentes. L\'eau cache aussi des 💣 MINES AQUATIQUES!',
+    'help_res_head':'📦 RESSOURCES',
+    'help_res_land':'Terre: 🌲 Bois · 🪨 Pierre · ⚙️ Fer · 🪵 Charbon · 🪙 Or · 💎 Cristal · 🌿 Herbes · 🍄 Champignon',
+    'help_res_water':'Eau: 🐠 Poisson · 🦀 Crabe · 🪸 Corail · 🫧 Perle · 🐙 Pieuvre',
+    'help_res_info':'De nouveaux types de ressources se débloquent en avançant. Collectez les quantités exactes indiquées.',
+    'help_special_head':'✨ OBJETS SPÉCIAUX',
+    'help_bomb':'BOMBE','help_bomb_desc':'Révèle tous les voisins (minas mitad de daño)',
+    'help_map':'CARTE','help_map_desc':'Révèle plusieurs cases de terrain sûres au hasard',
+    'help_potion':'POTION','help_potion_desc':'60% de chance de soigner, 40% de blesser',
+    'help_lantern':'LANTERNE','help_lantern_desc':'Éclaire toutes les cases adjacentes sans dégâts',
+    'help_medkit':'TROUSSE','help_medkit_desc':'Restaure la vie quand collectée',
+    'help_shop_head':'🛒 BOUTIQUE',
+    'help_shop':'Gagnez 🪙 pièces en révélant des cases et collectant des ressources. Regardez des pubs pour obtenir des objets gratuitement!',
+    'help_arcade_head':'⏱ MODE ARCADE',
+    'help_arcade':'Activez le Mode Arcade depuis l\'écran de démarrage. Terminez le niveau avant la fin du temps!',
+    'help_score_head':'🏆 SCORE',
+    'help_score_reveal':'+5 par case révélée',
+    'help_score_collect':'+20×niveau par ressource collectée',
+    'help_score_level':'+200×niveau pour terminer un niveau',
+    'help_score_coins':'+pièces pour révéler et collecter',
+  },
+  de: {
+    'btn_reveal':'🔍 <u>A</u>UFDECKEN','btn_collect':'⛏ <u>S</u>AMMELN','btn_flag':'🚩 <u>M</u>ARKIEREN',
+    'btn_quit':'🏳 AUFGEBEN','btn_menu':'🏠 MENÜ',
+    'hud_player':'SPIELER','hud_coins':'MÜNZEN',
+    'start_play':'🚀 SPIELEN!','start_hist':'📜 SPIELVERLAUF','start_shop':'🛒 SHOP','start_help':'❓ ANLEITUNG',
+    'arcade_off':'⏱ ARCADE: AUS','arcade_on':'⏱ ARCADE: EIN',
+    'start_name_ph':'Name eingeben...','start_name_label':'DEIN NAME','start_avatar_label':'WÄHLE DEINEN AVATAR',
+    'shop_title':'🛒 SHOP','shop_items':'GEGENSTÄNDE','shop_powerups':'POWER-UPS',
+    'shop_buy':'KAUFEN 🪙','shop_watch_ad':'📺 WERBUNG ANSEHEN','shop_reset':'↺ ZURÜCKSETZEN',
+    'item_map':'KARTE','item_map_desc':'Zeigt mehrere sichere Geländefelder',
+    'item_lantern':'LATERNE','item_lantern_desc':'Beleuchtet benachbarte Felder ohne Minenschaden',
+    'item_medkit':'VERBANDSKASTEN','item_medkit_desc':'Stellt sofort Leben wieder her',
+    'item_invinc':'UNVERWUNDBARKEIT','item_invinc_desc':'Kein Schaden im gesamten Spiel',
+    'item_slowtime':'ZEITVERLANGSAMUNG','item_slowtime_desc':'Verdoppelt verbleibende Zeit (nur Arcade)',
+    'item_ai':'KI LÖSER','item_ai_desc':'Zeigt das vollständige Spielfeld schrittweise animiert',
+    'win_title':'🌍 PLANET GELÖST!','go_title':'💀 GAME OVER',
+    'go_msg':'LEBEN AUFGEBRAUCHT — Brett aufgedeckt',
+    'btn_next':'▶ NÄCHSTES LEVEL','btn_end':'🏁 BEENDEN','btn_restart':'↺ NEU STARTEN','btn_mainmenu':'🏠 HAUPTMENÜ',
+    'close':'✕ SCHLIESSEN',
+    'win_coins_earned':'🪙 MÜNZEN VERDIENT:',
+    'win_double_offer':'📺 WERBUNG ANSEHEN UM MÜNZEN ZU VERDOPPELN!',
+    'win_double_btn':'📺 MÜNZEN VERDOPPELN',
+    'go_retry_offer':'📺 WERBUNG ANSEHEN UM LEVEL NEU ZU STARTEN!',
+    'go_retry_btn':'📺 LEVEL WIEDERHOLEN',
+    'help_title':'❓ ANLEITUNG',
+    'help_obj_head':'🎯 ZIEL',
+    'help_obj':'Erkunde den hexagonalen Planeten, sammle alle erforderlichen Ressourcen im rechten Panel und erreiche dann das 🌀 PORTAL.',
+    'help_ctrl_head':'🖱 STEUERUNG',
+    'help_ctrl':'Tippe/klicke ein Feld zum Auswählen. Tastenkürzel:',
+    'help_key_r':'Ausgewähltes Feld aufdecken',
+    'help_key_c':'Ressource sammeln / Gegenstand benutzen',
+    'help_key_f':'Verdächtige Mine markieren',
+    'help_key_zoom':'Zoom ein/aus',
+    'help_key_reset':'Ansicht zurücksetzen',
+    'help_key_pan':'Karte verschieben',
+    'help_key_debug':'Debug-Modus (unendliche Ressourcen)',
+    'help_actions_head':'⚡ AKTIONEN',
+    'help_reveal':'AUFDECKEN','help_reveal_desc':'Deckt das ausgewählte Feld auf. Minen kosten Leben!',
+    'help_collect':'SAMMELN','help_collect_desc':'Sammelt eine Ressource oder aktiviert einen gefundenen Gegenstand.',
+    'help_flag':'MARKIEREN','help_flag_desc':'Markiert eine verdächtige Mine.',
+    'help_mines_head':'⚠ MINEN',
+    'help_mines':'Eine 💣 MINE aufzudecken kostet Leben. Auch Wasser verbirgt 💣 WASSERMINEN!',
+    'help_res_head':'📦 RESSOURCEN',
+    'help_res_land':'Land: 🌲 Holz · 🪨 Stein · ⚙️ Eisen · 🪵 Kohle · 🪙 Gold · 💎 Kristall · 🌿 Kräuter · 🍄 Pilz',
+    'help_res_water':'Wasser: 🐠 Fisch · 🦀 Krabbe · 🪸 Koralle · 🫧 Perle · 🐙 Oktopus',
+    'help_res_info':'Neue Ressourcentypen werden mit steigendem Level freigeschaltet.',
+    'help_special_head':'✨ SPEZIELLE GEGENSTÄNDE',
+    'help_bomb':'BOMBE','help_bomb_desc':'Deckt alle Nachbarn auf (Minen halber Schaden)',
+    'help_map':'KARTE','help_map_desc':'Zeigt mehrere sichere Geländefelder',
+    'help_potion':'TRANK','help_potion_desc':'60% heilen, 40% Schaden',
+    'help_lantern':'LATERNE','help_lantern_desc':'Beleuchtet alle Nachbarfelder sicher',
+    'help_medkit':'VERBAND','help_medkit_desc':'Stellt Leben wieder her',
+    'help_shop_head':'🛒 SHOP',
+    'help_shop':'Verdiene 🪙 Münzen durch Aufdecken und Sammeln. Schaue Werbung für kostenlose Items!',
+    'help_arcade_head':'⏱ ARCADE-MODUS',
+    'help_arcade':'Aktiviere den Arcade-Modus im Startbildschirm. Schließe das Level ab, bevor die Zeit abläuft!',
+    'help_score_head':'🏆 PUNKTE',
+    'help_score_reveal':'+5 pro aufgedecktem Feld',
+    'help_score_collect':'+20×Level pro gesammelter Ressource',
+    'help_score_level':'+200×Level für Level-Abschluss',
+    'help_score_coins':'+Münzen für Aufdecken und Sammeln',
+  },
+  es: {
+    'btn_reveal':'🔍 <u>R</u>EVELAR','btn_collect':'⛏ <u>C</u>OLETAR','btn_flag':'🚩 <u>M</u>ARCAR',
+    'btn_quit':'🏳 RENDIRSE','btn_menu':'🏠 MENÚ',
+    'hud_player':'JUGADOR','hud_coins':'MONEDAS',
+    'start_play':'🚀 ¡JUGAR!','start_hist':'📜 HISTORIAL','start_shop':'🛒 TIENDA','start_help':'❓ CÓMO JUGAR',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Escribe tu nombre...','start_name_label':'TU NOMBRE','start_avatar_label':'ELIGE TU AVATAR',
+    'shop_title':'🛒 TIENDA','shop_items':'OBJETOS','shop_powerups':'POTENCIADORES',
+    'shop_buy':'COMPRAR 🪙','shop_watch_ad':'📺 VER ANUNCIO','shop_reset':'↺ REINICIAR PRECIOS',
+    'item_map':'MAPA','item_map_desc':'Revela varias celdas de terreno seguras al azar',
+    'item_lantern':'LINTERNA','item_lantern_desc':'Ilumina celdas adyacentes sin daño por minas',
+    'item_medkit':'BOTIQUÍN','item_medkit_desc':'Restaura vida inmediatamente',
+    'item_invinc':'INVENCIBILIDAD','item_invinc_desc':'Sin daño durante toda la partida',
+    'item_slowtime':'RALENTIZAR','item_slowtime_desc':'Duplica el tiempo restante (solo Arcade)',
+    'item_ai':'IA RESOLVENTE','item_ai_desc':'Revela el tablero completo con animación paso a paso',
+    'win_title':'🌍 ¡PLANETA RESUELTO!','go_title':'💀 GAME OVER',
+    'go_msg':'VIDA AGOTADA — tablero revelado para mostrar errores',
+    'btn_next':'▶ SIGUIENTE NIVEL','btn_end':'🏁 FIN','btn_restart':'↺ REINICIAR','btn_mainmenu':'🏠 MENÚ PRINCIPAL',
+    'close':'✕ CERRAR',
+    'win_coins_earned':'🪙 MONEDAS GANADAS:',
+    'win_double_offer':'📺 ¡VE UN ANUNCIO PARA DUPLICAR TUS MONEDAS!',
+    'win_double_btn':'📺 DUPLICAR MONEDAS',
+    'go_retry_offer':'📺 ¡VE UN ANUNCIO PARA REINTENTAR EL NIVEL!',
+    'go_retry_btn':'📺 REINTENTAR NIVEL',
+    'help_title':'❓ CÓMO JUGAR',
+    'help_obj_head':'🎯 OBJETIVO',
+    'help_obj':'Explora el planeta hexagonal, recoge todos los recursos requeridos en el panel derecho, luego llega al 🌀 PORTAL y pulsa RECOGER para completar el nivel.',
+    'help_ctrl_head':'🖱 CONTROLES',
+    'help_ctrl':'Toca/clic una celda para seleccionarla. Atajos de teclado:',
+    'help_key_r':'Revelar celda seleccionada',
+    'help_key_c':'Recoger / usar objeto',
+    'help_key_f':'Marcar mina sospechosa',
+    'help_key_zoom':'Zoom',
+    'help_key_reset':'Reiniciar vista',
+    'help_key_pan':'Desplazar mapa',
+    'help_key_debug':'Modo debug (recursos infinitos)',
+    'help_actions_head':'⚡ ACCIONES',
+    'help_reveal':'REVELAR','help_reveal_desc':'Descubre la celda seleccionada. ¡Las minas cuestan vida!',
+    'help_collect':'RECOGER','help_collect_desc':'Recoge un recurso o activa un objeto encontrado.',
+    'help_flag':'MARCAR','help_flag_desc':'Marca una mina sospechosa.',
+    'help_mines_head':'⚠ MINAS',
+    'help_mines':'Revelar una 💣 MINA cuesta vida. ¡El agua también esconde 💣 MINAS ACUÁTICAS!',
+    'help_res_head':'📦 RECURSOS',
+    'help_res_land':'Tierra: 🌲 Madera · 🪨 Piedra · ⚙️ Hierro · 🪵 Carbón · 🪙 Oro · 💎 Cristal · 🌿 Hierbas · 🍄 Seta',
+    'help_res_water':'Agua: 🐠 Pez · 🦀 Cangrejo · 🪸 Coral · 🫧 Perla · 🐙 Pulpo',
+    'help_res_info':'Nuevos tipos de recursos se desbloquean al avanzar de nivel.',
+    'help_special_head':'✨ OBJETOS ESPECIALES',
+    'help_bomb':'BOMBA','help_bomb_desc':'Revela todos los vecinos (minas mitad de daño)',
+    'help_map':'MAPA','help_map_desc':'Revela varias celdas seguras al azar',
+    'help_potion':'POCIÓN','help_potion_desc':'60% curar, 40% dañar',
+    'help_lantern':'LINTERNA','help_lantern_desc':'Ilumina celdas adyacentes sin daño',
+    'help_medkit':'BOTIQUÍN','help_medkit_desc':'Restaura vida al recoger',
+    'help_shop_head':'🛒 TIENDA',
+    'help_shop':'Gana 🪙 monedas revelando celdas. Mira anuncios para objetos gratis.',
+    'help_arcade_head':'⏱ MODO ARCADE',
+    'help_arcade':'Activa el Modo Arcade. ¡Completa el nivel antes de que acabe el tiempo!',
+    'help_score_head':'🏆 PUNTUACIÓN',
+    'help_score_reveal':'+5 por celda revelada',
+    'help_score_collect':'+20×nivel por recurso recogido',
+    'help_score_level':'+200×nivel por completar un nivel',
+    'help_score_coins':'+monedas por revelar y recoger',
+  },
+  pt: {
+    'btn_reveal':'🔍 <u>R</u>EVELAR','btn_collect':'⛏ <u>C</u>OLETAR','btn_flag':'🚩 <u>M</u>ARCAR',
+    'btn_quit':'🏳 DESISTIR','btn_menu':'🏠 MENU',
+    'hud_player':'JOGADOR','hud_coins':'MOEDAS',
+    'start_play':'🚀 JOGAR!','start_hist':'📜 HISTÓRICO','start_shop':'🛒 LOJA','start_help':'❓ COMO JOGAR',
+    'arcade_off':'⏱ ARCADE: OFF','arcade_on':'⏱ ARCADE: ON',
+    'start_name_ph':'Digite seu nome...','start_name_label':'SEU NOME','start_avatar_label':'ESCOLHA SEU AVATAR',
+    'shop_title':'🛒 LOJA','shop_items':'ITENS','shop_powerups':'MELHORIAS',
+    'shop_buy':'COMPRAR 🪙','shop_watch_ad':'📺 VER ANÚNCIO','shop_reset':'↺ REINICIAR',
+    'item_map':'MAPA','item_map_desc':'Revela várias células de terreno seguras',
+    'item_lantern':'LANTERNA','item_lantern_desc':'Ilumina células adjacentes com segurança',
+    'item_medkit':'KIT MÉDICO','item_medkit_desc':'Restaura vida imediatamente',
+    'item_invinc':'INVENCIBILIDADE','item_invinc_desc':'Sem dano em toda a partida',
+    'item_slowtime':'DESACELERAÇÃO','item_slowtime_desc':'Dobra o tempo restante (só Arcade)',
+    'item_ai':'IA RESOLVEDOR','item_ai_desc':'Revela o campo completo com animação passo a passo',
+    'win_title':'🌍 PLANETA RESOLVIDO!','go_title':'💀 GAME OVER',
+    'go_msg':'VIDA ESGOTADA — tabuleiro revelado para mostrar erros',
+    'btn_next':'▶ PRÓXIMO NÍVEL','btn_end':'🏁 FIM','btn_restart':'↺ REINICIAR','btn_mainmenu':'🏠 MENU PRINCIPAL',
+    'close':'✕ FECHAR',
+    'win_coins_earned':'🪙 MOEDAS GANHAS:',
+    'win_double_offer':'📺 ASSISTA UM ANÚNCIO PARA DOBRAR SUAS MOEDAS!',
+    'win_double_btn':'📺 DOBRAR MOEDAS',
+    'go_retry_offer':'📺 ASSISTA UM ANÚNCIO PARA TENTAR NOVAMENTE!',
+    'go_retry_btn':'📺 TENTAR NOVAMENTE',
+    'help_title':'❓ COMO JOGAR',
+    'help_obj_head':'🎯 OBJETIVO',
+    'help_obj':'Explore o planeta hexagonal, colete todos os recursos necessários no painel direito, depois alcance o 🌀 PORTAL e pressione COLETAR para completar o nível.',
+    'help_ctrl_head':'🖱 CONTROLES',
+    'help_ctrl':'Toque/clique em uma célula para selecioná-la. Atalhos de teclado:',
+    'help_key_r':'Revelar célula selecionada',
+    'help_key_c':'Coletar / usar item',
+    'help_key_f':'Marcar mina suspeita',
+    'help_key_zoom':'Zoom',
+    'help_key_reset':'Redefinir vista',
+    'help_key_pan':'Mover mapa',
+    'help_key_debug':'Modo debug (recursos infinitos)',
+    'help_actions_head':'⚡ AÇÕES',
+    'help_reveal':'REVELAR','help_reveal_desc':'Descobre a célula selecionada. Minas custam vida!',
+    'help_collect':'COLETAR','help_collect_desc':'Coleta um recurso ou ativa um item encontrado.',
+    'help_flag':'MARCAR','help_flag_desc':'Marca uma mina suspeita.',
+    'help_mines_head':'⚠ MINAS',
+    'help_mines':'Revelar uma 💣 MINA custa vida. A água também esconde 💣 MINAS AQUÁTICAS!',
+    'help_res_head':'📦 RECURSOS',
+    'help_res_land':'Terra: 🌲 Madeira · 🪨 Pedra · ⚙️ Ferro · 🪵 Carvão · 🪙 Ouro · 💎 Cristal · 🌿 Ervas · 🍄 Cogumelo',
+    'help_res_water':'Água: 🐠 Peixe · 🦀 Caranguejo · 🪸 Coral · 🫧 Pérola · 🐙 Polvo',
+    'help_res_info':'Novos tipos de recursos são desbloqueados ao avançar de nível.',
+    'help_special_head':'✨ ITENS ESPECIAIS',
+    'help_bomb':'BOMBA','help_bomb_desc':'Revela todos os vizinhos (minas metade do dano)',
+    'help_map':'MAPA','help_map_desc':'Revela várias células seguras ao acaso',
+    'help_potion':'POÇÃO','help_potion_desc':'60% curar, 40% dano',
+    'help_lantern':'LANTERNA','help_lantern_desc':'Ilumina células adjacentes sem dano',
+    'help_medkit':'KIT','help_medkit_desc':'Restaura vida ao coletar',
+    'help_shop_head':'🛒 LOJA',
+    'help_shop':'Ganhe 🪙 moedas revelando células. Assista anúncios para itens grátis!',
+    'help_arcade_head':'⏱ MODO ARCADE',
+    'help_arcade':'Ative o Modo Arcade na tela inicial. Complete o nível antes do tempo acabar!',
+    'help_score_head':'🏆 PONTUAÇÃO',
+    'help_score_reveal':'+5 por célula revelada',
+    'help_score_collect':'+20×nível por recurso coletado',
+    'help_score_level':'+200×nível por completar um nível',
+    'help_score_coins':'+moedas por revelar e coletar',
+  },
+  zh: {
+    'btn_reveal':'🔍 <u>R</u>揭露','btn_collect':'⛏ <u>C</u>收集','btn_flag':'🚩 <u>F</u>标记',
+    'btn_quit':'🏳 放弃','btn_menu':'🏠 菜单',
+    'hud_player':'玩家','hud_coins':'金币',
+    'start_play':'🚀 开始!','start_hist':'📜 游戏历史','start_shop':'🛒 商店','start_help':'❓ 如何游玩',
+    'arcade_off':'⏱ 街机: 关','arcade_on':'⏱ 街机: 开',
+    'start_name_ph':'输入你的名字...','start_name_label':'你的名字','start_avatar_label':'选择头像',
+    'shop_title':'🛒 商店','shop_items':'物品','shop_powerups':'强化道具',
+    'shop_buy':'购买 🪙','shop_watch_ad':'📺 看广告','shop_reset':'↺ 重置价格',
+    'item_map':'地图','item_map_desc':'随机揭露多个安全地形格',
+    'item_lantern':'灯笼','item_lantern_desc':'安全照亮相邻格子（无地雷伤害）',
+    'item_medkit':'急救包','item_medkit_desc':'立即恢复生命值',
+    'item_invinc':'无敌','item_invinc_desc':'整场比赛无伤害',
+    'item_slowtime':'时间减速','item_slowtime_desc':'剩余时间翻倍（仅街机模式）',
+    'item_ai':'AI解析器','item_ai_desc':'逐步动画展示完整棋盘',
+    'win_title':'🌍 星球攻略!','go_title':'💀 游戏结束',
+    'go_msg':'生命耗尽 — 棋盘已揭露显示错误',
+    'btn_next':'▶ 下一关','btn_end':'🏁 结束游戏','btn_restart':'↺ 重新开始','btn_mainmenu':'🏠 主菜单',
+    'close':'✕ 关闭',
+    'win_coins_earned':'🪙 获得金币:',
+    'win_double_offer':'📺 看广告将金币翻倍!',
+    'win_double_btn':'📺 金币翻倍',
+    'go_retry_offer':'📺 看广告重试本关!',
+    'go_retry_btn':'📺 重试关卡',
+    'help_title':'❓ 如何游玩',
+    'help_obj_head':'🎯 目标',
+    'help_obj':'探索六边形星球，收集右侧面板所示的所有资源，然后到达🌀传送门并按收集完成关卡。',
+    'help_ctrl_head':'🖱 操作',
+    'help_ctrl':'点击格子选中。键盘快捷键:',
+    'help_key_r':'揭露选中格子',
+    'help_key_c':'收集资源 / 使用物品',
+    'help_key_f':'标记疑似地雷',
+    'help_key_zoom':'缩放',
+    'help_key_reset':'重置视图',
+    'help_key_pan':'移动地图',
+    'help_key_debug':'调试模式（无限资源）',
+    'help_actions_head':'⚡ 动作',
+    'help_reveal':'揭露','help_reveal_desc':'揭开选中格子。地雷格子会消耗生命!',
+    'help_collect':'收集','help_collect_desc':'收集资源或激活发现的物品。',
+    'help_flag':'标记','help_flag_desc':'标记疑似地雷。标记格子不会被意外揭露。',
+    'help_mines_head':'⚠ 地雷',
+    'help_mines':'揭露💣地雷会消耗生命。水中也隐藏💣水雷!',
+    'help_res_head':'📦 资源',
+    'help_res_land':'陆地: 🌲木材·🪨石头·⚙️铁矿·🪵煤炭·🪙黄金·💎水晶·🌿草药·🍄蘑菇',
+    'help_res_water':'水域: 🐠鱼·🦀螃蟹·🪸珊瑚·🫧珍珠·🐙章鱼',
+    'help_res_info':'随着关卡推进，新资源类型会解锁。',
+    'help_special_head':'✨ 特殊物品',
+    'help_bomb':'炸弹','help_bomb_desc':'揭露所有相邻格（地雷半伤）',
+    'help_map':'地图','help_map_desc':'随机揭露安全格子',
+    'help_potion':'药水','help_potion_desc':'60%治疗，40%伤害',
+    'help_lantern':'灯笼','help_lantern_desc':'安全照亮相邻格子',
+    'help_medkit':'急救','help_medkit_desc':'收集时恢复生命',
+    'help_shop_head':'🛒 商店',
+    'help_shop':'揭露格子获得🪙金币，在商店购买道具或看广告免费领取!',
+    'help_arcade_head':'⏱ 街机模式',
+    'help_arcade':'在开始界面启用街机模式，在倒计时结束前完成关卡!',
+    'help_score_head':'🏆 得分',
+    'help_score_reveal':'每揭露格子+5',
+    'help_score_collect':'每收集资源+20×关卡',
+    'help_score_level':'完成关卡+200×关卡',
+    'help_score_coins':'+金币用于商店',
+  },
+};
+
+function T(key) {
+  return (STRINGS[currentLang]||STRINGS.en)[key] || STRINGS.en[key] || key;
+}
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-select,#lang-select-start').forEach(s => s.value = lang);
+  try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
+  applyI18n();
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (el.tagName==='INPUT') { el.placeholder = T(k).replace(/<[^>]+>/g,''); return; }
+    el.innerHTML = T(k);
+  });
+  const br=document.getElementById('b-reveal'); if(br) br.innerHTML=T('btn_reveal');
+  const bc=document.getElementById('b-collect'); if(bc) bc.innerHTML=T('btn_collect');
+  const bf=document.getElementById('b-flag'); if(bf) bf.innerHTML=T('btn_flag');
+  const bq=document.getElementById('b-quit'); if(bq&&!gameAbandoned) bq.innerHTML=T('btn_quit');
+  const bm=document.getElementById('b-menu'); if(bm) bm.innerHTML=T('btn_menu');
+  const sp=document.getElementById('start-play-btn'); if(sp) sp.innerHTML=T('start_play');
+  const sh=document.getElementById('start-hist-btn'); if(sh) sh.innerHTML=T('start_hist');
+  const ss=document.getElementById('start-shop-btn'); if(ss) ss.innerHTML=T('start_shop');
+  const shelp=document.getElementById('start-help-btn'); if(shelp) shelp.innerHTML=T('start_help');
+  const sn=document.getElementById('start-name'); if(sn) sn.placeholder=T('start_name_ph').replace(/<[^>]+>/g,'');
+  const ab=document.getElementById('arcade-toggle-btn'); if(ab) ab.textContent=arcadeMode?T('arcade_on'):T('arcade_off');
+  const pl=document.getElementById('player-label'); if(pl) pl.textContent=T('hud_player');
+  const cl=document.querySelector('#coins-hud .top-label'); if(cl) cl.textContent=T('hud_coins');
+  const st2=document.getElementById('shop-title'); if(st2) st2.textContent=T('shop_title');
+  const wh=document.querySelector('#sc-level h1'); if(wh) wh.textContent=T('win_title').replace(/<[^>]+>/g,'');
+  const gh=document.querySelector('#sc-over h1'); if(gh) gh.textContent=T('go_title').replace(/<[^>]+>/g,'');
+  const gp=document.querySelector('#sc-over p'); if(gp) gp.textContent=T('go_msg').replace(/<[^>]+>/g,'');
+}
+
+(function(){
+  try { const s=localStorage.getItem(LANG_KEY); if(s&&STRINGS[s]){currentLang=s;} } catch(e){}
+  document.querySelectorAll('#lang-select,#lang-select-start').forEach(s=>s.value=currentLang);
+  setTimeout(applyI18n, 60);
+})();
+
+</script>
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// ── GAME DISTRIBUTION SDK INTEGRATION
+// ════════════════════════════════════════════════════════════════════════════
+var GD_SDK_LOADED = false;
+const USE_ADS = true; // GameDistribution handles real ads; simulation is fallback
+var gdsdkRewardCallback = null;
+var gdsdkInterstitialCallback = null;
+
+window['GD_OPTIONS'] = {
+  gameId: 'YOUR_GAME_ID_HERE', // ← Replace with your 32-char GameDistribution game ID
+  advertisingEnabled: true,
+  onEvent: function(event) {
+    switch (event.name) {
+      case 'SDK_GAME_START':   break;
+      case 'SDK_GAME_PAUSE':   break;
+      case 'SDK_READY':
+        GD_SDK_LOADED = true;
+        break;
+      case 'SDK_REWARDED_WATCH_COMPLETE':
+        if (gdsdkRewardCallback) { gdsdkRewardCallback(); gdsdkRewardCallback = null; }
+        break;
+      case 'SDK_REWARDED_WATCH_INCOMPLETE':
+      case 'SDK_ERROR':
+        if (gdsdkRewardCallback) { gdsdkRewardCallback(); gdsdkRewardCallback = null; }
+        break;
+      case 'SDK_INTERSTITIAL_CLOSE':
+      case 'SDK_INTERSTITIAL_DISMISSED':
+        if (gdsdkInterstitialCallback) { gdsdkInterstitialCallback(); gdsdkInterstitialCallback = null; }
+        break;
+    }
+  }
+};
+
+// Show a rewarded ad via GD SDK (falls back to simulation if SDK not loaded)
+function showRewardedAd(callback) {
+  gdsdkRewardCallback = callback;
+  if (GD_SDK_LOADED && typeof gdsdk !== 'undefined') {
+    try {
+      gdsdk.showAd(gdsdk.AdType.Rewarded);
+      return;
+    } catch(e) {}
+  }
+  // Fallback simulation
+  showAdSimulation(callback, true);
+}
+
+// Show an interstitial ad via GD SDK
+function showInterstitialAd(callback) {
+  gdsdkInterstitialCallback = callback;
+  if (GD_SDK_LOADED && typeof gdsdk !== 'undefined') {
+    try {
+      gdsdk.showAd(gdsdk.AdType.Interstitial);
+      return;
+    } catch(e) {}
+  }
+  // Fallback simulation — fire immediately
+  if (callback) { setTimeout(callback, 200); gdsdkInterstitialCallback = null; }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── THEME
+// ════════════════════════════════════════════════════════════════════════════
+const THEME_KEY = 'mineplanet-theme';
+let isDark = localStorage.getItem(THEME_KEY) !== 'light';
+function toggleTheme(){
+  isDark=!isDark;document.body.classList.toggle('light',!isDark);
+  localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+}
+if (!isDark) {document.body.classList.add('light');} else {document.body.classList.remove('light');}
+
+// ── STARS ──
+(()=>{
+  const c=document.getElementById('stars');c.width=innerWidth;c.height=innerHeight;
+  const x=c.getContext('2d');
+  for(let i=0;i<380;i++){x.beginPath();x.arc(Math.random()*c.width,Math.random()*c.height,Math.random()*1.5,0,Math.PI*2);x.fillStyle=`rgba(255,255,255,${.1+Math.random()*.8})`;x.fill();}
+  for(let i=0;i<6;i++){const g=x.createRadialGradient(Math.random()*c.width,Math.random()*c.height,0,Math.random()*c.width,Math.random()*c.height,300+Math.random()*400);g.addColorStop(0,`hsla(${Math.random()*360},80%,50%,.05)`);g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);}
+})();
+
+// ── PARTICLES ──
+const pc=document.getElementById('pc');pc.width=innerWidth;pc.height=innerHeight;
+const pctx=pc.getContext('2d');let parts=[];
+function spawnBurst(sx,sy,color,n=14){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,sp=50+Math.random()*110;parts.push({x:sx,y:sy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-30,color,sz:3+Math.random()*5,life:.5+Math.random()*.4,t:0});}}
+function tickParts(dt){pctx.clearRect(0,0,pc.width,pc.height);parts=parts.filter(p=>{p.t+=dt;if(p.t>=p.life)return false;const pct=p.t/p.life;pctx.globalAlpha=(1-pct)*.9;pctx.fillStyle=p.color;const s=p.sz*(1-pct*.5);pctx.fillRect(p.x+p.vx*p.t-s/2,p.y+p.vy*p.t+60*p.t*p.t-s/2,s,s);return true;});pctx.globalAlpha=1;}
+
+// ── CANVAS ──
+const canvas=document.getElementById('gc');const ctx=canvas.getContext('2d');
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;pc.width=innerWidth;pc.height=innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();drawAll();});
+
+// ── HEX MATH ──
+function hexToPixel(q,r,sz){return{x:sz*(Math.sqrt(3)*q+Math.sqrt(3)/2*r),y:sz*(1.5*r)};}
+function pixelToHex(px,py,sz){const q=(Math.sqrt(3)/3*px-1/3*py)/sz;const r=(2/3*py)/sz;return axialRound(q,r);}
+function axialRound(fq,fr){const fs=-fq-fr;let rq=Math.round(fq),rr=Math.round(fr),rs=Math.round(fs);const dq=Math.abs(rq-fq),dr=Math.abs(rr-fr),ds=Math.abs(rs-fs);if(dq>dr&&dq>ds)rq=-rr-rs;else if(dr>ds)rr=-rq-rs;return{q:rq,r:rr};}
+function hexDisk(R){const l=[];for(let q=-R;q<=R;q++){const r1=Math.max(-R,-q-R),r2=Math.min(R,-q+R);for(let r=r1;r<=r2;r++)l.push({q,r});}return l;}
+function hexNeighbors(q,r){return[[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]].map(([dq,dr])=>({q:q+dq,r:r+dr}));}
+function hexDist(q,r){return Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r));}
+
+// ── GAME STATE ──
+let level=1,score=0,maxHp=12,hp=12;
+let cells=[],sel=null;
+let inventory={wood:0,stone:0,iron:0,crystal:0,fish:0};
+let objective={};
+let camX=0,camY=0,camZ=1;
+let hexSize=32;
+let playerName='UNKNOWN';
+let playerAvatar='🌍';
+let matchHistory=[];
+let historyOpen=false;
+let gameAbandoned=false;
+let bombsHit=0;
+
+function lvlCfg(lv){
+  return{
+    radius:Math.min(5+Math.floor(lv/2),11),
+    mineRatio:Math.min(0.06+lv*.022,.22),
+    waterRatio:Math.max(.28-lv*.01,.15),
+    woodNeed:Math.min(1+Math.floor(lv/2),5),
+    stoneNeed:Math.min(1+Math.floor(lv/2),5),
+    ironNeed:Math.min(1+Math.floor(lv/2),4),
+    fishNeed:Math.min(1+Math.floor(lv/2),5),
+    coalNeed:lv>=2?Math.min(Math.floor((lv-1)/2)+1,3):0,
+    crabNeed:lv>=2?Math.min(Math.floor((lv-1)/2)+1,3):0,
+    goldNeed:lv>=3?Math.min(Math.floor((lv-2)/2)+1,3):0,
+    coralNeed:lv>=3?Math.min(Math.floor((lv-2)/2)+1,3):0,
+    crystalNeed:lv>=4?Math.min(Math.floor((lv-3)/2)+1,3):0,
+    herbsNeed:lv>=5?Math.min(Math.floor((lv-4)/2)+1,2):0,
+    pearlNeed:lv>=5?Math.min(Math.floor((lv-4)/2)+1,2):0,
+    mushroomNeed:lv>=6?Math.min(Math.floor((lv-5)/2)+1,2):0,
+    octopusNeed:lv>=7?Math.min(Math.floor((lv-6)/2)+1,2):0,
+  };
+}
+
+// ── COLORS ──
+const DARK={landHidden:'#0e2018',landHiddenBorder:'#1c3828',waterHidden:'#061828',waterHiddenBorder:'#0d3060',revealedLandBorder:'#00ff88',revealedWaterBorder:'#00aaff'};
+const LIGHT={landHidden:'#b8d8c0',landHiddenBorder:'#7aaa88',waterHidden:'#8ab8d8',waterHiddenBorder:'#4488bb',revealedLandBorder:'#008844',revealedWaterBorder:'#0066aa'};
+function TC(){return isDark?DARK:LIGHT;}
+
+const ICFG={
+  empty:{i:'',s:.60,g:null},wood:{i:'🌲',s:.62,g:null},stone:{i:'🪨',s:.62,g:null},iron:{i:'⚙️',s:.60,g:'#66aaff'},
+  crystal:{i:'💎',s:.60,g:'#aa88ff'},gold:{i:'🪙',s:.62,g:'#ffdd00'},coal:{i:'🪵',s:.60,g:'#886644'},
+  herbs:{i:'🌿',s:.62,g:'#44ff88'},mushroom:{i:'🍄',s:.62,g:'#ff8844'},water:{i:'',s:.55,g:null},
+  fish:{i:'🐠',s:.72,g:'#00ddff'},coral:{i:'🪸',s:.62,g:'#ff6688'},pearl:{i:'🫧',s:.58,g:'#aaddff'},
+  crab:{i:'🦀',s:.64,g:'#ff5522'},octopus:{i:'🐙',s:.64,g:'#cc44ff'},portal:{i:'🌀',s:.60,g:'#bb44ff'},
+  mine:{i:'💣',s:.58,g:'#ff3355'},waterMine:{i:'💣',s:.58,g:'#ff3355'},medkit:{i:'🩺',s:.58,g:'#ff4466'},
+  bomb:{i:'💥',s:.62,g:'#ff8800'},map:{i:'🗺️',s:.58,g:'#44ffff'},potion:{i:'🧪',s:.60,g:'#aa44ff'},
+  lantern:{i:'🔦',s:.58,g:'#ffee44'},
+};
+
+const NUM_COLORS_DARK=['#00ff88','#44ff55','#aaff44','#ffff33','#ffbb00','#ff7700','#ff2255','#ee00ff','#aaaaff'];
+const NUM_COLORS_LIGT=['#00cc77','#3ac94d','#8ecc39','#d4c92a','#ffa500','#ff6200','#e6194b','#c71585','#7a7aff'];
+const RES_ICONS={wood:'🌲',stone:'🪨',iron:'⚙️',crystal:'💎',fish:'🐠',gold:'🪙',coal:'🪵',herbs:'🌿',mushroom:'🍄',coral:'🪸',pearl:'🫧',crab:'🦀',octopus:'🐙'};
+const COLLECT_TYPES=['wood','stone','iron','crystal','fish','gold','coal','herbs','mushroom','coral','pearl','crab','octopus','portal'];
+const SPECIAL_COLLECT=['medkit','bomb','map','potion','lantern'];
+const WATER_TYPES=['water','fish','waterMine','coral','pearl','crab','octopus'];
+const SPECIAL_REVEAL=[];
+
+// ── BUILD PLANET ──
+function buildPlanet(){
+  gameAbandoned=false;bombsHit=0;updateQuitBtn();
+  const cfg=lvlCfg(level);const R=cfg.radius;
+  hexSize=Math.max(22,Math.min(42,Math.floor(210/(R+1))));cells=[];
+  hexDisk(R).forEach(({q,r})=>{
+    const d=hexDist(q,r);const rng=Math.random();const ef=d/R;
+    const wc=cfg.waterRatio*(0.5+ef)+(Math.abs(r)>R*.6?.5:0)+(d===R?.4:0);
+    let type='empty';
+    if(rng<Math.min(wc,.9))type='water';
+    else if(rng<wc+cfg.mineRatio)type='mine';
+    else if(rng<wc+cfg.mineRatio+.09)type='wood';
+    else if(rng<wc+cfg.mineRatio+.16)type='stone';
+    else if(rng<wc+cfg.mineRatio+.21)type='iron';
+    else if(rng<wc+cfg.mineRatio+.25)type='coal';
+    else if(cfg.goldNeed>0&&rng<wc+cfg.mineRatio+.28)type='gold';
+    else if(cfg.crystalNeed>0&&rng<wc+cfg.mineRatio+.31)type='crystal';
+    else if(cfg.herbsNeed>0&&rng<wc+cfg.mineRatio+.33)type='herbs';
+    else if(cfg.mushroomNeed>0&&rng<wc+cfg.mineRatio+.35)type='mushroom';
+    const p=hexToPixel(q,r,hexSize);
+    cells.push({q,r,type,revealed:false,flagged:false,adjacent:0,px:p.x,py:p.y,dist:d});
+  });
+  cells.filter(c=>c.type==='water').forEach(c=>{
+    const rw=Math.random();
+    if(rw<.30)c.type='fish';
+    else if(rw<.42&&cfg.coralNeed>0)c.type='coral';
+    else if(rw<.50&&cfg.crabNeed>0)c.type='crab';
+    else if(rw<.55&&cfg.pearlNeed>0)c.type='pearl';
+    else if(rw<.58&&cfg.octopusNeed>0)c.type='octopus';
+  });
+  cells.filter(c=>WATER_TYPES.includes(c.type)).forEach(c=>{if(Math.random()<.15)c.type='waterMine';});
+  const landNeeds=[
+    {key:'wood',need:cfg.woodNeed},{key:'stone',need:cfg.stoneNeed},{key:'iron',need:cfg.ironNeed},{key:'coal',need:cfg.coalNeed},
+    ...(cfg.goldNeed>0?[{key:'gold',need:cfg.goldNeed}]:[]),
+    ...(cfg.crystalNeed>0?[{key:'crystal',need:cfg.crystalNeed}]:[]),
+    ...(cfg.herbsNeed>0?[{key:'herbs',need:cfg.herbsNeed}]:[]),
+    ...(cfg.mushroomNeed>0?[{key:'mushroom',need:cfg.mushroomNeed}]:[]),
+  ];
+  landNeeds.forEach(({key,need})=>{
+    if(!need)return;const have=cells.filter(c=>c.type===key).length;
+    if(have<need){let pool=cells.filter(c=>c.type==='empty'&&c.dist<R-1);for(let i=have;i<need&&pool.length;i++){const idx=Math.floor(Math.random()*pool.length);pool[idx].type=key;pool.splice(idx,1);}}
+  });
+  const waterNeeds=[
+    {key:'fish',need:cfg.fishNeed},
+    ...(cfg.coralNeed>0?[{key:'coral',need:cfg.coralNeed}]:[]),
+    ...(cfg.crabNeed>0?[{key:'crab',need:cfg.crabNeed}]:[]),
+    ...(cfg.pearlNeed>0?[{key:'pearl',need:cfg.pearlNeed}]:[]),
+    ...(cfg.octopusNeed>0?[{key:'octopus',need:cfg.octopusNeed}]:[]),
+  ];
+  waterNeeds.forEach(({key,need})=>{
+    if(!need)return;const have=cells.filter(c=>c.type===key).length;
+    if(have<need){
+      let pool=cells.filter(c=>WATER_TYPES.includes(c.type)&&c.type!=='waterMine');
+      for(let i=have;i<need&&pool.length;i++){const idx=Math.floor(Math.random()*pool.length);pool[idx].type=key;pool.splice(idx,1);}
+    }
+  });
+  // Special items
+  const specials=['medkit','bomb','map','potion','lantern'];
+  let emptyPool=cells.filter(c=>c.type==='empty'&&c.dist<R-1);
+  specials.forEach(s=>{if(emptyPool.length){const idx=Math.floor(Math.random()*emptyPool.length);emptyPool[idx].type=s;emptyPool.splice(idx,1);}});
+  // Portal
+  const outerRing=cells.filter(c=>c.dist===R&&(c.type==='empty'||c.type==='stone'));
+  const portalCell=outerRing[Math.floor(Math.random()*outerRing.length)]||cells.find(c=>c.type==='empty');
+  if(portalCell)portalCell.type='portal';
+  // Adjacency
+  cells.forEach(c=>{c.adjacent=hexNeighbors(c.q,c.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;});
+  // Objective
+  const cfg2=lvlCfg(level);
+  objective={};inventory={};
+  if(cfg2.woodNeed)objective.wood=cfg2.woodNeed;if(cfg2.stoneNeed)objective.stone=cfg2.stoneNeed;
+  if(cfg2.ironNeed)objective.iron=cfg2.ironNeed;if(cfg2.fishNeed)objective.fish=cfg2.fishNeed;
+  if(cfg2.coalNeed)objective.coal=cfg2.coalNeed;if(cfg2.goldNeed)objective.gold=cfg2.goldNeed;
+  if(cfg2.crystalNeed)objective.crystal=cfg2.crystalNeed;if(cfg2.herbsNeed)objective.herbs=cfg2.herbsNeed;
+  if(cfg2.pearlNeed)objective.pearl=cfg2.pearlNeed;if(cfg2.mushroomNeed)objective.mushroom=cfg2.mushroomNeed;
+  if(cfg2.coralNeed)objective.coral=cfg2.coralNeed;if(cfg2.crabNeed)objective.crab=cfg2.crabNeed;
+  if(cfg2.octopusNeed)objective.octopus=cfg2.octopusNeed;
+  sel=null;camX=0;camY=0;camZ=1;
+  updateUI();drawAll();
+}
+
+function findCell(q,r){return cells.find(c=>c.q===q&&c.r===r)||null;}
+
+// ── WORLD / SCREEN ──
+function worldToScreen(wx,wy){return{x:(wx+camX)*camZ+canvas.width/2,y:(wy+camY)*camZ+canvas.height/2};}
+function screenToWorld(sx,sy){return{x:(sx-canvas.width/2)/camZ-camX,y:(sy-canvas.height/2)/camZ-camY};}
+
+// ── DRAW ──
+let portalPhase=0;
+const GAP=.08;
+function lighten(hex,f){let c=parseInt(hex.slice(1),16);let r=Math.min(255,((c>>16)&255)+Math.round(255*f));let g=Math.min(255,((c>>8)&255)+Math.round(255*f));let b=Math.min(255,(c&255)+Math.round(255*f));return`rgb(${r},${g},${b})`;}
+
+function hexPath(sx,sy,sz,gap){
+  ctx.beginPath();
+  for(let i=0;i<6;i++){const a=Math.PI/6+i*Math.PI/3;ctx.lineTo(sx+Math.cos(a)*sz*(1-gap),sy+Math.sin(a)*sz*(1-gap));}
+  ctx.closePath();
+}
+
+function drawAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  cells.forEach(c=>{
+    const sp=worldToScreen(c.px,c.py);
+    const sz=hexSize*camZ;
+    if(sp.x<-sz||sp.x>canvas.width+sz||sp.y<-sz||sp.y>canvas.height+sz)return;
+    drawHex(c,sp.x,sp.y,sz);
+  });
+  ctx.restore();
+}
+
+function drawHex(c,sx,sy,sz){
+  const tc=TC();const isWater=WATER_TYPES.includes(c.type)||c.type==='waterMine';const isSel=c===sel;
+  const fillH=isWater?tc.waterHidden:tc.landHidden;
+  let borderH;
+  if(c.revealed){
+    borderH=isSel?(isWater?(isDark?'#00e5ff':'#0066aa'):(isDark?'#00ff88':'#008844')):(isWater?tc.revealedWaterBorder:tc.revealedLandBorder);
+  } else {
+    borderH=isSel?(isWater?(isDark?'#00e5ff':'#0066aa'):(isDark?'#00ff88':'#008844')):(isWater?tc.waterHiddenBorder:tc.landHiddenBorder);
+  }
+  if(isWater&&c.revealed){const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,sz);grad.addColorStop(0,lighten(fillH,.30));grad.addColorStop(1,fillH);hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();}
+  else{const grad=ctx.createRadialGradient(sx,sy-sz*.1,0,sx,sy,sz);grad.addColorStop(0,lighten(fillH,.14));grad.addColorStop(1,fillH);hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();}
+  if(isWater&&!c.revealed){hexPath(sx,sy,sz,GAP);ctx.fillStyle=`rgba(20,80,200,${.06+.05*Math.sin(portalPhase*1.5+c.q*.8+c.r*.5)})`;ctx.fill();}
+  hexPath(sx,sy,sz,GAP);ctx.strokeStyle=borderH;ctx.lineWidth=isSel?3.5:(c.revealed?3.0:1.2);ctx.stroke();
+  if(c.revealed&&!isSel){hexPath(sx,sy,sz*1.05,GAP);ctx.strokeStyle=isWater?'rgba(0,160,255,.40)':'rgba(0,255,136,.32)';ctx.lineWidth=5;ctx.stroke();}
+  if(isSel){hexPath(sx,sy,sz*1.08,GAP);ctx.strokeStyle=isWater?(isDark?'rgba(0,229,255,.55)':'rgba(0,100,180,.5)'):(isDark?'rgba(0,255,136,.55)':'rgba(0,120,60,.5)');ctx.lineWidth=9;ctx.stroke();}
+  if(c.type==='portal'&&c.revealed){
+    const p=Math.sin(portalPhase)*.5+.5;const p2=Math.sin(portalPhase*1.7+1)*.5+.5;
+    hexPath(sx,sy,sz,GAP);ctx.fillStyle=`rgba(120,20,220,${.18+.22*p})`;ctx.fill();
+    hexPath(sx,sy,sz*1.18,GAP);ctx.strokeStyle=`rgba(200,80,255,${.15+.35*p2})`;ctx.lineWidth=6+4*p2;ctx.stroke();
+    hexPath(sx,sy,sz,GAP);ctx.strokeStyle=`rgba(220,100,255,${.6+.4*p})`;ctx.lineWidth=3.5;ctx.stroke();
+    const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,sz*.5);grad.addColorStop(0,`rgba(200,100,255,${.25*p})`);grad.addColorStop(1,'rgba(100,20,200,0)');
+    hexPath(sx,sy,sz,GAP);ctx.fillStyle=grad;ctx.fill();ctx.shadowColor='#cc44ff';ctx.shadowBlur=20+18*p;
+  }
+  if(!c.revealed&&!isWater){for(let dd=-1;dd<=1;dd++)for(let dr=-1;dr<=1;dr++){if(!dd&&!dr)continue;ctx.beginPath();ctx.arc(sx+dd*sz*.27,sy+dr*sz*.19,1.2,0,Math.PI*2);ctx.fillStyle=isDark?'rgba(0,255,100,.055)':'rgba(0,80,40,.07)';ctx.fill();}}
+  if(c.revealed){
+    const cfg=ICFG[c.type]||ICFG.empty;
+    if(cfg.i){const fs=Math.max(22,sz*cfg.s);ctx.font=`${fs}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';if(cfg.g){ctx.shadowColor=cfg.g;ctx.shadowBlur=18;}ctx.fillText(cfg.i,sx,sy+sz*.02);ctx.shadowBlur=0;}
+    if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine'){
+      const col=(isDark?NUM_COLORS_DARK:NUM_COLORS_LIGT)[c.adjacent-1]||'#fff';
+      const fs=Math.max(22,Math.min(sz*.28,18));ctx.font=`bold ${fs}px "Georgia"`;
+      const ns=String(c.adjacent),tw=ctx.measureText(ns).width;const bx=sx+(cfg.i?sz*.3:0),by=sy-(cfg.i?sz*.28:0);
+      ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=10;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(ns,bx,by);ctx.shadowBlur=0;
+    }
+  }
+  if(c.flagged){const fsize=Math.max(13,sz*.52);ctx.font=`${fsize}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='#ff3355';ctx.shadowBlur=14;ctx.fillStyle='rgba(255,30,60,.9)';ctx.fillText('🚩',sx,sy);ctx.shadowBlur=0;}
+}
+
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+
+// ── INPUT ──
+let ptrs={},pinchDist=null,panStart=null,panCam=null,tapPt=null,moved=false;
+canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);ptrs[e.pointerId]={x:e.clientX,y:e.clientY};tapPt={x:e.clientX,y:e.clientY};moved=false;if(Object.keys(ptrs).length===1){panStart={x:e.clientX,y:e.clientY};panCam={x:camX,y:camY};}});
+canvas.addEventListener('pointermove',e=>{if(!ptrs[e.pointerId])return;ptrs[e.pointerId]={x:e.clientX,y:e.clientY};const arr=Object.values(ptrs);if(arr.length===2){const dx=arr[0].x-arr[1].x,dy=arr[0].y-arr[1].y,d=Math.sqrt(dx*dx+dy*dy);if(pinchDist)camZ=Math.max(.25,Math.min(4,camZ*(d/pinchDist)));pinchDist=d;moved=true;}else if(arr.length===1&&panStart){const dx=e.clientX-panStart.x,dy=e.clientY-panStart.y;if(Math.abs(dx)+Math.abs(dy)>8)moved=true;if(moved){camX=panCam.x+dx/camZ;camY=panCam.y+dy/camZ;}}});
+canvas.addEventListener('pointerup',e=>{if(!moved&&tapPt){const dx=e.clientX-tapPt.x,dy=e.clientY-tapPt.y;if(Math.abs(dx)+Math.abs(dy)<12)handleTap(e.clientX,e.clientY);}delete ptrs[e.pointerId];if(Object.keys(ptrs).length<2)pinchDist=null;if(!Object.keys(ptrs).length)panStart=null;});
+canvas.addEventListener('wheel',e=>{camZ=Math.max(.25,Math.min(4,camZ*(e.deltaY<0?1.12:.89)));e.preventDefault();},{passive:false});
+
+function handleTap(sx,sy){
+  if(gameAbandoned)return;
+  const w=screenToWorld(sx,sy);const {q,r}=pixelToHex(w.x,w.y,hexSize);
+  const c=findCell(q,r);if(!c)return;
+  sel=c;updateCellInfo(c);updateActionBtns(c);drawAll();
+}
+function zoom(f){camZ=Math.max(.25,Math.min(4,camZ*f));}
+function resetView(){camX=0;camY=0;camZ=1;}
+
+// ── ACTIONS ──
+function doReveal(){
+  if(gameAbandoned||!sel||sel.revealed||sel.flagged)return;
+  sel.revealed=true;
+  const sp=worldToScreen(sel.px,sel.py);
+  if(sel.type==='mine'||sel.type==='waterMine'){
+    const dmg=Math.max(2,3+Math.floor(level/3));hp-=dmg;shakeT=450;bombsHit++;
+    flashFn('#ff1133','.3');spawnBurst(sp.x,sp.y,'#ff3355',20);spawnBurst(sp.x,sp.y,'#ff8800',8);
+    toast(`💥 MINE! −${dmg} HP`);updateHpUI();updateMinesUI();if(hp<=0){gameOver();return;}
+  } else if(sel.type==='medkit'){spawnBurst(sp.x,sp.y,'#ff4444',8);toast(`🩺 MEDKIT found! Press ⛏ COLLECT to use it`);
+  } else if(sel.type==='bomb'){spawnBurst(sp.x,sp.y,'#ff8800',10);toast(`💥 BOMB found! Press ⛏ COLLECT to detonate`);
+  } else if(sel.type==='map'){spawnBurst(sp.x,sp.y,'#44ffff',10);toast(`🗺️ MAP found! Press ⛏ COLLECT to reveal terrain`);
+  } else if(sel.type==='potion'){spawnBurst(sp.x,sp.y,'#aa44ff',10);toast(`🧪 POTION found! Press ⛏ COLLECT to drink`);
+  } else if(sel.type==='lantern'){spawnBurst(sp.x,sp.y,'#ffee44',10);toast(`🔦 LANTERN found! Press ⛏ COLLECT to illuminate`);
+  } else if(sel.type==='portal'){spawnBurst(sp.x,sp.y,'#aa44ff',18);toast('🌀 PORTAL FOUND! Collect resources then use COLLECT here');
+  } else if(WATER_TYPES.includes(sel.type)){spawnBurst(sp.x,sp.y,'#0088ff',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);
+  } else {spawnBurst(sp.x,sp.y,isDark?'#00ff88':'#008844',8);if(sel.adjacent===0)floodFill(sel.q,sel.r);}
+  score+=5;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
+}
+
+function floodFill(q,r){
+  const queue=[{q,r}],seen=new Set([`${q},${r}`]);
+  while(queue.length){
+    const {q:cq,r:cr}=queue.shift();
+    hexNeighbors(cq,cr).forEach(({q:nq,r:nr})=>{
+      const k=`${nq},${nr}`;if(seen.has(k))return;seen.add(k);
+      const nc=findCell(nq,nr);
+      if(!nc||nc.revealed||nc.flagged||nc.type==='mine'||nc.type==='waterMine')return;
+      nc.revealed=true;if(nc.adjacent===0)queue.push({q:nq,r:nr});
+    });
+  }
+}
+
+function doCollect(){
+  if(gameAbandoned||!sel||!sel.revealed)return;
+  const isSpecial=SPECIAL_COLLECT.includes(sel.type);
+  if(!COLLECT_TYPES.includes(sel.type)&&!isSpecial){toast('⚠ NOTHING TO COLLECT');return;}
+  if(sel.type==='medkit'){
+    const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);
+    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#ff4444',12);spawnBurst(sp.x,sp.y,'#ffffff',8);
+    toast(`🩺 MEDKIT! +${heal} HP`);updateHpUI();flashFn('#ff0044','.1');
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='bomb'){
+    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#ff8800',22);flashFn('#ff8800','.2');
+    let revealed=0;
+    hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{
+      const nc=findCell(q,r);if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;if(nc.type==='mine'||nc.type==='waterMine'){bombsHit++;const dmg=Math.max(1,Math.floor((3+Math.floor(level/3))/2));hp-=dmg;toast(`💥 BOMB HIT MINE! −${dmg} HP`);updateHpUI();if(hp<=0){sel.type='empty';gameOver();return;}}}
+    });
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`💥 BOMB! ${revealed} cells revealed`);shakeT=250;score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();return;
+  }
+  if(sel.type==='map'){
+    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#44ffff',18);flashFn('#44ffff','.1');
+    const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');
+    const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);toReveal.forEach(c=>c.revealed=true);
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`🗺️ MAP! ${toReveal.length} terrain cells revealed`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='potion'){
+    const sp=worldToScreen(sel.px,sel.py);const lucky=Math.random()<.6;
+    if(lucky){const heal=Math.min(3+Math.floor(level/2),6);hp=Math.min(hp+heal,maxHp);spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#44ff88',8);toast(`🧪 LUCKY POTION! +${heal} HP`);flashFn('#aa44ff','.1');}
+    else{const dmg=Math.max(1,2+Math.floor(level/4));hp-=dmg;spawnBurst(sp.x,sp.y,'#aa44ff',14);spawnBurst(sp.x,sp.y,'#ff3355',8);toast(`🧪 BAD POTION! −${dmg} HP`);flashFn('#aa44ff','.15');shakeT=200;}
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    updateHpUI();if(hp<=0){gameOver();return;}score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='lantern'){
+    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#ffee44',16);flashFn('#ffee44','.08');
+    let revealed=0;hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{const nc=findCell(q,r);if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}});
+    sel.type='empty';sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+    toast(`🔦 LANTERN! ${revealed} cells illuminated safely`);score+=10*level;updateScoreUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();return;
+  }
+  if(sel.type==='portal'){
+    if(!objDone()){toast('⚠ COLLECT ALL RESOURCES FIRST!');return;}
+    score+=200*level;updateScoreUI();
+    const sp=worldToScreen(sel.px,sel.py);spawnBurst(sp.x,sp.y,'#aa44ff',28);flashFn('#aa44ff','.18');
+    setTimeout(()=>showWinScreen(),800);return;
+  }
+  // Normal resource collect
+  inventory[sel.type]=(inventory[sel.type]||0)+1;
+  const sp=worldToScreen(sel.px,sel.py);
+  const cols={wood:'#44ff44',stone:'#aaaaaa',iron:'#4488ff',crystal:'#aa44ff',fish:'#44ccff',gold:'#ffdd00',coal:'#886644',herbs:'#44ff88',mushroom:'#ff8844',coral:'#ff6688',pearl:'#aaddff',crab:'#ff5522',octopus:'#cc44ff'};
+  spawnBurst(sp.x,sp.y,cols[sel.type]||'#ffaa00',14);flashFn(isDark?'#ffaa00':'#bb6600','.07');
+  toast(`✓ +1 ${sel.type.toUpperCase()}`);score+=20*level;
+  sel.type=WATER_TYPES.includes(sel.type)?'water':'empty';
+  sel.adjacent=hexNeighbors(sel.q,sel.r).map(n=>findCell(n.q,n.r)).filter(n=>n&&(n.type==='mine'||n.type==='waterMine')).length;
+  updateScoreUI();updateResUI();updateCellInfo(sel);updateActionBtns(sel);drawAll();
+}
+
+function doFlag(){
+  if(gameAbandoned||!sel||sel.revealed)return;
+  sel.flagged=!sel.flagged;toast(sel.flagged?'🚩 FLAGGED':'🚩 REMOVED');
+  updateCellInfo(sel);updateActionBtns(sel);updateMinesUI();drawAll();
+}
+
+// ── COINS EARNED IN LEVEL (computed at win time) ──
+function calcLevelCoins(){
+  // Rough estimate: score this level mapped to coins
+  return Math.max(10, Math.floor(score / 20) + level * 5);
+}
+let _lastLevelCoins = 0;
+
+// ── WIN SCREEN WITH AD OFFER ──
+function showWinScreen(){
+  saveToHistory('✅ WIN LVL '+level);
+  stopArcadeTimer();
+  _lastLevelCoins = calcLevelCoins();
+  const scr = document.getElementById('sc-level');
+  document.getElementById('sc-score').textContent = 'SCORE: '+score;
+  document.getElementById('sc-next').textContent = 'NEXT: LVL '+(level+1);
+  const cfg=lvlCfg(level+1);
+  document.getElementById('sc-diff').textContent=`MINES: ${Math.round(cfg.mineRatio*100)}%  GRID: R${cfg.radius}`;
+  // Update ad offer texts
+  const coinsEl = document.getElementById('win-coins-earned');
+  const offerEl = document.getElementById('win-double-offer-text');
+  const btnEl   = document.getElementById('win-double-btn');
+  if(coinsEl) coinsEl.textContent = T('win_coins_earned') + ' ' + _lastLevelCoins + ' 🪙';
+  if(offerEl) offerEl.textContent = T('win_double_offer');
+  if(btnEl)   btnEl.textContent   = T('win_double_btn');
+  // Show/hide ad button based on USE_ADS
+  const adWrap = document.getElementById('win-ad-wrap');
+  if(adWrap) adWrap.style.display = USE_ADS ? '' : 'none';
+  scr.classList.add('show');
+}
+
+function winWatchAdDouble(){
+  showRewardedAd(()=>{
+    addCoins(_lastLevelCoins); // double = give again
+    toast('🪙 COINS DOUBLED! +' + _lastLevelCoins);
+    document.getElementById('win-ad-wrap').style.display = 'none';
+    spawnBurst(canvas.width/2, canvas.height/2, '#ffaa00', 24);
+  });
+}
+
+// ── GAME OVER SCREEN WITH AD RETRY OFFER ──
+function gameOver(){
+  saveToHistory('💀 GAME OVER');
+  stopArcadeTimer();
+  cells.forEach(c=>{c.revealed=true;c.flagged=false;});
+  sel=null;gameAbandoned=true;
+  updateQuitBtn();updateActionBtns(null);drawAll();
+  // Update go screen
+  document.getElementById('go-score').textContent='SCORE: '+score;
+  const retryOfferEl = document.getElementById('go-retry-offer-text');
+  const retryBtnEl   = document.getElementById('go-retry-btn');
+  if(retryOfferEl) retryOfferEl.textContent = T('go_retry_offer');
+  if(retryBtnEl)   retryBtnEl.textContent   = T('go_retry_btn');
+  const adWrap = document.getElementById('go-ad-wrap');
+  if(adWrap) adWrap.style.display = USE_ADS ? '' : 'none';
+  document.getElementById('sc-over').classList.add('show');
+}
+
+function goWatchAdRetry(){
+  showRewardedAd(()=>{
+    // Retry: restore HP and rebuild same level
+    document.getElementById('sc-over').classList.remove('show');
+    hp = maxHp; gameAbandoned = false;
+    updateHpUI(); updateQuitBtn();
+    buildPlanet();
+    toast('🔄 LEVEL RETRY! Good luck!');
+  });
+}
+
+function checkWin(){}
+function endGameFromWin(){
+  saveToHistory('🏁 GAME ENDED @ LVL '+level);
+  document.getElementById('sc-level').classList.remove('show');
+  gameAbandoned=true;updateQuitBtn();updateActionBtns(null);
+  toast('🏁 GAME ENDED — score saved to history');
+}
+function nextLevel(){
+  document.getElementById('sc-level').classList.remove('show');
+  level++;maxHp=Math.min(maxHp+2,28);hp=maxHp;
+  document.getElementById('lv-num').textContent=level;
+  updateHpUI();buildPlanet();
+  showInterstitialAd(null); // interstitial between levels
+}
+function restartGame(){
+  level=1;score=0;maxHp=12;hp=12;bombsHit=0;
+  document.getElementById('lv-num').textContent=level;
+  document.getElementById('sc-over').classList.remove('show');
+  document.getElementById('sc-level').classList.remove('show');
+  buildPlanet();
+}
+function backToStart(){
+  document.getElementById('sc-over').classList.remove('show');
+  document.getElementById('sc-level').classList.remove('show');
+  document.getElementById('start-screen').classList.remove('hidden');
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('left-panel').style.display='none';
+  document.getElementById('right-panel').style.display='none';
+  document.getElementById('bottombar').style.display='none';
+  document.getElementById('gc').style.display='none';
+  document.getElementById('pc').style.display='none';
+}
+
+// ── UI LABELS ──
+const REVEALED_LABEL={
+  empty:'EMPTY FIELD',mine:'💣 MINE',wood:'🌲 FOREST',stone:'🪨 ROCK',iron:'⚙️ IRON',crystal:'💎 CRYSTAL',portal:'🌀 PORTAL',
+  fish:'🐠 FISH',medkit:'🩺 MEDKIT',water:'🌊 WATER',waterMine:'💣 MINE',gold:'🪙 GOLD',coal:'🪵 COAL',
+  herbs:'🌿 HERBS',mushroom:'🍄 MUSHROOM',coral:'🪸 CORAL',pearl:'🫧 PEARL',crab:'🦀 CRAB',octopus:'🐙 OCTOPUS',
+  bomb:'💥 BOMB',map:'🗺️ MAP',potion:'🧪 POTION',lantern:'🔦 LANTERN'
+};
+function updateCellInfo(c){
+  const el=document.getElementById('cell-info');
+  if(!c){el.textContent='— tap a cell —';return;}
+  let t;
+  if(!c.revealed){t=WATER_TYPES.includes(c.type)?'UNEXPLORED WATER — press 🔍':'UNEXPLORED TERRAIN — press 🔍';}
+  else{
+    t=REVEALED_LABEL[c.type]||'?';
+    if(c.adjacent>0&&c.type!=='mine'&&c.type!=='waterMine')t+=` [${c.adjacent} nearby mines]`;
+    if(c.type==='portal'&&!objDone())t+=' — collect resources first!';
+    if(c.type==='portal'&&objDone())t+=' — press ⛏ COLLECT to exit!';
+    if(c.type==='bomb')t+=' — press ⛏ COLLECT to detonate neighbors!';
+    if(c.type==='map')t+=' — press ⛏ COLLECT to reveal terrain!';
+    if(c.type==='potion')t+=' — press ⛏ COLLECT to drink (60% lucky)!';
+    if(c.type==='lantern')t+=' — press ⛏ COLLECT to illuminate safely!';
+    if(c.type==='medkit')t+=' — press ⛏ COLLECT to restore HP!';
+  }
+  if(c.flagged)t+=' 🚩';el.textContent=t;
+}
+function objDone(){return Object.keys(objective).every(k=>(inventory[k]||0)>=(objective[k]||0));}
+function updateActionBtns(c){
+  if(gameAbandoned){['b-reveal','b-collect','b-flag'].forEach(id=>document.getElementById(id).classList.add('off'));return;}
+  document.getElementById('b-reveal').classList.toggle('off',!c||c.revealed||c.flagged);
+  document.getElementById('b-collect').classList.toggle('off',!c||!c.revealed||(![...COLLECT_TYPES,...SPECIAL_COLLECT].includes(c.type)));
+  document.getElementById('b-flag').classList.toggle('off',!c||c.revealed);
+  renderInvBar();
+}
+function updateHpUI(){document.getElementById('hp-num').textContent=hp;document.getElementById('hp-fill').style.width=(Math.max(0,hp)/maxHp*100)+'%';}
+function updateScoreUI(){document.getElementById('score-num').textContent=score;}
+function updateMinesUI(){
+  const total=cells.filter(c=>c.type==='mine'||c.type==='waterMine').length;
+  const flagged=cells.filter(c=>c.flagged).length;
+  document.getElementById('mines-val').textContent=total;
+  document.getElementById('flags-val').textContent=`🚩 ${flagged}`;
+  document.getElementById('bombs-hit-val').textContent=`💥 ${bombsHit}`;
+  const safe=cells.filter(c=>!c.revealed&&!WATER_TYPES.includes(c.type)&&c.type!=='mine').length;
+  document.getElementById('safe-val').textContent=safe;
+}
+function updateResUI(){
+  document.getElementById('res-list').innerHTML=Object.entries(objective).map(([k,need])=>{
+    const have=inventory[k]||0,done=have>=need;const onBoard=cells.filter(c=>c.type===k).length;
+    return`<div class="res-row${done?' done':''}"><span>${RES_ICONS[k]||k} ${k}</span>&nbsp;&nbsp;<span class="res-num">${have}/${need} <span>(${onBoard})</span></span></div>`;
+  }).join('');
+}
+function updateUI(){updateHpUI();updateScoreUI();updateMinesUI();updateResUI();updateCellInfo(sel);}
+
+function updateQuitBtn(){
+  const btn=document.getElementById('b-quit');const menuBtn=document.getElementById('b-menu');
+  if(gameAbandoned){btn.textContent='▶ NEW GAME';btn.classList.remove('red');btn.classList.add('green');if(menuBtn)menuBtn.style.display='';}
+  else{btn.textContent='🏳 QUIT';btn.classList.remove('green');btn.classList.add('red');if(menuBtn)menuBtn.style.display='none';}
+}
+function onQuitOrStart(){
+  if(gameAbandoned){level=1;score=0;maxHp=12;hp=12;bombsHit=0;document.getElementById('lv-num').textContent=level;buildPlanet();}
+  else{openPopup('popup-quit');}
+}
+function doAbandon(){
+  closePopup('popup-quit');cells.forEach(c=>{c.revealed=true;c.flagged=false;});
+  sel=null;gameAbandoned=true;updateQuitBtn();updateActionBtns(null);
+  saveToHistory('🏳 GAME QUIT');drawAll();toast('🏳 GAME ABANDONED — all cells revealed');
+}
+
+// ── CUSTOM POPUPS ──
+function openPopup(id){document.getElementById(id).classList.add('show');}
+function closePopup(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.popup-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('show');});});
+
+// ── TOAST & FLASH ──
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.style.opacity='1';clearTimeout(toastT);toastT=setTimeout(()=>el.style.opacity='0',1900);}
+function flashFn(col,op){const el=document.getElementById('flash');el.style.background=col;el.style.opacity=op||'.2';setTimeout(()=>el.style.opacity='0',140);}
+
+// ── HISTORY ──
+function saveToHistory(result){
+  const now=new Date();
+  const dateStr=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  matchHistory.unshift({date:dateStr,player:playerName||'UNKNOWN',avatar:playerAvatar,score,level,result});
+  if(matchHistory.length>50)matchHistory.pop();
+  try{localStorage.setItem('mineplanet-history',JSON.stringify(matchHistory));}catch(e){}
+  renderHistory();renderHistoryOverlay();
+}
+function renderHistory(){
+  const empty=document.getElementById('history-empty');const table=document.getElementById('history-table');const tbody=document.getElementById('history-body');
+  if(!matchHistory.length){empty.style.display='block';table.style.display='none';return;}
+  empty.style.display='none';table.style.display='table';
+  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.avatar||'🌍'} ${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
+}
+function toggleHistory(){
+  historyOpen=!historyOpen;document.getElementById('history-panel').classList.toggle('open',historyOpen);
+  const bb=document.getElementById('bottombar');
+  if(historyOpen){renderHistory();setTimeout(()=>{bb.style.bottom=document.getElementById('history-panel').offsetHeight+'px';},20);}
+  else{bb.style.bottom='0';}
+}
+function openHistoryOverlay(){renderHistoryOverlay();document.getElementById('history-overlay').classList.remove('hidden');}
+function closeHistoryOverlay(){document.getElementById('history-overlay').classList.add('hidden');}
+function renderHistoryOverlay(){
+  const empty=document.getElementById('history-overlay-empty');const table=document.getElementById('history-overlay-table');const tbody=document.getElementById('history-overlay-body-rows');
+  if(!matchHistory.length){empty.style.display='block';table.style.display='none';return;}
+  empty.style.display='none';table.style.display='table';
+  tbody.innerHTML=matchHistory.map((m,i)=>`<tr><td>${i+1}</td><td>${m.date}</td><td class="name-cell">${m.avatar||'🌍'} ${m.player}</td><td class="score-cell">${m.score}</td><td>${m.level}</td><td style="color:var(--red)">${m.result}</td></tr>`).join('');
+}
+function doClearHistoryOverlay(){openPopup('popup-clear');}
+function clearHistory(){openPopup('popup-clear');}
+function doClearHistory(){closePopup('popup-clear');matchHistory=[];try{window.storage&&window.storage.delete('mineplanet-history');}catch(e){}renderHistory();renderHistoryOverlay();}
+async function loadHistory(){
+  try{
+    const v=localStorage.getItem('mineplanet-history');
+    if(v)matchHistory=JSON.parse(v);
+  }catch(e){}
+  renderHistory();
+}
+
+// ── KEYBOARD ──
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(k==='r')doReveal();if(k==='c')doCollect();if(k==='f')doFlag();
+  if(k==='+'||k==='=')zoom(1.15);if(k==='-')zoom(.87);if(k==='0'||k==='escape')resetView();
+  if(k==='arrowleft')camX+=50/camZ;if(k==='arrowright')camX-=50/camZ;
+  if(k==='arrowup')camY+=50/camZ;if(k==='arrowdown')camY-=50/camZ;
+});
+
+// ── RENDER LOOP ──
+let shakeT=0,lastT=0;
+function loop(t){
+  requestAnimationFrame(loop);const dt=Math.min((t-lastT)/1000,.05);lastT=t;
+  portalPhase+=dt*2.2;
+  if(shakeT>0){shakeT-=dt*1000;const s=(shakeT/450)*.014;camX+=(Math.random()-.5)*s;camY+=(Math.random()-.5)*s;}
+  tickParts(dt);drawAll();
+}
+
+// ── START ──
+loadHistory();
+
+// ── AVATARS ──
+const AVATARS={astroM:{i:'👨‍🚀',l:'Commander'},astroF:{i:'👩‍🚀',l:'Captain'},robot:{i:'🤖',l:'Robot'},alien:{i:'👽',l:'Alien'},dragon:{i:'🐲',l:'Dragon'},devil:{i:'😈',l:'Devil'},angel:{i:'😇',l:'Angel'},wizard:{i:'🧙',l:'Wizard'},ninja:{i:'🥷',l:'Ninja'},cat:{i:'🐱',l:'Cat'}};
+let selectedAvatarKey=null;
+(()=>{
+  const grid=document.getElementById('avatar-grid');
+  Object.entries(AVATARS).forEach(([key,av])=>{
+    const b=document.createElement('button');b.className='avbtn';b.dataset.key=key;
+    b.innerHTML=`<span class="ae">${av.i}</span><span class="al">${av.l}</span>`;
+    b.addEventListener('click',()=>{document.querySelectorAll('.avbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedAvatarKey=key;});
+    grid.appendChild(b);
+  });
+})();
+
+function showGameUI(){['topbar','left-panel','right-panel','bottombar','gc','pc'].forEach(id=>document.getElementById(id).style.display='');}
+function hideGameUI(){['topbar','left-panel','right-panel','bottombar','gc','pc'].forEach(id=>document.getElementById(id).style.display='none');}
+
+document.getElementById('start-play-btn').addEventListener('click',()=>{
+  const name=document.getElementById('start-name').value.trim();
+  if(!name){toast('✏️ Enter your name!');return;}
+  if(!selectedAvatarKey){toast('👆 Choose your avatar!');return;}
+  playerName=name;playerAvatar=AVATARS[selectedAvatarKey].i;
+  document.getElementById('player-name-hud').textContent=playerName;
+  document.getElementById('player-avatar-hud').textContent=playerAvatar;
+  document.getElementById('start-screen').classList.add('hidden');
+  showGameUI();level=1;score=0;maxHp=12;hp=12;bombsHit=0;
+  document.getElementById('lv-num').textContent=level;buildPlanet();
+});
+document.getElementById('start-hist-btn').addEventListener('click',()=>openHistoryOverlay());
+document.getElementById('start-help-btn').addEventListener('click',()=>openPopup('popup-help'));
+
+hideGameUI();
+requestAnimationFrame(loop);
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── AD SIMULATION (fallback)
+// ════════════════════════════════════════════════════════════════════════════
+let adCallback = null; let adTimer = null;
+const AD_EMOJIS = ['🎮','🏆','⭐','🎯','🚀','💡','🎁','🌟'];
+
+function showAdSimulation(callback, isRewarded) {
+  adCallback = callback;
+  document.getElementById('ad-content').textContent = AD_EMOJIS[Math.floor(Math.random()*AD_EMOJIS.length)];
+  document.getElementById('ad-skip-btn').style.display = 'none';
+  document.getElementById('ad-overlay').classList.add('show');
+  let t = isRewarded ? 5 : 3;
+  document.getElementById('ad-countdown').textContent = 'Skip in ' + t + 's...';
+  adTimer = setInterval(() => {
+    t--;
+    if (t <= 0) {clearInterval(adTimer);document.getElementById('ad-countdown').textContent='';document.getElementById('ad-skip-btn').style.display='block';}
+    else document.getElementById('ad-countdown').textContent = 'Skip in ' + t + 's...';
+  }, 1000);
+}
+function adSkip() {
+  clearInterval(adTimer);document.getElementById('ad-overlay').classList.remove('show');
+  if (adCallback) { adCallback(); adCallback = null; }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── DEBUG MODE
+// ════════════════════════════════════════════════════════════════════════════
+let debugMode = false;
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key.toLowerCase() === 'd') {
+    e.preventDefault();debugMode = !debugMode;
+    document.getElementById('debug-badge').style.display = debugMode ? 'block' : 'none';
+    toast(debugMode ? '⚡ DEBUG ON — infinite resources' : '⚡ DEBUG OFF');
+    if (debugMode) {Object.keys(objective).forEach(k => { inventory[k] = (objective[k] || 0) + 99; });coins += 9999; updateCoinsUI();updateResUI();}
+  }
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── COINS SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+let coins = 0;
+const COINS_KEY = 'mineplanet-coins';
+async function loadCoins() {
+  try{if(window.storage){const r=await window.storage.get(COINS_KEY);if(r&&r.value)coins=parseInt(r.value)||0;}}catch(e){try{const v=localStorage.getItem(COINS_KEY);if(v)coins=parseInt(v)||0;}catch(e2){}}
+  updateCoinsUI();
+}
+function saveCoins(){try{window.storage&&window.storage.set(COINS_KEY,String(coins));}catch(e){}try{localStorage.setItem(COINS_KEY,String(coins));}catch(e){}}
+function addCoins(n){coins+=n;saveCoins();updateCoinsUI();}
+function updateCoinsUI(){const el=document.getElementById('coins-num');if(el)el.textContent=coins;const el2=document.getElementById('shop-coins-val');if(el2)el2.textContent=coins;}
+
+let _lastCoinScore=0;
+const _origUpdateScoreUI=updateScoreUI;
+window.updateScoreUI=function(){const delta=score-_lastCoinScore;if(delta===5)addCoins(1);else if(delta>=20)addCoins(Math.ceil(delta/20)*3);_lastCoinScore=score;_origUpdateScoreUI();};
+
+const _origUpdateHpUI=updateHpUI;
+window.updateHpUI=function(){if(invincible&&hp<1)hp=1;_origUpdateHpUI();};
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── SHOP SYSTEM
+// ════════════════════════════════════════════════════════════════════════════
+const SHOP_KEY='mineplanet-shop-prices';
+const SHOP_DEFAULT_PRICES={map:80,lantern:60,medkit:50,invincible:200,slowtime:120,ai:350};
+let shopPrices={...SHOP_DEFAULT_PRICES};
+let invincible=false;
+
+async function loadShopPrices(){
+  try{if(window.storage){const r=await window.storage.get(SHOP_KEY);if(r&&r.value)shopPrices=JSON.parse(r.value);}}catch(e){try{const v=localStorage.getItem(SHOP_KEY);if(v)shopPrices=JSON.parse(v);}catch(e2){}}
+}
+function saveShopPrices(){try{window.storage&&window.storage.set(SHOP_KEY,JSON.stringify(shopPrices));}catch(e){}try{localStorage.setItem(SHOP_KEY,JSON.stringify(shopPrices));}catch(e){}}
+function openShop(){
+  updateCoinsUI();refreshShopPrices();
+  const st=document.getElementById('shop-slowtime-item');if(st)st.style.display=arcadeMode?'':'none';
+  document.querySelectorAll('.shop-ads-btn').forEach(b=>b.classList.toggle('hidden',!USE_ADS));
+  document.getElementById('shop-overlay').classList.add('show');
+}
+function closeShop(){document.getElementById('shop-overlay').classList.remove('show');}
+function refreshShopPrices(){Object.keys(shopPrices).forEach(key=>{const el=document.getElementById('price-'+key);if(el)el.textContent='🪙 '+shopPrices[key];});}
+function shopBuy(key){
+  const price=shopPrices[key];if(coins<price){toast('🪙 Not enough coins ('+price+' needed)');return;}
+  coins-=price;shopPrices[key]=Math.round(shopPrices[key]*1.5);
+  saveCoins();saveShopPrices();updateCoinsUI();refreshShopPrices();applyShopItem(key);
+}
+function shopWatchAd(key){if(!USE_ADS)return;showRewardedAd(()=>applyShopItem(key));}
+
+let shopInventory={map:0,lantern:0,medkit:0,invincible:0,slowtime:0,ai:0};
+const INV_KEY='mineplanet-shopinv';
+async function loadShopInventory(){
+  try{if(window.storage){const r=await window.storage.get(INV_KEY);if(r&&r.value)shopInventory=JSON.parse(r.value);}}catch(e){try{const v=localStorage.getItem(INV_KEY);if(v)shopInventory=JSON.parse(v);}catch(e2){}}
+  renderInvBar();
+}
+function saveShopInventory(){try{window.storage&&window.storage.set(INV_KEY,JSON.stringify(shopInventory));}catch(e){}try{localStorage.setItem(INV_KEY,JSON.stringify(shopInventory));}catch(e){}}
+
+const INV_CFG={
+  map:{icon:'🗺️',label:'MAP',cls:'inv-btn-map',needsCell:false},
+  lantern:{icon:'🔦',label:'LANTERN',cls:'inv-btn-lantern',needsCell:true},
+  medkit:{icon:'🩺',label:'MEDKIT',cls:'inv-btn-medkit',needsCell:false},
+  invincible:{icon:'🛡️',label:'INVNC.',cls:'inv-btn-invincible',needsCell:false},
+  slowtime:{icon:'⏳',label:'SLOW',cls:'inv-btn-slowtime',needsCell:false},
+  ai:{icon:'🤖',label:'AI',cls:'inv-btn-ai',needsCell:false},
+};
+
+function stockItem(key){shopInventory[key]=(shopInventory[key]||0)+1;saveShopInventory();renderInvBar();toast(INV_CFG[key].icon+' '+INV_CFG[key].label+' added to inventory! Use it from the action bar.');}
+
+function renderInvBar(){
+  const bar=document.getElementById('shop-inv-bar');if(!bar)return;
+  const hasAny=Object.values(shopInventory).some(v=>v>0);bar.classList.toggle('empty',!hasAny);
+  bar.innerHTML=Object.entries(INV_CFG).map(([key,cfg])=>{
+    const qty=shopInventory[key]||0;if(qty===0)return'';
+    const needsCellAndMissing=cfg.needsCell&&!sel;const needsArcade=key==='slowtime'&&!arcadeMode;
+    const isOff=gameAbandoned||needsCellAndMissing||needsArcade;
+    const offCls=isOff?' off':'';const needsCls=cfg.needsCell?' needs-cell':'';
+    return`<div class="inv-item"><button class="${cfg.cls}${offCls}${needsCls}" onclick="useInvItem('${key}')" title="${cfg.label}">${cfg.icon} ${cfg.label}</button><div class="inv-badge">${qty}</div></div>`;
+  }).join('');
+}
+
+function useInvItem(key){
+  if(!shopInventory[key]||shopInventory[key]<=0)return;
+  if(key==='map'){if(!cells.length){toast('🗺️ Start a game first!');return;}const hidden=cells.filter(c=>!c.revealed&&!c.flagged&&!WATER_TYPES.includes(c.type)&&c.type!=='mine');const toReveal=hidden.sort(()=>Math.random()-.5).slice(0,6+level);toReveal.forEach(c=>c.revealed=true);toast('🗺️ MAP used! '+toReveal.length+' cells revealed');drawAll();updateUI();
+  }else if(key==='lantern'){if(!sel){toast('🔦 Select a cell first!');return;}let revealed=0;hexNeighbors(sel.q,sel.r).forEach(({q,r})=>{const nc=findCell(q,r);if(nc&&!nc.revealed&&!nc.flagged){nc.revealed=true;revealed++;}});spawnBurst(canvas.width/2,canvas.height/2,'#ffee44',12);toast('🔦 LANTERN used! '+revealed+' cells lit safely');drawAll();updateUI();
+  }else if(key==='medkit'){const heal=Math.min(4+Math.floor(level/2),8);hp=Math.min(hp+heal,maxHp);updateHpUI();spawnBurst(canvas.width/2,canvas.height/2,'#ff4466',12);toast('🩺 MEDKIT used! +'+heal+' HP');
+  }else if(key==='invincible'){invincible=true;document.getElementById('invinc-badge').style.display='block';toast('🛡️ INVINCIBILITY active for this match!');
+  }else if(key==='slowtime'){if(!arcadeMode){toast('⏳ Only available in Arcade mode!');return;}arcadeTimeLeft=Math.min(arcadeTimeLeft*2,arcadeTotalTime);toast('⏳ TIME DOUBLED!');
+  }else if(key==='ai'){startAIResolver();}
+  shopInventory[key]--;saveShopInventory();renderInvBar();
+}
+
+function applyShopItem(key){closeShop();stockItem(key);}
+function shopReset(){
+  shopPrices={...SHOP_DEFAULT_PRICES};shopInventory={map:0,lantern:0,medkit:0,invincible:0,slowtime:0,ai:0};coins=50;
+  saveShopPrices();saveShopInventory();saveCoins();updateCoinsUI();refreshShopPrices();renderInvBar();
+  toast('↺ Shop reset — wallet: 🪙 50, inventory cleared');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── ARCADE MODE
+// ════════════════════════════════════════════════════════════════════════════
+let arcadeMode=false,arcadeTimeLeft=0,arcadeTotalTime=0,arcadeRunning=false;
+let arcadeInterval=null;
+function toggleArcadeMode(){
+  arcadeMode=!arcadeMode;const btn=document.getElementById('arcade-toggle-btn');
+  if(btn)btn.textContent='⏱ ARCADE: '+(arcadeMode?'ON':'OFF');
+  toast(arcadeMode?'⏱ ARCADE MODE ON':'⏱ ARCADE MODE OFF');
+}
+function startArcadeTimer(){
+  if(!arcadeMode)return;clearInterval(arcadeInterval);
+  const cfg=lvlCfg(level);
+  const totalRes=(cfg.woodNeed||0)+(cfg.stoneNeed||0)+(cfg.ironNeed||0)+(cfg.fishNeed||0)+(cfg.coalNeed||0)+(cfg.goldNeed||0)+(cfg.crystalNeed||0)+(cfg.herbsNeed||0)+(cfg.mushroomNeed||0)+(cfg.coralNeed||0)+(cfg.pearlNeed||0)+(cfg.crabNeed||0)+(cfg.octopusNeed||0);
+  arcadeTotalTime=30*cfg.radius+15*totalRes;arcadeTimeLeft=arcadeTotalTime;arcadeRunning=true;
+  document.getElementById('arcade-timer-wrap').style.display='flex';updateArcadeTimerUI();
+  arcadeInterval=setInterval(()=>{if(!arcadeRunning||gameAbandoned)return;arcadeTimeLeft--;updateArcadeTimerUI();if(arcadeTimeLeft<=0){clearInterval(arcadeInterval);arcadeRunning=false;toast('⏱ TIME UP!');setTimeout(()=>gameOver(),800);}},1000);
+}
+function stopArcadeTimer(){clearInterval(arcadeInterval);arcadeRunning=false;document.getElementById('arcade-timer-wrap').style.display='none';}
+function updateArcadeTimerUI(){
+  const m=Math.floor(arcadeTimeLeft/60),s=arcadeTimeLeft%60;
+  document.getElementById('arcade-timer-txt').textContent=m+':'+String(s).padStart(2,'0');
+  const pct=Math.max(0,arcadeTimeLeft/arcadeTotalTime*100);const fill=document.getElementById('arcade-timer-fill');
+  fill.style.width=pct+'%';fill.style.background=pct>50?'var(--glow)':pct>25?'var(--amber)':'var(--red)';
+  document.getElementById('arcade-timer-txt').style.color=pct>25?'var(--glow)':'var(--red)';
+}
+
+// Patch buildPlanet for arcade + invincibility reset
+const _origBuildPlanet=buildPlanet;
+window.buildPlanet=function(){
+  invincible=false;document.getElementById('invinc-badge').style.display='none';_lastCoinScore=score;
+  _origBuildPlanet();if(arcadeMode)startArcadeTimer();renderInvBar();
+};
+const _origNextLevel=nextLevel;
+window.nextLevel=function(){stopArcadeTimer();_origNextLevel();};
+const _origGameOver=gameOver;
+window.gameOver=function(){_origGameOver();};
+document.getElementById('start-play-btn').addEventListener('click',()=>{stopArcadeTimer();_lastCoinScore=0;setTimeout(renderInvBar,100);},true);
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── AI RESOLVER — reveals board step by step WITHOUT collecting resources
+// ════════════════════════════════════════════════════════════════════════════
+let aiRunning=false;
+function startAIResolver(){
+  if(aiRunning||gameAbandoned)return;
+  aiRunning=true;
+  document.getElementById('ai-overlay').classList.add('show');
+  stopArcadeTimer();
+  setTimeout(runAIStep,300);
+}
+function runAIStep(){
+  if(!aiRunning)return;
+  // Only REVEAL cells — do NOT collect resources. AI shows the board, player still collects manually.
+  const toReveal=cells.filter(c=>!c.revealed&&!c.flagged&&c.type!=='mine'&&c.type!=='waterMine');
+  if(toReveal.length){
+    const batch=toReveal.sort(()=>Math.random()-.5).slice(0,4);
+    batch.forEach(c=>{
+      c.revealed=true;
+      score+=5;
+    });
+    updateScoreUI();drawAll();updateMinesUI();
+    setTimeout(runAIStep,100);return;
+  }
+  // Also reveal mines (for full board view)
+  const minesHidden=cells.filter(c=>!c.revealed&&(c.type==='mine'||c.type==='waterMine'));
+  if(minesHidden.length){
+    minesHidden.forEach(c=>c.revealed=true);
+    drawAll();
+  }
+  // Done — show win screen only if objectives met; otherwise just show the board
+  if(objDone()){
+    score+=200*level;updateScoreUI();
+    spawnBurst(canvas.width/2,canvas.height/2,'#aa44ff',32);flashFn('#aa44ff','.2');
+    setTimeout(()=>{
+      aiRunning=false;document.getElementById('ai-overlay').classList.remove('show');
+      showWinScreen();saveToHistory('🤖 AI WIN LVL '+level);
+    },600);
+  } else {
+    aiRunning=false;document.getElementById('ai-overlay').classList.remove('show');
+    toast('🤖 BOARD REVEALED — collect resources to complete the level!');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ── INIT
+// ════════════════════════════════════════════════════════════════════════════
+loadCoins();
+loadShopPrices();
+loadShopInventory();
+
+</script>
+</body>
+</html>
