@@ -114,7 +114,8 @@
     z-index: 1;
     opacity: 0; pointer-events: none;
     transition: opacity 0.35s;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
   .screen.active { opacity: 1; pointer-events: all; }
 
@@ -158,6 +159,21 @@
     align-self: end;
   }
 
+  /* Other screens: ensure proper scroll with fixed nav */
+  #screen-history,
+  #screen-vehicle,
+  #screen-appsettings {
+    overflow: hidden;
+  }
+  #screen-history > .settings-body,
+  #screen-history > .history-body,
+  #screen-vehicle > .settings-body,
+  #screen-appsettings > .settings-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   /* Scrollable widgets area */
   .dash-scroll-area {
     overflow-y: auto;
@@ -199,19 +215,22 @@
     gap: 0; z-index: 2;
     padding: 0.3rem 0.65rem;
     flex-shrink: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   /* Unified copilot widget: bubble text + emoji + label all in one */
   .face-widget {
     display: flex; flex-direction: row;
-    align-items: center; gap: 0.6rem;
-    padding: 0.6rem 1rem;
+    align-items: center; gap: 0.7rem;
+    padding: 0.7rem 1rem;
     width: 100%;
     max-width: 400px;
-    min-height: 90px;
+    min-height: 110px;
   }
   #face-emoji {
-    font-size: min(18vw, 80px);
+    font-size: min(22vw, 90px);
     line-height: 1;
     filter: drop-shadow(0 0 20px rgba(255,255,255,0.08));
     transition: filter 0.5s;
@@ -221,20 +240,20 @@
   }
   .face-info {
     display: flex; flex-direction: column;
-    align-items: flex-start; gap: 0.15rem;
+    align-items: flex-start; gap: 0.2rem;
     min-width: 0; flex: 1;
   }
   .face-label {
     font-family: var(--font-display);
-    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+    font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em;
     color: rgba(255,255,255,0.7); text-transform: uppercase;
   }
   body.theme-light .face-label { color: var(--text); }
   #copilota-text {
     font-family: var(--font-body);
-    font-size: 0.72rem; font-style: italic;
+    font-size: 0.75rem; font-style: italic;
     color: var(--text-muted);
-    line-height: 1.35;
+    line-height: 1.4;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -336,10 +355,17 @@
     display: grid; grid-template-columns: 1fr 1fr 1fr;
     gap: 0.4rem; padding: 0 0.65rem;
     z-index: 2;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
   }
   /* 2 columns on very narrow screens */
   @media (max-width: 340px) {
     .widgets-grid { grid-template-columns: 1fr 1fr; }
+  }
+  /* Wider grid on tablets */
+  @media (min-width: 600px) {
+    .widgets-grid { max-width: 560px; }
   }
 
   /* ── DRAG & DROP WIDGET LAYOUT ───────────────────────────── */
@@ -469,11 +495,17 @@
   .score-bar-wrap
   {
     padding: 0.25rem 1.0rem;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
   }
   .session-controls {
     display: flex; gap: 0.5rem; padding: 0 0.65rem 0.4rem;
     z-index: 2;
     flex-shrink: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    width: 100%;
   }
   .btn-session {
     flex: 1; padding: 0.55rem 0.5rem;
