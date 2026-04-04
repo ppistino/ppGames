@@ -153,6 +153,10 @@
     grid-template-rows: auto auto auto 1fr auto auto;
     overflow: hidden;
   }
+  /* Prevent session-controls row from growing */
+  #screen-dash > .session-controls {
+    align-self: end;
+  }
 
   /* Scrollable widgets area */
   .dash-scroll-area {
@@ -192,45 +196,50 @@
   .face-section {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 0.25rem; z-index: 2;
-    padding: 0.25rem 0.65rem 0.35rem;
+    gap: 0; z-index: 2;
+    padding: 0.3rem 0.65rem;
     flex-shrink: 0;
   }
-  /* Copilota bubble above emoji */
-  #copilota-bubble {
-    background: rgba(22,27,34,0.82);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.2rem 0.75rem;
-    font-family: var(--font-body);
-    font-size: 0.7rem; font-style: italic;
-    color: var(--text-muted);
-    text-align: center;
-    max-width: 88vw; min-height: 1.3rem;
-    display: flex; align-items: center; justify-content: center;
-    transition: opacity 0.5s, transform 0.4s;
-    opacity: 0; transform: translateY(6px);
-    pointer-events: none; position: relative;
+
+  /* Unified copilot widget: bubble text + emoji + label all in one */
+  .face-widget {
+    display: flex; flex-direction: row;
+    align-items: center; gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    width: 100%;
+    max-width: 400px;
+    min-height: 90px;
   }
-  body.theme-light #copilota-bubble { background: rgba(240,242,245,0.9); }
-  #copilota-bubble.visible { opacity: 1; transform: translateY(0); }
-  #copilota-bubble::after {
-    content: '';
-    position: absolute; bottom: -7px; left: 50%;
-    transform: translateX(-50%);
-    border: 4px solid transparent;
-    border-top-color: var(--border);
-  }
-  /* Face widget */
-  /* face-widget styles now in unified widget base above */
   #face-emoji {
-    font-size: var(--face-size);
+    font-size: min(18vw, 80px);
     line-height: 1;
-    filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.08));
     transition: filter 0.5s;
     user-select: none;
     animation: face-breathe 3s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .face-info {
+    display: flex; flex-direction: column;
+    align-items: flex-start; gap: 0.15rem;
+    min-width: 0; flex: 1;
+  }
+  .face-label {
+    font-family: var(--font-display);
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.7); text-transform: uppercase;
+  }
+  body.theme-light .face-label { color: var(--text); }
+  #copilota-text {
+    font-family: var(--font-body);
+    font-size: 0.72rem; font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.35;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    transition: opacity 0.4s;
   }
   @keyframes face-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
   @keyframes face-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
@@ -289,19 +298,7 @@
     font-family: var(--font-mono);
   }
 
-  /* ── FACE WIDGET variant ──────────────────────────────────── */
-  .face-widget {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 0.1rem;
-    padding: 0.3rem 1.4rem 0.4rem;
-  }
-  .face-label {
-    font-family: var(--font-display);
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
-    color: rgba(255,255,255,0.6); text-transform: uppercase;
-  }
-
-  /* ── CLOCK accent border (applied via data-variant) ──────── */
+  /* ── CLOCK accent border ──────── */
   /*.widget[data-variant="clock"] {
     border-color: rgba(88,166,255,0.25);
     display: flex; flex-direction: column;
@@ -311,23 +308,23 @@
     font-size: 1.25rem; font-weight: 700; line-height: 1; color: var(--accent);
   }
 
-  /* ── SPEED wide widget ────────────────────────────────────── */
+  /* ── SPEED widget (same size as others) ──────────────────── */
   .widget[data-variant="speed"] {
     display: flex; flex-direction: column;
-    grid-column: span 2;
   }
   .widget-speed-inner {
-    display: flex; align-items: baseline; gap: 0.3rem;
+    display: flex; align-items: baseline; gap: 0.2rem;
+    justify-content: center;
   }
   #w-speed-big {
     font-family: var(--font-display);
-    font-size: 2rem; font-weight: 700; line-height: 1; color: #fff;
+    font-size: 1.25rem; font-weight: 700; line-height: 1; color: #fff;
     text-shadow: 0 0 20px rgba(88,166,255,0.3); transition: color 0.4s;
   }
   body.theme-light #w-speed-big { color: var(--text); text-shadow: none; }
   .widget-speed-unit {
     font-family: var(--font-mono);
-    font-size: 0.75rem; color: var(--text-muted); padding-bottom: 0.3rem;
+    font-size: 0.55rem; color: var(--text-muted); padding-bottom: 0.15rem;
   }
 
   /* ── SPARKLINE widget ─────────────────────────────────────── */
@@ -474,7 +471,7 @@
     padding: 0.25rem 1.0rem;
   }
   .session-controls {
-    display: flex; gap: 0.5rem; padding: 0.25rem 0.65rem 0.3rem;
+    display: flex; gap: 0.5rem; padding: 0 0.65rem 0.4rem;
     z-index: 2;
     flex-shrink: 0;
   }
@@ -484,6 +481,8 @@
     font-family: var(--font-display);
     font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em;
     transition: transform 0.15s, opacity 0.15s;
+    max-height: 44px;
+    align-self: center;
   }
   .btn-session:active { transform: scale(0.96); }
   .btn-start { background: linear-gradient(135deg, var(--green), #26a641); color: #000; }
@@ -783,20 +782,10 @@
   }
   .voice-toggle.active { color: #f6ad55; border-color: #f6ad55; }
 
-  /* COPILOT TOAST */
+  /* COPILOT TOAST — now integrated in face widget */
   #copilot-toast {
-    position: fixed; bottom: 5.8rem; left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(22,27,34,0.93); backdrop-filter: blur(12px);
-    border: 1px solid var(--border); border-radius: 20px;
-    padding: 0.45rem 1.1rem;
-    font-size: 0.82rem; font-style: italic; color: var(--text-muted);
-    z-index: 80;
-    opacity: 0; transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-    max-width: 88vw; text-align: center;
+    display: none;
   }
-  #copilot-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   /* END SESSION OVERLAY */
   #overlay-end {
@@ -996,7 +985,7 @@
       <span id="gps-status">GPS off</span>
       <span id="sensor-mode" class="sim" style="margin-left:4px">SIM</span>
     </span>
-    <span id="wake-status" style="font-size:0.55rem">🔒 schermo</span>
+    <span id="wake-status" style="font-size:0.55rem;cursor:pointer" onclick="cycleTheme()">🔒 schermo</span>
   </div>
 
   <div id="edit-mode-banner">
@@ -1006,10 +995,12 @@
   </div>
 
   <div class="face-section">
-    <div id="copilota-bubble">Pronto a partire 🚗</div>
     <div class="face-widget">
       <div id="face-emoji">😊</div>
-      <div class="face-label" id="face-label">In attesa</div>
+      <div class="face-info">
+        <div class="face-label" id="face-label">In attesa</div>
+        <div id="copilota-text">Pronto a partire 🚗</div>
+      </div>
     </div>
   </div>
 
@@ -1093,6 +1084,34 @@
       <span class="widget-resize-handle"></span>
       <div class="widget-label">Velocità 2 min</div>
       <canvas id="speed-sparkline" height="32"></canvas>
+    </div>
+    <div class="widget" id="wg-accel" data-wid="accel" data-variant="chart">
+      <span class="widget-edit-badge">⠿</span>
+      <span class="widget-resize-handle"></span>
+      <div class="widget-label">Accel. long.</div>
+      <canvas id="accel-sparkline" height="32"></canvas>
+      <div class="widget-unit" id="w-accel-val">0.0 m/s²</div>
+    </div>
+    <div class="widget" id="wg-lateral" data-wid="lateral" data-variant="chart">
+      <span class="widget-edit-badge">⠿</span>
+      <span class="widget-resize-handle"></span>
+      <div class="widget-label">Accel. lat.</div>
+      <canvas id="lateral-sparkline" height="32"></canvas>
+      <div class="widget-unit" id="w-lateral-val">0.0 m/s²</div>
+    </div>
+    <div class="widget" id="wg-gforce" data-wid="gforce">
+      <span class="widget-edit-badge">⠿</span>
+      <span class="widget-resize-handle"></span>
+      <div class="widget-label">G-Force</div>
+      <div class="widget-val" id="w-gforce">0.00</div>
+      <div class="widget-unit">G</div>
+    </div>
+    <div class="widget" id="wg-altitude" data-wid="altitude">
+      <span class="widget-edit-badge">⠿</span>
+      <span class="widget-resize-handle"></span>
+      <div class="widget-label">Altitudine</div>
+      <div class="widget-val" id="w-altitude">–</div>
+      <div class="widget-unit">m s.l.m.</div>
     </div>
   </div>
 
@@ -1710,11 +1729,28 @@ function setTheme(name) {
   localStorage.setItem('ppCarSmile_appsettings', JSON.stringify(appSettings));
 }
 
+const THEME_ORDER = ['dark', 'light', 'sport', 'racing'];
+const THEME_ICONS = { dark: '🌙', light: '☀️', sport: '💜', racing: '🔥' };
+
+function cycleTheme() {
+  const cur = appSettings.theme || 'dark';
+  const idx = THEME_ORDER.indexOf(cur);
+  const next = THEME_ORDER[(idx + 1) % THEME_ORDER.length];
+  setTheme(next);
+}
+
 function applyTheme(name) {
   document.body.className = name !== 'dark' ? 'theme-' + name : '';
   document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
   const el = document.getElementById('theme-' + name);
   if (el) el.classList.add('active');
+  // Update wake-status to show current theme
+  const ws = document.getElementById('wake-status');
+  if (ws) {
+    const icon = THEME_ICONS[name] || '🌙';
+    const label = name === 'dark' ? 'Notte' : name === 'light' ? 'Giorno' : name === 'sport' ? 'Sport' : 'Racing';
+    ws.textContent = icon + ' ' + label;
+  }
   // Update voice btn visibility
   const vbtn = document.getElementById('voice-btn');
   if (vbtn) vbtn.style.display = currentScreen === 'dash' ? 'block' : 'none';
@@ -1781,6 +1817,8 @@ function startSession() {
     _prevScore: 75,
   };
   speedHistory = [];
+  accelHistory = [];
+  lateralHistory = [];
   sessionTimeline = [];
   timelineTimer = 0;
   document.getElementById('btn-start').style.display = 'none';
@@ -1977,6 +2015,11 @@ function simStep() {
   // Sparkline
   pushSpeedHistory(speed);
   drawSparkline();
+
+  // Sensor sparklines
+  pushSensorHistory(acc, lat);
+  drawAllSensorSparklines();
+  updateSensorWidgets(acc, lat, sdata.altitude || null);
 
   // Timeline sample every 5 seconds (10 steps @ 500ms)
   timelineTimer++;
@@ -2249,17 +2292,17 @@ function getCopilotMessage(event, fuel) {
 let bubbleTimer = null;
 function showCopilotaBubble(text) {
   if (!text) return;
-  const el = document.getElementById('copilota-bubble');
+  const el = document.getElementById('copilota-text');
   if (!el) return;
   el.textContent = text;
-  el.classList.add('visible');
+  el.style.opacity = '1';
   clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => el.classList.remove('visible'), 5000);
+  bubbleTimer = setTimeout(() => { el.style.opacity = '0.6'; }, 6000);
 }
 
 function hideCopilotaBubble() {
-  const el = document.getElementById('copilota-bubble');
-  if (el) el.classList.remove('visible');
+  const el = document.getElementById('copilota-text');
+  if (el) el.style.opacity = '0.6';
 }
 
 function voiceSpeak(text) {
@@ -2546,6 +2589,82 @@ function drawSparkline() {
 }
 
 // ============================================================
+// SENSOR SPARKLINES (Accel long, Accel lat)
+// ============================================================
+let accelHistory = [];
+let lateralHistory = [];
+
+function pushSensorHistory(acc, lat) {
+  accelHistory.push(acc);
+  lateralHistory.push(lat);
+  if (accelHistory.length > SPARKLINE_MAX) accelHistory.shift();
+  if (lateralHistory.length > SPARKLINE_MAX) lateralHistory.shift();
+}
+
+function drawSensorSparkline(canvasId, data, color, minRange) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 100;
+  const H = 32;
+  canvas.width = W; canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+  if (data.length < 2) return;
+
+  const absMax = Math.max(Math.max(...data.map(Math.abs)), minRange || 2);
+  const pts = data.slice(-W);
+  const step = W / (pts.length - 1);
+  const mid = H / 2;
+
+  // Zero line
+  ctx.beginPath();
+  ctx.moveTo(0, mid); ctx.lineTo(W, mid);
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+
+  // Data line
+  ctx.beginPath();
+  pts.forEach((v, i) => {
+    const x = i * step;
+    const y = mid - (v / absMax) * (mid - 2);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Current value dot
+  const last = pts[pts.length - 1];
+  const lx = (pts.length - 1) * step;
+  const ly = mid - (last / absMax) * (mid - 2);
+  ctx.beginPath();
+  ctx.arc(lx, ly, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function drawAllSensorSparklines() {
+  drawSensorSparkline('accel-sparkline', accelHistory, 'rgba(248,166,85,0.85)', 4);
+  drawSensorSparkline('lateral-sparkline', lateralHistory, 'rgba(168,139,250,0.85)', 4);
+}
+
+function updateSensorWidgets(acc, lat, altitude) {
+  const aEl = document.getElementById('w-accel-val');
+  if (aEl) aEl.textContent = acc.toFixed(1) + ' m/s²';
+  const lEl = document.getElementById('w-lateral-val');
+  if (lEl) lEl.textContent = lat.toFixed(1) + ' m/s²';
+  // G-force: combined vector magnitude / 9.81
+  const gforce = Math.sqrt(acc * acc + lat * lat) / 9.81;
+  const gEl = document.getElementById('w-gforce');
+  if (gEl) gEl.textContent = gforce.toFixed(2);
+  // Altitude
+  const altEl = document.getElementById('w-altitude');
+  if (altEl) altEl.textContent = altitude !== null ? Math.round(altitude) : '–';
+}
+
+// ============================================================
 // SESSION TIMELINE CHART (end overlay)
 // ============================================================
 let sessionTimeline = []; // {score, t} sampled every 5s
@@ -2598,7 +2717,7 @@ function drawSessionChart() {
 // REAL SENSORS (GPS + DeviceMotion) with SIM fallback
 // ============================================================
 let usingRealSensors = false;
-let realSensorData = { speed: 0, acc: 0, lat: 0 };
+let realSensorData = { speed: 0, acc: 0, lat: 0, altitude: null };
 let lastGpsPos = null, lastGpsTime = 0;
 let gpsWatchId = null;
 
@@ -2610,6 +2729,7 @@ function startRealSensors() {
         const now = Date.now();
         const speedMs = pos.coords.speed || 0;
         realSensorData.speed = speedMs * 3.6; // km/h
+        realSensorData.altitude = pos.coords.altitude; // meters or null
 
         // Compute longitudinal acceleration from speed delta
         if (lastGpsTime > 0) {
@@ -2626,7 +2746,6 @@ function startRealSensors() {
         const dot = document.getElementById('gps-dot');
         if (dot) dot.classList.add('gps');
         document.getElementById('gps-status').textContent = 'GPS reale';
-        document.getElementById('wake-status').textContent = '🔆 schermo';
       },
       err => {
         console.warn('GPS error:', err.message);
@@ -2686,9 +2805,11 @@ async function requestWakeLock() {
   try {
     if ('wakeLock' in navigator) {
       wakeLock = await navigator.wakeLock.request('screen');
-      document.getElementById('wake-status').textContent = '🔆 schermo';
+      const ws2 = document.getElementById('wake-widget-status');
+      if (ws2) ws2.textContent = '🔆 attivo';
       wakeLock.addEventListener('release', () => {
-        document.getElementById('wake-status').textContent = '🔒 schermo';
+        const ws3 = document.getElementById('wake-widget-status');
+        if (ws3) ws3.textContent = '🔒';
       });
     }
   } catch(e) { console.warn('WakeLock:', e.message); }
@@ -2763,23 +2884,37 @@ let widgetEditMode = false;
 let layoutSnapshot = null; // for cancel
 
 const WIDGET_DEFAULTS = [
-  { id:'wg-speed',     col:0, row:0, w:2, h:1 },
-  { id:'wg-clock',     col:2, row:0, w:1, h:1 },
-  { id:'wg-cons',      col:0, row:1, w:1, h:1 },
-  { id:'wg-cost',      col:1, row:1, w:1, h:1 },
-  { id:'wg-score',     col:2, row:1, w:1, h:1 },
-  { id:'wg-cumcons',   col:0, row:2, w:1, h:1 },
-  { id:'wg-km',        col:1, row:2, w:1, h:1 },
-  { id:'wg-totalcost', col:2, row:2, w:1, h:1 },
-  { id:'wg-tank',      col:0, row:3, w:1, h:1 },
-  { id:'wg-gear',      col:1, row:3, w:1, h:1 },
-  { id:'wg-sparkline', col:2, row:3, w:1, h:1 },
+  { id:'wg-speed',     col:0, row:0, w:1, h:1 },
+  { id:'wg-clock',     col:1, row:0, w:1, h:1 },
+  { id:'wg-cons',      col:2, row:0, w:1, h:1 },
+  { id:'wg-cost',      col:0, row:1, w:1, h:1 },
+  { id:'wg-score',     col:1, row:1, w:1, h:1 },
+  { id:'wg-cumcons',   col:2, row:1, w:1, h:1 },
+  { id:'wg-km',        col:0, row:2, w:1, h:1 },
+  { id:'wg-totalcost', col:1, row:2, w:1, h:1 },
+  { id:'wg-tank',      col:2, row:2, w:1, h:1 },
+  { id:'wg-gear',      col:0, row:3, w:1, h:1 },
+  { id:'wg-sparkline', col:1, row:3, w:1, h:1 },
+  { id:'wg-accel',     col:2, row:3, w:1, h:1 },
+  { id:'wg-lateral',   col:0, row:4, w:1, h:1 },
+  { id:'wg-gforce',    col:1, row:4, w:1, h:1 },
+  { id:'wg-altitude',  col:2, row:4, w:1, h:1 },
 ];
 
 function loadWidgetLayout() {
   try {
     const saved = localStorage.getItem(WIDGET_LAYOUT_KEY);
-    return saved ? JSON.parse(saved) : WIDGET_DEFAULTS.map(d=>({...d}));
+    if (saved) {
+      const layout = JSON.parse(saved);
+      // Migration: if any widget has w>1 or layout has fewer items than defaults, reset
+      const hasOversized = layout.some(l => l.w > 1);
+      if (hasOversized || layout.length < WIDGET_DEFAULTS.length) {
+        localStorage.removeItem(WIDGET_LAYOUT_KEY);
+        return WIDGET_DEFAULTS.map(d=>({...d}));
+      }
+      return layout;
+    }
+    return WIDGET_DEFAULTS.map(d=>({...d}));
   } catch { return WIDGET_DEFAULTS.map(d=>({...d})); }
 }
 
