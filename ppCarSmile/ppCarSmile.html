@@ -5,1422 +5,258 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ppCarSmile</title>
 <style>
-  /* System font stacks — no external dependencies */
-  /* Rajdhani → condensed sans-serif for big numbers */
-  /* Space Mono → monospace for labels/debug */
-  /* Nunito → rounded sans-serif body text */
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--text:#e6edf3;--text-muted:#8b949e;--accent:#58a6ff;--green:#39d353;--red:#f85149;--state-color:#1A4731}
+body.theme-light{--bg:#f0f2f5;--surface:#fff;--surface2:#e8eaed;--border:#d0d7de;--text:#1c2128;--text-muted:#57606a}
+body.theme-sport{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3e;--text:#e8e0ff;--text-muted:#8878cc;--accent:#a78bfa;--green:#4ade80}
+body.theme-racing{--bg:#0f0500;--surface:#1a0a00;--surface2:#2a1500;--border:#3d2000;--text:#fff3e0;--text-muted:#cc8844;--accent:#ff8c00;--green:#ffcc00}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;position:relative}
+#bg-glow{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 50% 20%,var(--state-color) 0%,transparent 70%);opacity:.35;pointer-events:none;transition:background .8s}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;z-index:1;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .3s}
+.screen.active{opacity:1;pointer-events:all}
+.bottom-nav{display:flex;border-top:1px solid var(--border);background:var(--bg);z-index:10;flex-shrink:0;margin-bottom:18px}
+.nav-btn{flex:1;padding:.55rem .2rem;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:var(--text-muted);font-size:.7rem;text-transform:uppercase;-webkit-tap-highlight-color:transparent}
+.nav-btn.active{color:var(--accent)}
+.status-bar{display:flex;align-items:center;justify-content:space-between;padding:.35rem .7rem;flex-shrink:0;font-size:.58rem;color:var(--text-muted)}
+//.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;background:var(--text-muted)}
+//.status-dot.gps{background:var(--green);animation:pulse 2s infinite}
+.status-dot {width: 9px;height: 9px;border-radius: 50%;display: inline-block;margin-right: 6px;background: var(--text-muted);}
+.status-dot.gps {background: var(--green);animation: pulse 2s infinite;}
+#gps-status {font-size: 0.9rem;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+//#sensor-mode{font-size:.48rem;padding:3px 8px;border-radius:6px;cursor:pointer;background:rgba(57,211,83,.12);border:1px solid rgba(57,211,83,.3);color:var(--green);user-select:none}
+//#sensor-mode.off{background:rgba(248,166,69,.12);border-color:rgba(248,166,69,.3);color:#f6ad55}
+//.theme-btn{font-size:.52rem;cursor:pointer;padding:2px 6px;border-radius:4px;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);color:var(--accent);user-select:none}
+#sensor-mode {font-size: 0.9rem;padding: 0.28rem 0.5rem;border-radius: 8px;cursor: pointer;background: rgba(57,211,83,.12);border: 1px solid rgba(57,211,83,.3);color: var(--green);user-select: none;}
+#sensor-mode.off {background: rgba(248,166,69,.12);border-color: rgba(248,166,69,.3);color: #f6ad55;}
+.theme-btn {font-size: 0.9rem;padding: 0.28rem 0.5rem;border-radius: 8px;cursor: pointer;background: rgba(88,166,255,.1);border: 1px solid rgba(88,166,255,.3);color: var(--accent);user-select: none;}
+.face-section{display:flex;align-items:center;gap:.5rem;padding:.35rem .6rem .8rem;flex-shrink:0;background:rgba(22,27,34,.7);backdrop-filter:blur(12px);border:1px solid rgba(48,54,61,.8);border-radius:12px;margin:0 .4rem .3rem}
+body.theme-light .face-section{background:rgba(255,255,255,.8)}
+#face-emoji{font-size:clamp(44px,13vw,72px);line-height:1;animation:breathe 3s ease-in-out infinite;flex-shrink:0}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes vibrate{0%{transform:translate(0)}25%{transform:translate(-2px,2px)}50%{transform:translate(2px,-2px)}75%{transform:translate(-2px,-2px)}}
+.face-info{flex:1;min-width:0}
+.face-label{font-size:1rem;font-weight:700;text-transform:uppercase;color:rgba(255,255,255,.7)}
+body.theme-light .face-label{color:var(--text)}
+#copilota-text{font-size:1rem;font-style:italic;color:var(--text-muted);line-height:1.3;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.scroll-area{flex:1 1 0px;min-height:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;padding:.3rem .4rem 1rem}
+.widgets-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.3rem}
+.widget{background:rgba(22,27,34,.7);backdrop-filter:blur(12px);border:1px solid rgba(48,54,61,.8);border-radius:10px;padding:.3rem;text-align:center;min-width:0;overflow:hidden}
+body.theme-light .widget{background:rgba(255,255,255,.8)}
+.widget-label{font-size:.6rem;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.widget-val{font-size:1.5rem;font-weight:700;line-height:1.1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.theme-light .widget-val{color:var(--text)}
+#w-clock{color:var(--accent)}
+#w-speed{color:var(--accent);text-shadow:0 0 15px rgba(88,166,255,.3)}
+#w-cons{color:var(--accent)}
+.widget-unit{font-size:.6rem;color:var(--text-muted)}
+.widget canvas{display:block;width:100%;height:26px;margin-top:2px}
+.score-wrap{padding:.3rem 0}
+.score-meta{display:flex;justify-content:space-between;font-size:.52rem;color:var(--text-muted)}
+#score-num{font-weight:700;color:#fff;font-size:.68rem}
+body.theme-light #score-num{color:var(--text)}
+.score-track{height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:3px}
+.score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#742A2A 0%,#f6ad55 40%,#39d353 100%);background-size:300% 100%;width:75%;transition:width .8s,background-position .8s}
+.session-controls{display:flex;gap:.5rem;padding:.25rem .4rem;flex-shrink:0}
+.btn-session{flex:1;padding:.5rem;border:none;border-radius:10px;cursor:pointer;font-size:1.2rem;font-weight:700;transition:transform .15s}
+.btn-session:active{transform:scale(.96)}
+.btn-start{background:linear-gradient(135deg,var(--green),#26a641);color:#000}
+.btn-stop{background:linear-gradient(135deg,var(--red),#b91c1c);color:#fff;display:none}
+.btn-stop.visible{display:block}
+.screen-header{padding:.8rem .9rem .6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg)}
+.screen-header h2{font-size:1.05rem;font-weight:700}
+.logo{font-size:1.15rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo-sub{font-size:.58rem;color:var(--text-muted)}
+.session-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.65rem;margin-bottom:.4rem;display:grid;grid-template-columns:auto 1fr auto;gap:.5rem;align-items:center}
+.session-score-badge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:#fff}
+.session-date{font-size:.68rem;font-weight:700}
+.session-meta{font-size:.58rem;color:var(--text-muted)}
+.session-badges{font-size:1rem}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text-muted)}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:.5rem}
+.section-label{font-size:.58rem;color:var(--accent);text-transform:uppercase;margin:1rem 0 .4rem;display:flex;align-items:center;gap:.4rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.field-row{margin-bottom:.6rem}
+.field-row label{display:block;font-size:.7rem;font-weight:600;color:var(--text-muted);margin-bottom:.2rem}
+.field-row input,.field-row select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.88rem;padding:.4rem .6rem;outline:none}
+.field-row input:focus,.field-row select:focus{border-color:var(--accent)}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid var(--border);gap:.7rem}
+.setting-info{flex:1;min-width:0}
+.setting-title{font-size:.82rem;font-weight:700}
+.setting-desc{font-size:.62rem;color:var(--text-muted);margin-top:2px}
+.toggle-wrap{flex-shrink:0}
+.toggle-input{position:absolute;opacity:0;width:0;height:0}
+.toggle-track{display:block;width:44px;height:24px;border-radius:12px;background:var(--border);cursor:pointer;position:relative;transition:background .25s}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .25s}
+.toggle-input:checked+.toggle-track{background:var(--accent)}
+.toggle-input:checked+.toggle-track::after{transform:translateX(20px)}
+.btn-primary{width:100%;padding:.75rem;border:none;border-radius:12px;cursor:pointer;font-size:.95rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--green));color:#000;margin-top:.8rem}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.theme-card{border:2px solid var(--border);border-radius:12px;padding:.6rem;cursor:pointer;position:relative}
+.theme-card.active{border-color:var(--accent)}
+.theme-card.active::after{content:'✓';position:absolute;top:.3rem;right:.4rem;color:var(--accent);font-size:.65rem}
+.theme-preview{height:26px;border-radius:6px;margin-bottom:.3rem;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.theme-name{font-size:.72rem;font-weight:700}
+.theme-desc{font-size:.55rem;color:var(--text-muted)}
+.danger-zone{border:1px solid rgba(248,81,73,.3);border-radius:12px;padding:.7rem;margin-top:.8rem}
+.danger-title{font-size:.58rem;color:var(--red);text-transform:uppercase;margin-bottom:.4rem}
+.btn-danger{width:100%;padding:.55rem;background:none;border:1px solid rgba(248,81,73,.4);border-radius:8px;color:var(--red);font-size:.85rem;font-weight:700;cursor:pointer;margin-bottom:.35rem}
+.btn-outline{flex:1;padding:.55rem;border-radius:10px;background:none;border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:.82rem;font-weight:700}
+.highway-row{display:flex;align-items:center;gap:.35rem}
+.highway-speed-input{width:52px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.72rem;padding:.2rem .35rem;text-align:center;outline:none}
+.vehicle-tabs{display:flex;gap:.35rem;padding:.5rem .7rem 0;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.vehicle-tabs::-webkit-scrollbar{display:none}
+.vehicle-tab{display:flex;align-items:center;gap:.25rem;padding:.3rem .6rem;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);font-size:.58rem;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.vehicle-tab.active{border-color:var(--accent);color:var(--accent)}
+.vehicle-tab .tab-del{width:14px;height:14px;border-radius:50%;background:rgba(248,81,73,.15);border:none;color:var(--red);font-size:.52rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-add-vehicle{padding:.3rem .55rem;border-radius:20px;border:1px dashed var(--border);background:none;color:var(--text-muted);font-size:.58rem;cursor:pointer;white-space:nowrap;flex-shrink:0}
+#overlay-end{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem}
+#overlay-end.visible{display:flex}
+.end-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:1.4rem 1rem;width:100%;max-width:330px;text-align:center}
+.end-score-big{font-size:3.5rem;font-weight:700;color:#fff}
+.end-face{font-size:2.2rem}
+.end-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin:.7rem 0}
+.end-stat{background:var(--surface2);border-radius:10px;padding:.4rem}
+.end-stat-val{font-size:1.1rem;font-weight:700;color:#fff}
+.end-stat-lbl{font-size:.55rem;color:var(--text-muted)}
+.end-badges{font-size:1.2rem;margin:.4rem 0}
+.end-buttons{display:flex;gap:.4rem;margin-top:.7rem}
+#copilot-toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(22,27,34,.93);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;font-style:italic;color:var(--text-muted);z-index:80;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:88vw;text-align:center}
+#copilot-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#cpbar{position:fixed;bottom:0;left:0;right:0;z-index:200;text-align:center;font-size:9px;color:var(--text-muted);pointer-events:none;padding:3px 0;background:var(--bg);border-top:1px solid var(--border);opacity:.7}
+#cpbar span{cursor:pointer;pointer-events:all;padding:2px 6px}
+.popup-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.popup-bg.hidden{display:none!important}
+.popup-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px 16px;max-width:370px;width:92%;max-height:85vh;overflow-y:auto}
+.popup-title{font-size:1.15rem;font-weight:700;color:var(--accent);text-align:center;margin-bottom:12px}
+.popup-row{font-size:.82rem;color:var(--text-muted);margin-bottom:7px;line-height:1.5}
+.popup-row strong{color:var(--text)}
+.lic{font-size:.55rem;color:var(--text-muted);border:1px solid var(--border);border-radius:10px;padding:9px;line-height:1.8;margin-top:9px}
+.lic .lt{color:var(--accent);font-weight:700;letter-spacing:2px;font-size:.58rem;display:block;margin-bottom:4px}
+.popup-close{width:100%;margin-top:12px;padding:9px;border-radius:50px;border:none;background:linear-gradient(135deg,var(--accent),var(--green));color:#000;font-size:.82rem;font-weight:700;cursor:pointer}
+#session-chart-wrap{width:100%;margin:.5rem 0;background:var(--surface2);border-radius:10px;padding:.35rem}
+#session-chart-label{font-size:.48rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:2px}
+#session-chart{display:block;width:100%;height:40px}
+.calib-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:.6rem;margin-top:.35rem}
+.calib-row{display:flex;gap:.35rem;align-items:flex-end;margin-top:.4rem}
+.calib-row .field-row{flex:1;margin-bottom:0}
+.btn-calib{padding:.4rem .6rem;border-radius:8px;border:none;background:var(--accent);color:#000;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0}
+.calib-history{font-size:.52rem;color:var(--text-muted);margin-top:.35rem;line-height:1.6}
 
-  :root {
-    --font-display: 'Segoe UI', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-    --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'DejaVu Sans Mono', monospace;
-    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #21262d;
-    --border: #30363d;
-    --text: #e6edf3;
-    --text-muted: #8b949e;
-    --accent: #58a6ff;
-    --green: #39d353;
-    --red: #f85149;
+/* VOICE TOGGLE */
+.voice-toggle {
+  background: rgba(22,27,34,0.7); backdrop-filter: blur(8px);
+  border: 0.8px solid var(--border); border-radius: 8px;
+  padding: 0.28rem 0.5rem; cursor: pointer;
+  font-size: 1rem; color: var(--text-muted);
+  transition: color 0.2s;
+  /* rimosso: position, top, right, z-index, display:none */
+}
+.voice-toggle.active { color: #f6ad55; border-color: #f6ad55; }
 
-    --state-perfect: #1A4731;
-    --state-ok: #276749;
-    --state-attention: #744210;
-    --state-neurotic: #7B341E;
-    --state-danger: #742A2A;
-    --state-color: #1A4731;
-
-    --face-size: min(28vw, 140px);
-    --speed-size: min(14vw, 64px);
-    --transition: 0.8s cubic-bezier(0.4,0,0.2,1);
-
-    /* Themes */
-    --theme-accent: #58a6ff;
-    --theme-green: #39d353;
-  }
-
-  /* ── LIGHT THEME ── */
-  body.theme-light {
-    --bg: #f0f2f5;
-    --surface: #ffffff;
-    --surface2: #e8eaed;
-    --border: #d0d7de;
-    --text: #1c2128;
-    --text-muted: #57606a;
-    --state-perfect: #d4f5e2;
-    --state-ok: #b6eecb;
-    --state-attention: #fde8c4;
-    --state-neurotic: #fdd0b8;
-    --state-danger: #fcc8c8;
-  }
-
-  /* ── SPORT THEME ── */
-  body.theme-sport {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a26;
-    --border: #2a2a3e;
-    --text: #e8e0ff;
-    --text-muted: #8878cc;
-    --accent: #a78bfa;
-    --green: #4ade80;
-    --theme-accent: #a78bfa;
-    --theme-green: #4ade80;
-  }
-
-  /* ── RACING THEME ── */
-  body.theme-racing {
-    --bg: #0f0500;
-    --surface: #1a0a00;
-    --surface2: #2a1500;
-    --border: #3d2000;
-    --text: #fff3e0;
-    --text-muted: #cc8844;
-    --accent: #ff8c00;
-    --green: #ffcc00;
-    --theme-accent: #ff8c00;
-    --theme-green: #ffcc00;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    height: 100dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* DYNAMIC BG GLOW */
-  #bg-glow {
-    position: fixed; inset: 0; z-index: 0;
-    background: radial-gradient(ellipse 80% 60% at 50% 20%, var(--state-color) 0%, transparent 70%);
-    opacity: 0.35;
-    transition: background var(--transition);
-    pointer-events: none;
-  }
-
-  /* ======================== SCREENS ======================== */
-  .screen {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    z-index: 1;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.35s;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-  .screen.active { opacity: 1; pointer-events: all; }
-
-  /* ======================== BOTTOM NAV ======================== */
-  .bottom-nav {
-    display: flex;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
-    z-index: 10;
-    flex-shrink: 0;
-  }
-  .nav-btn {
-    flex: 1; padding: 0.65rem 0.25rem;
-    background: none; border: none;
-    display: flex; flex-direction: column; align-items: center; gap: 2px;
-    cursor: pointer; color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.5rem; letter-spacing: 0.04em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    position: relative;
-  }
-  .nav-btn .icon { font-size: 1.15rem; }
-  .nav-btn.active { color: var(--accent); }
-  .nav-btn.active::after {
-    content: '';
-    position: absolute; top: 0; left: 20%; right: 20%;
-    height: 2px; background: var(--accent);
-    border-radius: 0 0 2px 2px;
-  }
-
-  /* ======================== SCREEN: DASHBOARD ======================== */
-  #screen-dash {
-    display: grid;
-    grid-template-rows: auto auto auto 1fr auto auto;
-    overflow: hidden;
-  }
-  /* Prevent session-controls row from growing */
-  #screen-dash > .session-controls {
-    align-self: end;
-  }
-
-  /* Other screens: ensure proper scroll with fixed nav */
-  #screen-history,
-  #screen-vehicle,
-  #screen-appsettings {
-    overflow: hidden;
-  }
-  #screen-history > .settings-body,
-  #screen-history > .history-body,
-  #screen-vehicle > .settings-body,
-  #screen-appsettings > .settings-body {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Scrollable widgets area */
-  .dash-scroll-area {
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    min-height: 0;
-    padding-bottom: 0.4rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .dash-scroll-area::-webkit-scrollbar { width: 3px; }
-  .dash-scroll-area::-webkit-scrollbar-track { background: transparent; }
-  .dash-scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* Scroll fade hint at bottom — very subtle, only last 5% */
-  .dash-scroll-area {
-    mask-image: linear-gradient(to bottom, black 92%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 92%, transparent 100%);
-  }
-
-  .status-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.45rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.62rem; color: var(--text-muted);
-    z-index: 2; flex-shrink: 0;
-  }
-  .status-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    display: inline-block; margin-right: 4px;
-    background: var(--text-muted);
-  }
-  .status-dot.gps { background: var(--green); animation: pulse-dot 2s infinite; }
-  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  .face-section {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 0; z-index: 2;
-    padding: 0.3rem 0.65rem;
-    flex-shrink: 0;
-    max-width: 480px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  /* Unified copilot widget: bubble text + emoji + label all in one */
-  .face-widget {
-    display: flex; flex-direction: row;
-    align-items: center; gap: 0.7rem;
-    padding: 0.7rem 1rem;
-    width: 100%;
-    max-width: 400px;
-    min-height: 110px;
-  }
-  #face-emoji {
-    font-size: min(22vw, 90px);
-    line-height: 1;
-    filter: drop-shadow(0 0 20px rgba(255,255,255,0.08));
-    transition: filter 0.5s;
-    user-select: none;
-    animation: face-breathe 3s ease-in-out infinite;
-    flex-shrink: 0;
-  }
-  .face-info {
-    display: flex; flex-direction: column;
-    align-items: flex-start; gap: 0.2rem;
-    min-width: 0; flex: 1;
-  }
-  .face-label {
-    font-family: var(--font-display);
-    font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em;
-    color: rgba(255,255,255,0.7); text-transform: uppercase;
-  }
-  body.theme-light .face-label { color: var(--text); }
-  #copilota-text {
-    font-family: var(--font-body);
-    font-size: 0.75rem; font-style: italic;
-    color: var(--text-muted);
-    line-height: 1.4;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    transition: opacity 0.4s;
-  }
-  @keyframes face-breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-  @keyframes face-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-  @keyframes face-vibrate { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-3px,2px)} 50%{transform:translate(3px,-2px)} 75%{transform:translate(-2px,-3px)} }
-  .speed-display {
-    display: flex; align-items: baseline; justify-content: center;
-    gap: 0.25rem; z-index: 2;
-  }
-  #speed-val {
-    font-family: var(--font-display);
-    font-size: var(--speed-size);
-    font-weight: 700; line-height: 1; color: #fff;
-    text-shadow: 0 0 30px rgba(88,166,255,0.4);
-    transition: color 0.5s;
-  }
-  .speed-unit {
-    font-family: var(--font-mono);
-    font-size: 0.85rem; color: var(--text-muted); align-self: flex-end; padding-bottom: 0.5rem;
-  }
-
-  /* ── BASE WIDGET ─────────────────────────────────────────── */
-  .widget, .face-widget {
-    background: rgba(22,27,34,0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(48,54,61,0.8);
-    border-radius: 10px;
-    padding: 0.4rem 0.5rem;
-    position: relative; overflow: hidden;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  body.theme-light .widget,
-  body.theme-light .face-widget { background: rgba(255,255,255,0.8); }
-
-  .widget::before, .face-widget::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent);
-    pointer-events: none; border-radius: inherit;
-  }
-
-  /* Shared text styles */
-  .widget-label {
-    font-family: var(--font-mono);
-    font-size: 0.52rem; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--text-muted);
-    margin-bottom: 0.15rem;
-  }
-  .widget-val {
-    font-family: var(--font-display);
-    font-size: 1.25rem; font-weight: 700; line-height: 1; color: #fff;
-  }
-  body.theme-light .widget-val { color: var(--text); }
-  .widget-unit {
-    font-size: 0.6rem; color: var(--text-muted);
-    font-family: var(--font-mono);
-  }
-
-  /* ── CLOCK accent border ──────── */
-  /*.widget[data-variant="clock"] {
-    border-color: rgba(88,166,255,0.25);
-    display: flex; flex-direction: column;
-  }*/
-  #w-clock-val {
-    font-family: var(--font-display);
-    font-size: 1.25rem; font-weight: 700; line-height: 1; color: var(--accent);
-  }
-
-  /* ── SPEED widget (same size as others) ──────────────────── */
-  .widget[data-variant="speed"] {
-    display: flex; flex-direction: column;
-  }
-  .widget-speed-inner {
-    display: flex; align-items: baseline; gap: 0.2rem;
-    justify-content: center;
-  }
-  #w-speed-big {
-    font-family: var(--font-display);
-    font-size: 1.25rem; font-weight: 700; line-height: 1; color: #fff;
-    text-shadow: 0 0 20px rgba(88,166,255,0.3); transition: color 0.4s;
-  }
-  body.theme-light #w-speed-big { color: var(--text); text-shadow: none; }
-  .widget-speed-unit {
-    font-family: var(--font-mono);
-    font-size: 0.55rem; color: var(--text-muted); padding-bottom: 0.15rem;
-  }
-
-  /* ── SPARKLINE widget ─────────────────────────────────────── */
-  .widget[data-variant="chart"] { min-width: 140px; }
-  #speed-sparkline { display: block; width: 100%; height: 32px; margin-top: 4px; }
-
-  /* ── GRID CONTAINERS ─────────────────────────────────────── */
-  .widgets-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 0.4rem; padding: 0 0.65rem;
-    z-index: 2;
-    max-width: 480px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  /* 2 columns on very narrow screens */
-  @media (max-width: 340px) {
-    .widgets-grid { grid-template-columns: 1fr 1fr; }
-  }
-  /* Wider grid on tablets */
-  @media (min-width: 600px) {
-    .widgets-grid { max-width: 560px; }
-  }
-
-  /* ── DRAG & DROP WIDGET LAYOUT ───────────────────────────── */
-  /* Edit mode: widgets-grid becomes a free-positioning canvas */
-  .widgets-grid.edit-mode {
-    position: relative;
-    height: var(--wgrid-height, 320px);
-    display: block; /* override grid */
-    padding: 0 0.65rem;
-  }
-  /* Grid overlay lines visible in edit mode */
-  .widgets-grid.edit-mode::after {
-    content: '';
-    position: absolute; inset: 0 0.65rem;
-    background-image:
-      linear-gradient(rgba(88,166,255,0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(88,166,255,0.08) 1px, transparent 1px);
-    background-size: var(--cell, 80px) var(--cell, 80px);
-    pointer-events: none; border-radius: 8px;
-  }
-  /* Widget in edit mode: absolutely positioned, draggable */
-  .widgets-grid.edit-mode .widget {
-    position: absolute;
-    cursor: grab;
-    user-select: none;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    transition: box-shadow 0.15s;
-    min-width: var(--cell, 80px); min-height: var(--cell, 80px);
-  }
-  .widgets-grid.edit-mode .widget:active {
-    cursor: grabbing;
-    box-shadow: 0 8px 32px rgba(88,166,255,0.25);
-    z-index: 10;
-  }
-  .widgets-grid.edit-mode .widget {
-    position: absolute;
-    cursor: grab;
-    user-select: none;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    transition: box-shadow 0.15s;
-    min-width: var(--cell, 80px); min-height: var(--cell, 80px);
-  }
-  .widgets-grid.edit-mode .widget:active {
-    cursor: grabbing;
-    box-shadow: 0 8px 32px rgba(88,166,255,0.25);
-    z-index: 10;
-  }
-  .widget-edit-badge {
-    display: none;
-    position: absolute; top: 4px; right: 4px;
-    width: 16px; height: 16px; border-radius: 4px;
-    background: rgba(88,166,255,0.2); border: 1px solid rgba(88,166,255,0.4);
-    font-size: 8px; color: var(--accent);
-    align-items: center; justify-content: center;
-    cursor: grab; z-index: 2;
-  }
-  .edit-mode .widget-edit-badge { display: flex; }
-  .widget-resize-handle {
-    display: none;
-    position: absolute; bottom: 2px; right: 2px;
-    width: 14px; height: 14px; cursor: nw-resize; z-index: 3;
-  }
-  .widget-resize-handle::after {
-    content: '';
-    position: absolute; bottom: 2px; right: 2px;
-    width: 8px; height: 8px;
-    border-right: 2px solid rgba(88,166,255,0.5);
-    border-bottom: 2px solid rgba(88,166,255,0.5);
-    border-radius: 1px;
-  }
-  .edit-mode .widget-resize-handle { display: block; }
-  #edit-mode-banner {
-    display: none;
-    padding: 0.4rem 0.65rem;
-    background: rgba(88,166,255,0.1);
-    border-bottom: 1px solid rgba(88,166,255,0.25);
-    font-family: var(--font-mono);
-    font-size: 0.58rem; color: var(--accent);
-    letter-spacing: 0.06em; text-transform: uppercase;
-    text-align: center; z-index: 3; flex-shrink: 0;
-    display: none; align-items: center; justify-content: space-between;
-    gap: 0.5rem;
-  }
-  #edit-mode-banner.visible { display: flex; }
-  #edit-mode-banner .banner-label { flex: 1; text-align: left; }
-  .btn-edit-save {
-    padding: 0.28rem 0.75rem; border-radius: 6px; border: none;
-    background: var(--accent); color: #000;
-    font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700;
-    cursor: pointer; flex-shrink: 0; white-space: nowrap;
-    transition: opacity 0.15s;
-  }
-  .btn-edit-save:active { opacity: 0.8; }
-  .btn-edit-cancel {
-    padding: 0.28rem 0.65rem; border-radius: 6px;
-    border: 1px solid rgba(88,166,255,0.4); background: none;
-    color: var(--accent); font-family: var(--font-mono);
-    font-size: 0.6rem; cursor: pointer; flex-shrink: 0; white-space: nowrap;
-  }
-  .score-bar-track {
-    height: 5px; border-radius: 3px;
-    background: rgba(255,255,255,0.08); overflow: hidden;
-  }
-  .score-bar-fill {
-    height: 100%; border-radius: 3px;
-    background: linear-gradient(90deg, #742A2A 0%, #f6ad55 40%, #39d353 100%);
-    background-size: 300% 100%;
-    transition: background-position 0.8s, width 0.8s;
-    width: 75%; background-position: 60% 0;
-  }
-  .score-meta {
-    display: flex; justify-content: space-between; align-items: center;
-    font-family: var(--font-mono); font-size: 0.58rem;
-    color: var(--text-muted);
-  }
-  #score-num { font-size: 0.75rem; font-weight: 700; color: #fff; }
-  body.theme-light #score-num { color: var(--text); }
-
-  .widgets-scroll {
-    display: flex; gap: 0.45rem;
-    padding: 0 0.65rem 0.4rem;
-    overflow-x: auto; z-index: 2;
-    scrollbar-width: none;
-  }
-  .widgets-scroll::-webkit-scrollbar { display: none; }
-
-  .score-bar-wrap
-  {
-    padding: 0.25rem 1.0rem;
-    max-width: 480px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  .session-controls {
-    display: flex; gap: 0.5rem; padding: 0 0.65rem 0.4rem;
-    z-index: 2;
-    flex-shrink: 0;
-    max-width: 480px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  .btn-session {
-    flex: 1; padding: 0.55rem 0.5rem;
-    border: none; border-radius: 10px; cursor: pointer;
-    font-family: var(--font-display);
-    font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em;
-    transition: transform 0.15s, opacity 0.15s;
-    max-height: 44px;
-    align-self: center;
-  }
-  .btn-session:active { transform: scale(0.96); }
-  .btn-start { background: linear-gradient(135deg, var(--green), #26a641); color: #000; }
-  .btn-stop { background: linear-gradient(135deg, var(--red), #b91c1c); color: #fff; display: none; }
-  .btn-stop.visible { display: flex; align-items: center; justify-content: center; }
-
-  /* ======================== SCREEN: HISTORY ======================== */
-  #screen-history { background: var(--bg); display: flex; flex-direction: column; }
-  .screen-header {
-    padding: 1.1rem 1.4rem 0.9rem;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-    background: var(--bg); z-index: 10;
-  }
-  .screen-header h2 {
-    font-family: var(--font-display);
-    font-size: 1.25rem; font-weight: 700;
-  }
-  .history-body { flex: 1; overflow-y: auto; padding: 0.9rem; display: flex; flex-direction: column; gap: 0.55rem; }
-  .session-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px; padding: 0.8rem 0.9rem;
-    display: grid; grid-template-columns: auto 1fr auto;
-    gap: 0.7rem; align-items: center;
-  }
-  .session-score-badge {
-    width: 42px; height: 42px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
-    color: #fff;
-  }
-  .session-date { font-size: 0.72rem; font-weight: 700; }
-  .session-meta { font-size: 0.65rem; color: var(--text-muted); }
-  .session-badges { font-size: 1rem; }
-  .empty-state { text-align: center; padding: 3rem 2rem; color: var(--text-muted); font-size: 0.85rem; }
-  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
-
-  /* ======================== SCREEN: VEHICLE SETTINGS ======================== */
-  #screen-vehicle { background: var(--bg); display: flex; flex-direction: column; }
-
-  .settings-body { flex: 1; overflow-y: auto; padding: 0 1.2rem 1.5rem; }
-
-  /* Vehicle tabs */
-  .vehicle-tabs {
-    display: flex; gap: 0.4rem;
-    padding: 0.75rem 1.2rem 0;
-    overflow-x: auto; scrollbar-width: none;
-    flex-shrink: 0;
-  }
-  .vehicle-tabs::-webkit-scrollbar { display: none; }
-  .vehicle-tab {
-    display: flex; align-items: center; gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text-muted);
-    font-family: var(--font-mono); font-size: 0.62rem;
-    cursor: pointer; white-space: nowrap;
-    transition: border-color 0.2s, color 0.2s;
-    flex-shrink: 0;
-  }
-  .vehicle-tab.active { border-color: var(--accent); color: var(--accent); }
-  .vehicle-tab .tab-del {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: rgba(248,81,73,0.15); border: none;
-    color: var(--red); font-size: 0.6rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    padding: 0; flex-shrink: 0;
-  }
-  .btn-add-vehicle {
-    padding: 0.4rem 0.75rem;
-    border-radius: 20px;
-    border: 1px dashed var(--border);
-    background: none; color: var(--text-muted);
-    font-family: var(--font-mono); font-size: 0.62rem;
-    cursor: pointer; white-space: nowrap; flex-shrink: 0;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .btn-add-vehicle:hover { border-color: var(--accent); color: var(--accent); }
-
-  .section-label {
-    font-family: var(--font-mono);
-    font-size: 0.62rem; letter-spacing: 0.14em;
-    color: var(--accent); text-transform: uppercase;
-    margin: 1.3rem 0 0.65rem;
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  .field-row { margin-bottom: 0.8rem; }
-  .field-row label {
-    display: block; font-size: 0.74rem; font-weight: 600;
-    color: var(--text-muted); margin-bottom: 0.28rem;
-  }
-  .field-row input, .field-row select {
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text);
-    font-family: var(--font-body); font-size: 0.92rem;
-    padding: 0.5rem 0.8rem; outline: none;
-    transition: border-color 0.2s;
-  }
-  .field-row input:focus, .field-row select:focus { border-color: var(--accent); }
-  .field-row select option { background: var(--surface); }
-  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
-
-  .btn-primary {
-    width: 100%; padding: 0.9rem;
-    border: none; border-radius: 12px; cursor: pointer;
-    font-family: var(--font-display);
-    font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em;
-    background: linear-gradient(135deg, var(--accent), var(--green));
-    color: #000; margin-top: 1.2rem;
-    transition: transform 0.15s, opacity 0.15s;
-  }
-  .btn-primary:active { transform: scale(0.97); opacity: 0.9; }
-
-  /* ======================== SCREEN: APP SETTINGS ======================== */
-  #screen-appsettings { background: var(--bg); display: flex; flex-direction: column; }
-
-  /* Theme selector */
-  .theme-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 0.65rem; margin-bottom: 1rem;
-  }
-  .theme-card {
-    border: 2px solid var(--border);
-    border-radius: 12px; padding: 0.9rem;
-    cursor: pointer; transition: border-color 0.2s;
-    position: relative;
-  }
-  .theme-card.active { border-color: var(--accent); }
-  .theme-card.active::after {
-    content: '✓';
-    position: absolute; top: 0.4rem; right: 0.6rem;
-    font-size: 0.75rem; color: var(--accent);
-  }
-  .theme-preview {
-    height: 32px; border-radius: 6px; margin-bottom: 0.5rem;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem; gap: 4px;
-  }
-  .theme-name { font-size: 0.78rem; font-weight: 700; }
-  .theme-desc { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
-
-  /* Setting row */
-  .setting-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0.9rem 0; border-bottom: 1px solid var(--border);
-    gap: 1rem;
-  }
-  .setting-row:last-child { border-bottom: none; }
-  .setting-info { flex: 1; min-width: 0; }
-  .setting-title { font-size: 0.88rem; font-weight: 700; }
-  .setting-desc { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
-
-  /* Toggle switch */
-  .toggle-wrap { position: relative; flex-shrink: 0; }
-  .toggle-input { position: absolute; opacity: 0; width: 0; height: 0; }
-  .toggle-track {
-    display: block; width: 44px; height: 24px;
-    border-radius: 12px; background: var(--border);
-    cursor: pointer; transition: background 0.25s; position: relative;
-  }
-  .toggle-track::after {
-    content: ''; position: absolute;
-    top: 3px; left: 3px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #fff; transition: transform 0.25s;
-  }
-  .toggle-input:checked + .toggle-track { background: var(--accent); }
-  .toggle-input:checked + .toggle-track::after { transform: translateX(20px); }
-
-  /* Danger zone */
-  .danger-zone {
-    border: 1px solid rgba(248,81,73,0.3);
-    border-radius: 12px; padding: 1rem;
-    margin-top: 1rem;
-  }
-  .danger-title {
-    font-family: var(--font-mono);
-    font-size: 0.62rem; letter-spacing: 0.1em;
-    color: var(--red); text-transform: uppercase; margin-bottom: 0.75rem;
-  }
-  .btn-danger {
-    width: 100%; padding: 0.7rem;
-    background: none; border: 1px solid rgba(248,81,73,0.4);
-    border-radius: 8px; color: var(--red);
-    font-family: var(--font-display); font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; margin-bottom: 0.5rem;
-    transition: background 0.2s;
-  }
-  .btn-danger:hover { background: rgba(248,81,73,0.1); }
-  .btn-danger:last-child { margin-bottom: 0; }
-
-  /* ======================== DEBUG PANEL (FLOATING) ======================== */
-  #debug-panel {
-    position: fixed;
-    top: 60px; right: 12px;
-    width: min(320px, 90vw);
-    background: rgba(0,0,0,0.93);
-    backdrop-filter: blur(20px);
-    border: 1.5px solid #39d353;
-    border-radius: 14px;
-    z-index: 200;
-    max-height: calc(100dvh - 120px);
-    display: flex; flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    opacity: 0; pointer-events: none;
-    transform: scale(0.92) translateY(-8px);
-    transition: opacity 0.25s, transform 0.25s;
-  }
-  #debug-panel.open {
-    opacity: 1; pointer-events: all;
-    transform: scale(1) translateY(0);
-  }
-  /* Draggable header */
-  .debug-header {
-    padding: 0.55rem 0.85rem;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid rgba(57,211,83,0.3);
-    cursor: grab; user-select: none; flex-shrink: 0;
-    border-radius: 12px 12px 0 0;
-  }
-  .debug-header:active { cursor: grabbing; }
-  .debug-title {
-    font-family: var(--font-mono);
-    font-size: 0.65rem; color: #39d353; letter-spacing: 0.1em;
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .debug-drag-hint { font-size: 0.55rem; color: rgba(57,211,83,0.5); }
-  .debug-close {
-    background: none; border: none; color: #39d353;
-    font-size: 1rem; cursor: pointer; padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-  }
-  .debug-close:hover { background: rgba(57,211,83,0.15); }
-  .debug-body { padding: 0.65rem 0.85rem; overflow-y: auto; flex: 1; }
-  .debug-row {
-    display: flex; justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 0.62rem; color: #8b949e;
-    padding: 0.18rem 0; border-bottom: 1px solid rgba(48,54,61,0.4);
-  }
-  .debug-row span:last-child { color: #39d353; }
-  .debug-scenario-label {
-    font-family: var(--font-mono);
-    font-size: 0.58rem; color: #39d353; letter-spacing: 0.1em;
-    text-transform: uppercase; margin: 0.65rem 0 0.35rem;
-  }
-  .scenario-btns { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.4rem; }
-  .scenario-btn {
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); border-radius: 6px;
-    font-family: var(--font-mono); font-size: 0.58rem;
-    padding: 0.25rem 0.55rem; cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-  }
-  .scenario-btn:hover, .scenario-btn.active { border-color: #39d353; color: #39d353; }
-  .slider-row { margin: 0.35rem 0; }
-  .slider-row label {
-    display: flex; justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 0.58rem; color: #8b949e; margin-bottom: 0.15rem;
-  }
-  .slider-row label span { color: #39d353; }
-  input[type=range] { width: 100%; accent-color: #39d353; cursor: pointer; }
-
-  /* DEBUG FAB */
-  #debug-fab {
-    position: fixed; bottom: 5.2rem; right: 0.85rem;
-    width: 38px; height: 38px; border-radius: 50%;
-    background: rgba(57,211,83,0.12);
-    border: 1.5px solid rgba(57,211,83,0.55);
-    color: #39d353; font-size: 0.6rem;
-    font-family: var(--font-mono);
-    cursor: pointer; z-index: 50;
-    display: none; align-items: center; justify-content: center;
-    transition: background 0.2s, transform 0.15s;
-    line-height: 1; text-align: center;
-  }
-  #debug-fab:hover { background: rgba(57,211,83,0.22); }
-  #debug-fab.panel-open { transform: rotate(45deg); }
-
-  /* VOICE TOGGLE */
-  .voice-toggle {
-    position: fixed; top: 0.4rem; right: 50%; z-index: 50;
-    background: rgba(22,27,34,0.7); backdrop-filter: blur(8px);
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 0.28rem 0.5rem; cursor: pointer;
-    font-size: 1rem; color: var(--text-muted);
-    transition: color 0.2s; display: none;
-  }
-  .voice-toggle.active { color: #f6ad55; border-color: #f6ad55; }
-
-  /* COPILOT TOAST — now integrated in face widget */
-  #copilot-toast {
-    display: none;
-  }
-
-  /* END SESSION OVERLAY */
-  #overlay-end {
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    padding: 2rem;
-  }
-  #overlay-end.visible { display: flex; }
-  .end-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 1.8rem 1.4rem; width: 100%; max-width: 360px;
-    text-align: center;
-  }
-  .end-score-big {
-    font-family: var(--font-display);
-    font-size: 5rem; font-weight: 700; line-height: 1;
-    color: #fff; margin: 0.4rem 0;
-  }
-  .end-face { font-size: 2.8rem; margin-bottom: 0.4rem; }
-  .end-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; margin: 0.9rem 0; }
-  .end-stat { background: var(--surface2); border-radius: 10px; padding: 0.55rem; }
-  .end-stat-val { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: #fff; }
-  .end-stat-lbl { font-size: 0.62rem; color: var(--text-muted); }
-  .end-badges { font-size: 1.4rem; margin: 0.65rem 0; letter-spacing: 0.15em; }
-  .end-buttons { display: flex; gap: 0.5rem; margin-top: 0.9rem; }
-  .btn-outline {
-    flex: 1; padding: 0.65rem; border-radius: 10px;
-    background: none; border: 1px solid var(--border);
-    color: var(--text); cursor: pointer;
-    font-family: var(--font-display); font-size: 0.88rem; font-weight: 700;
-    transition: border-color 0.2s;
-  }
-  .btn-outline:hover { border-color: var(--accent); }
-
-  /* LOGO */
-  .logo {
-    font-family: var(--font-display);
-    font-size: 1.6rem; font-weight: 700;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--green) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .logo-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: -3px; }
-
-  /* ──────────────────────────────────────
-     COPYRIGHT BAR (from ppTemplate v1.0)
-     ────────────────────────────────────── */
-  #cpbar {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-    text-align: center;
-    font-family: var(--font-mono); font-size: 9px;
-    color: var(--text-muted); letter-spacing: 1px;
-    pointer-events: none;
-    padding: 3px 0 4px;
-    background: var(--bg); border-top: 1px solid var(--border);
-    opacity: 0.7;
-  }
-  #cpbar span {
-    cursor: pointer; pointer-events: all;
-    transition: color 0.15s; padding: 2px 6px;
-  }
-  #cpbar span:hover { color: var(--accent); }
-
-  /* Offset bottom-nav to make room for cpbar */
-  .bottom-nav { margin-bottom: 16px; }
-
-  /* About / copyright popup (from ppTemplate v1.0) */
-  .popup-bg {
-    position: fixed; inset: 0; z-index: 500;
-    background: rgba(0,0,0,0.82);
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
-  }
-  .popup-bg.hidden { display: none !important; }
-  .popup-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 26px 22px;
-    max-width: 400px; width: 94%; max-height: 88vh; overflow-y: auto;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    animation: popIn 0.25s cubic-bezier(.34,1.56,.64,1);
-  }
-  @keyframes popIn { from{transform:scale(.75);opacity:0} to{transform:scale(1);opacity:1} }
-  .popup-title {
-    font-family: var(--font-display); font-size: 1.3rem; font-weight: 700;
-    color: var(--accent); letter-spacing: 3px;
-    text-align: center; margin-bottom: 16px;
-  }
-  .popup-row {
-    font-size: 0.88rem; color: var(--text-muted);
-    margin-bottom: 10px; line-height: 1.7;
-  }
-  .popup-row strong { color: var(--text); }
-  .popup-row a { color: var(--accent); text-decoration: none; }
-  .lic {
-    font-size: 0.62rem; color: var(--text-muted);
-    border: 1px solid var(--border); border-radius: 10px;
-    padding: 12px; line-height: 2; margin-top: 12px;
-  }
-  .lic p { margin-bottom: 3px; }
-  .lic .lt {
-    color: var(--accent); font-weight: 700; letter-spacing: 2px;
-    font-size: 0.65rem; display: block; margin-bottom: 6px;
-    font-family: var(--font-mono);
-  }
-  .popup-close {
-    width: 100%; margin-top: 16px; padding: 11px;
-    border-radius: 50px; border: none;
-    background: linear-gradient(135deg, var(--accent), var(--green));
-    color: #000; font-family: var(--font-display);
-    font-size: 0.9rem; letter-spacing: 2px; cursor: pointer;
-    transition: all 0.15s; font-weight: 700;
-  }
-  .popup-close:hover { transform: translateY(-1px); opacity: 0.9; }
-
-  /* Highway speed threshold input */
-  .highway-row {
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .highway-speed-input {
-    width: 64px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text);
-    font-family: var(--font-mono); font-size: 0.78rem;
-    padding: 0.3rem 0.5rem; outline: none; text-align: center;
-    transition: border-color 0.2s; flex-shrink: 0;
-  }
-  .highway-speed-input:focus { border-color: var(--accent); }
-  .highway-unit {
-    font-family: var(--font-mono);
-    font-size: 0.6rem; color: var(--text-muted); flex-shrink: 0;
-  }
-
-  /* widget-clock, widget-speed, widget-sm variants now in unified widget base above */
-
-  /* Session timeline chart in end overlay */
-  #session-chart-wrap {
-    width: 100%; margin: 0.8rem 0 0.4rem;
-    background: var(--surface2); border-radius: 10px;
-    padding: 0.5rem; overflow: hidden;
-  }
-  #session-chart-label {
-    font-family: var(--font-mono);
-    font-size: 0.55rem; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-  #session-chart {
-    display: block; width: 100%; height: 48px; border-radius: 6px;
-  }
-
-  /* Calibration section in vehicle form */
-  .calib-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px; padding: 0.85rem;
-    margin-top: 0.5rem;
-  }
-  .calib-row {
-    display: flex; gap: 0.5rem; align-items: flex-end; margin-top: 0.6rem;
-  }
-  .calib-row .field-row { flex: 1; margin-bottom: 0; }
-  .btn-calib {
-    padding: 0.5rem 0.85rem; border-radius: 8px; border: none;
-    background: var(--accent); color: #000;
-    font-family: var(--font-display); font-size: 0.85rem; font-weight: 700;
-    cursor: pointer; white-space: nowrap; flex-shrink: 0;
-  }
-  .calib-history {
-    font-family: var(--font-mono);
-    font-size: 0.58rem; color: var(--text-muted);
-    margin-top: 0.5rem; line-height: 1.8;
-  }
-
-  /* Sensors mode badge in status bar */
-  #sensor-mode {
-    font-family: var(--font-mono);
-    font-size: 0.5rem; letter-spacing: 0.05em;
-    padding: 1px 5px; border-radius: 4px;
-    background: rgba(57,211,83,0.12);
-    border: 1px solid rgba(57,211,83,0.3);
-    color: var(--green);
-  }
-  #sensor-mode.sim { background: rgba(248,166,69,0.12); border-color: rgba(248,166,69,0.3); color: #f6ad55; }
 </style>
 </head>
 <body>
-
 <div id="bg-glow"></div>
 
-<!-- ======================== SCREEN: DASHBOARD ======================== -->
 <div id="screen-dash" class="screen active">
   <div class="status-bar">
-    <span>
-      <span class="status-dot" id="gps-dot"></span>
-      <span id="gps-status">GPS off</span>
-      <span id="sensor-mode" class="sim" style="margin-left:4px">SIM</span>
-    </span>
-    <span id="wake-status" style="font-size:0.55rem;cursor:pointer" onclick="cycleTheme()">🔒 schermo</span>
+    <span><span class="status-dot" id="gps-dot"></span><span id="gps-status">GPS+Sensor</span> <span id="sensor-mode" class="off" onclick="toggleSensorMode()">OFF</span></span>
+    <button class="voice-toggle" id="voice-btn" onclick="toggleVoice()">🔇</button>
+    <span class="theme-btn" onclick="cycleTheme()">🌙 Notte</span>
   </div>
-
-  <div id="edit-mode-banner">
-    <span class="banner-label">✦ Modifica widget</span>
-    <button class="btn-edit-cancel" onclick="cancelWidgetEdit()">Annulla</button>
-    <button class="btn-edit-save" onclick="saveWidgetEdit()">💾 Salva</button>
-  </div>
-
   <div class="face-section">
-    <div class="face-widget">
-      <div id="face-emoji">😊</div>
-      <div class="face-info">
-        <div class="face-label" id="face-label">In attesa</div>
-        <div id="copilota-text">Pronto a partire 🚗</div>
-      </div>
-    </div>
+    <div id="face-emoji">😊</div>
+    <div class="face-info"><div class="face-label" id="face-label">In attesa</div><div id="copilota-text">Pronto a partire 🚗</div></div>
   </div>
-
-  <div class="dash-scroll-area">
-  <div class="widgets-grid" id="widgets-grid">
-    <div class="widget" id="wg-speed" data-wid="speed" data-variant="speed">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Velocità</div>
-      <div class="widget-speed-inner">
-        <div id="w-speed-big">0</div>
-        <div class="widget-speed-unit" id="speed-unit-label">km/h</div>
-      </div>
+  <div class="scroll-area">
+    <div class="widgets-grid">
+      <div class="widget"><div class="widget-label">Velocità</div><div class="widget-val" id="w-speed">0</div><div class="widget-unit" id="speed-unit">km/h</div></div>
+      <div class="widget"><div class="widget-label">Ora</div><div class="widget-val" id="w-clock">--:--</div><div class="widget-unit" id="w-wake">🔒</div></div>
+      <div class="widget"><div class="widget-label">Consumo ist.</div><div class="widget-val" id="w-cons">–</div><div class="widget-unit" id="w-cons-unit">L/100km</div></div>
+      <div class="widget"><div class="widget-label">Costo/km</div><div class="widget-val" id="w-cost">–</div><div class="widget-unit" id="w-cost-unit">€/km</div></div>
+      <div class="widget"><div class="widget-label">Score</div><div class="widget-val" id="w-score">–</div><div class="widget-unit">/ 100</div></div>
+      <div class="widget"><div class="widget-label">Cons. cum.</div><div class="widget-val" id="w-cumcons">–</div><div class="widget-unit" id="w-cumcons-unit">L</div></div>
+      <div class="widget"><div class="widget-label">Km sessione</div><div class="widget-val" id="w-km">0.0</div><div class="widget-unit">km</div></div>
+      <div class="widget"><div class="widget-label">Costo totale</div><div class="widget-val" id="w-totalcost">0.00</div><div class="widget-unit">€</div></div>
+      <div class="widget"><div class="widget-label">Serbatoio</div><div class="widget-val" id="w-tank">–</div><div class="widget-unit" id="w-tank-unit">L rimasti</div></div>
+      <div class="widget"><div class="widget-label">Marcia</div><div class="widget-val" id="w-gear">–</div><div class="widget-unit">gear</div></div>
+      <div class="widget"><div class="widget-label">Acc. long.</div><div class="widget-val" id="w-acc">0.0</div><div class="widget-unit">m/s²</div></div>
+      <div class="widget"><div class="widget-label">Acc. lat.</div><div class="widget-val" id="w-lat">0.0</div><div class="widget-unit">m/s²</div></div>
+      <div class="widget"><div class="widget-label">G-Force</div><div class="widget-val" id="w-gforce">0.00</div><div class="widget-unit">G</div></div>
+      <div class="widget"><div class="widget-label">Altitudine</div><div class="widget-val" id="w-alt">–</div><div class="widget-unit">m</div></div>
+      <div class="widget"><div class="widget-label">Vel. 2min</div><canvas id="sparkline" height="26"></canvas></div>
     </div>
-    <div class="widget" id="wg-clock" data-wid="clock" data-variant="clock">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Ora</div>
-      <div id="w-clock-val">--:--</div>
-      <div class="widget-unit" id="wake-widget-status" style="font-size:0.5rem;margin-top:2px">🔒</div>
-    </div>
-    <div class="widget" id="wg-cons" data-wid="cons">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Consumo ist.</div>
-      <div class="widget-val" id="w-cons">–</div>
-      <div class="widget-unit" id="w-cons-unit">L/100km</div>
-    </div>
-    <div class="widget" id="wg-cost" data-wid="cost">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label" id="w-cost-label">Costo / km</div>
-      <div class="widget-val" id="w-cost">–</div>
-      <div class="widget-unit" id="w-cost-unit">€/km</div>
-    </div>
-    <div class="widget" id="wg-score" data-wid="score">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Score sessione</div>
-      <div class="widget-val" id="w-score">–</div>
-      <div class="widget-unit">/ 100</div>
-    </div>
-    <div class="widget" id="wg-cumcons" data-wid="cumcons">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Cons. cumulativo</div>
-      <div class="widget-val" id="w-cumcons">–</div>
-      <div class="widget-unit" id="w-cumcons-unit">L</div>
-    </div>
-    <!-- Previously in widgets-scroll: now full widgets in grid -->
-    <div class="widget" id="wg-km" data-wid="km">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label" id="w-km-label">Km sessione</div>
-      <div class="widget-val" id="w-km">0.0</div>
-      <div class="widget-unit" id="w-km-unit">km</div>
-    </div>
-    <div class="widget" id="wg-totalcost" data-wid="totalcost">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Costo totale</div>
-      <div class="widget-val" id="w-totalcost">0.00</div>
-      <div class="widget-unit">€</div>
-    </div>
-    <div class="widget" id="wg-tank" data-wid="tank">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Serbatoio</div>
-      <div class="widget-val" id="w-tank">–</div>
-      <div class="widget-unit" id="w-tank-unit">L rimasti</div>
-    </div>
-    <div class="widget" id="wg-gear" data-wid="gear">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Marcia est.</div>
-      <div class="widget-val" id="w-gear">–</div>
-      <div class="widget-unit">gear</div>
-    </div>
-    <div class="widget" id="wg-sparkline" data-wid="sparkline" data-variant="chart" >
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Velocità 2 min</div>
-      <canvas id="speed-sparkline" height="32"></canvas>
-    </div>
-    <div class="widget" id="wg-accel" data-wid="accel" data-variant="chart">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Accel. long.</div>
-      <canvas id="accel-sparkline" height="32"></canvas>
-      <div class="widget-unit" id="w-accel-val">0.0 m/s²</div>
-    </div>
-    <div class="widget" id="wg-lateral" data-wid="lateral" data-variant="chart">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Accel. lat.</div>
-      <canvas id="lateral-sparkline" height="32"></canvas>
-      <div class="widget-unit" id="w-lateral-val">0.0 m/s²</div>
-    </div>
-    <div class="widget" id="wg-gforce" data-wid="gforce">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">G-Force</div>
-      <div class="widget-val" id="w-gforce">0.00</div>
-      <div class="widget-unit">G</div>
-    </div>
-    <div class="widget" id="wg-altitude" data-wid="altitude">
-      <span class="widget-edit-badge">⠿</span>
-      <span class="widget-resize-handle"></span>
-      <div class="widget-label">Altitudine</div>
-      <div class="widget-val" id="w-altitude">–</div>
-      <div class="widget-unit">m s.l.m.</div>
-    </div>
+    <div class="score-wrap"><div class="score-meta"><span>Score</span><span id="score-num">–</span></div><div class="score-track"><div class="score-fill" id="score-bar"></div></div></div>
   </div>
-
-  <div class="score-bar-wrap">
-    <div class="score-meta">
-      <span>Score</span>
-      <span id="score-num">–</span>
-    </div>
-    <div class="score-bar-track">
-      <div class="score-bar-fill" id="score-bar"></div>
-    </div>
-  </div>
-  </div><!-- end dash-scroll-area -->
-
   <div class="session-controls">
     <button class="btn-session btn-start" id="btn-start" onclick="startSession()">▶ Avvia sessione</button>
     <button class="btn-session btn-stop" id="btn-stop" onclick="stopSession()">⏹ Termina</button>
   </div>
-
-  <nav class="bottom-nav" id="nav-dash">
-    <button class="nav-btn active" id="navbtn-dash" onclick="showScreen('dash')">
-      <span class="icon">🏠</span>Dashboard
-    </button>
-    <button class="nav-btn" id="navbtn-history" onclick="showScreen('history')">
-      <span class="icon">📋</span>Storico
-    </button>
-    <button class="nav-btn" id="navbtn-vehicle" onclick="showScreen('vehicle')">
-      <span class="icon">🚗</span>Veicolo
-    </button>
-    <button class="nav-btn" id="navbtn-appsettings" onclick="showScreen('appsettings')">
-      <span class="icon">⚙️</span>App
-    </button>
-  </nav>
+  <nav class="bottom-nav"><button class="nav-btn active" onclick="showScreen('dash')"><span>🏠</span>Dash</button><button class="nav-btn" onclick="showScreen('history')"><span>📋</span>Storico</button><button class="nav-btn" onclick="showScreen('vehicle')"><span>🚗</span>Veicolo</button><button class="nav-btn" onclick="showScreen('settings')"><span>⚙️</span>App</button></nav>
 </div>
 
-<!-- ======================== SCREEN: HISTORY ======================== -->
 <div id="screen-history" class="screen">
-  <div class="screen-header">
-    <h2>📋 Storico sessioni</h2>
-    <div style="display:flex;gap:0.4rem">
-      <button class="btn-outline" style="width:auto;padding:0.35rem 0.65rem;font-size:0.72rem" onclick="exportCSV()">CSV</button>
-      <button class="btn-outline" style="width:auto;padding:0.35rem 0.65rem;font-size:0.72rem" onclick="exportJSON()">JSON</button>
-    </div>
-  </div>
-  <div id="history-list" class="history-body"></div>
-  <nav class="bottom-nav">
-    <button class="nav-btn" onclick="showScreen('dash')"><span class="icon">🏠</span>Dashboard</button>
-    <button class="nav-btn active" onclick="showScreen('history')"><span class="icon">📋</span>Storico</button>
-    <button class="nav-btn" onclick="showScreen('vehicle')"><span class="icon">🚗</span>Veicolo</button>
-    <button class="nav-btn" onclick="showScreen('appsettings')"><span class="icon">⚙️</span>App</button>
-  </nav>
+  <div class="screen-header"><h2>📋 Storico</h2><div style="display:flex;gap:.3rem"><button class="btn-outline" style="padding:.25rem .45rem;font-size:.62rem" onclick="exportCSV()">CSV</button><button class="btn-outline" style="padding:.25rem .45rem;font-size:.62rem" onclick="exportJSON()">JSON</button></div></div>
+  <div class="scroll-area" id="history-list"></div>
+  <nav class="bottom-nav"><button class="nav-btn" onclick="showScreen('dash')"><span>🏠</span>Dash</button><button class="nav-btn active" onclick="showScreen('history')"><span>📋</span>Storico</button><button class="nav-btn" onclick="showScreen('vehicle')"><span>🚗</span>Veicolo</button><button class="nav-btn" onclick="showScreen('settings')"><span>⚙️</span>App</button></nav>
 </div>
 
-<!-- ======================== SCREEN: VEHICLE SETTINGS ======================== -->
 <div id="screen-vehicle" class="screen">
-  <div class="screen-header">
-    <div><div class="logo" style="font-size:1.2rem">ppCarSmile</div><div class="logo-sub">Impostazioni veicolo</div></div>
-  </div>
-
-  <!-- Vehicle selector tabs -->
+  <div class="screen-header"><div><div class="logo">ppCarSmile</div><div class="logo-sub">Veicolo</div></div></div>
   <div class="vehicle-tabs" id="vehicle-tabs"></div>
-
-  <div class="settings-body" id="vehicle-form-wrap">
-    <!-- form injected by JS -->
-  </div>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn" onclick="showScreen('dash')"><span class="icon">🏠</span>Dashboard</button>
-    <button class="nav-btn" onclick="showScreen('history')"><span class="icon">📋</span>Storico</button>
-    <button class="nav-btn active" onclick="showScreen('vehicle')"><span class="icon">🚗</span>Veicolo</button>
-    <button class="nav-btn" onclick="showScreen('appsettings')"><span class="icon">⚙️</span>App</button>
-  </nav>
+  <div class="scroll-area" id="vehicle-form-wrap"></div>
+  <nav class="bottom-nav"><button class="nav-btn" onclick="showScreen('dash')"><span>🏠</span>Dash</button><button class="nav-btn" onclick="showScreen('history')"><span>📋</span>Storico</button><button class="nav-btn active" onclick="showScreen('vehicle')"><span>🚗</span>Veicolo</button><button class="nav-btn" onclick="showScreen('settings')"><span>⚙️</span>App</button></nav>
 </div>
 
-<!-- ======================== SCREEN: APP SETTINGS ======================== -->
-<div id="screen-appsettings" class="screen">
-  <div class="screen-header">
-    <div><div class="logo" style="font-size:1.2rem">ppCarSmile</div><div class="logo-sub">Impostazioni app</div></div>
-  </div>
-  <div class="settings-body">
-
+<div id="screen-settings" class="screen">
+  <div class="screen-header"><div><div class="logo">ppCarSmile</div><div class="logo-sub">Impostazioni</div></div></div>
+  <div class="scroll-area">
     <div class="section-label">Tema</div>
     <div class="theme-grid">
-      <div class="theme-card active" id="theme-dark" onclick="setTheme('dark')">
-        <div class="theme-preview" style="background:#0d1117">🌙</div>
-        <div class="theme-name">Notte</div>
-        <div class="theme-desc">Scuro, ideale in auto</div>
-      </div>
-      <div class="theme-card" id="theme-light" onclick="setTheme('light')">
-        <div class="theme-preview" style="background:#e8eaed">☀️</div>
-        <div class="theme-name">Giorno</div>
-        <div class="theme-desc">Chiaro, luce solare</div>
-      </div>
-      <div class="theme-card" id="theme-sport" onclick="setTheme('sport')">
-        <div class="theme-preview" style="background:#0a0a0f">💜</div>
-        <div class="theme-name">Sport</div>
-        <div class="theme-desc">Viola tech</div>
-      </div>
-      <div class="theme-card" id="theme-racing" onclick="setTheme('racing')">
-        <div class="theme-preview" style="background:#0f0500">🔥</div>
-        <div class="theme-name">Racing</div>
-        <div class="theme-desc">Arancio racing</div>
-      </div>
+      <div class="theme-card active" id="theme-dark" onclick="setTheme('dark')"><div class="theme-preview" style="background:#0d1117">🌙</div><div class="theme-name">Notte</div><div class="theme-desc">Scuro</div></div>
+      <div class="theme-card" id="theme-light" onclick="setTheme('light')"><div class="theme-preview" style="background:#e8eaed">☀️</div><div class="theme-name">Giorno</div><div class="theme-desc">Chiaro</div></div>
+      <div class="theme-card" id="theme-sport" onclick="setTheme('sport')"><div class="theme-preview" style="background:#0a0a0f">💜</div><div class="theme-name">Sport</div><div class="theme-desc">Viola</div></div>
+      <div class="theme-card" id="theme-racing" onclick="setTheme('racing')"><div class="theme-preview" style="background:#0f0500">🔥</div><div class="theme-name">Racing</div><div class="theme-desc">Arancio</div></div>
     </div>
-
-    <div class="section-label">Modalità notturna</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Auto-dimmer notturno</div>
-        <div class="setting-desc">Riduce la luminosità dopo le 20:00</div>
-      </div>
-      <div class="toggle-wrap">
-        <input type="checkbox" class="toggle-input" id="tog-nightmode" checked onchange="saveAppSettings()">
-        <label class="toggle-track" for="tog-nightmode"></label>
-      </div>
-    </div>
-
-    <div class="section-label">Unità di misura</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Distanza e velocità</div>
-        <div class="setting-desc">Scegli il sistema di misura preferito</div>
-      </div>
-      <div style="display:flex;gap:0.4rem;flex-shrink:0">
-        <button id="unit-km-btn" onclick="setUnits('km')"
-          style="padding:0.3rem 0.7rem;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:#000;font-family:var(--font-mono);font-size:0.62rem;cursor:pointer;transition:all 0.2s">km</button>
-        <button id="unit-mi-btn" onclick="setUnits('mi')"
-          style="padding:0.3rem 0.7rem;border-radius:8px;border:1.5px solid var(--border);background:none;color:var(--text-muted);font-family:var(--font-mono);font-size:0.62rem;cursor:pointer;transition:all 0.2s">mi</button>
-      </div>
-    </div>
-
+    <div class="section-label">Notturno</div>
+    <div class="setting-row"><div class="setting-info"><div class="setting-title">Auto-dimmer</div><div class="setting-desc">Riduce luminosità dopo le 20</div></div><div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="tog-nightmode" checked onchange="saveAppSettings()"><label class="toggle-track" for="tog-nightmode"></label></div></div>
     <div class="section-label">Copilota vocale</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Voce abilitata</div>
-        <div class="setting-desc">Commenti del copilota durante la guida</div>
-      </div>
-      <div class="toggle-wrap">
-        <input type="checkbox" class="toggle-input" id="tog-voice" onchange="voiceEnabled=this.checked; saveAppSettings()">
-        <label class="toggle-track" for="tog-voice"></label>
-      </div>
-    </div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Silenzia in autostrada</div>
-        <div class="setting-desc">Niente voci oltre la soglia impostata</div>
-      </div>
-      <div class="highway-row">
-        <input type="number" class="highway-speed-input" id="highway-speed"
-          value="110" min="60" max="200" step="10"
-          onchange="saveAppSettings()">
-        <span class="highway-unit" id="highway-unit-label">km/h</span>
-        <div class="toggle-wrap">
-          <input type="checkbox" class="toggle-input" id="tog-highway" checked onchange="saveAppSettings()">
-          <label class="toggle-track" for="tog-highway"></label>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">Layout widget</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Modifica posizione widget</div>
-        <div class="setting-desc">Trascina e ridimensiona i widget sulla dashboard</div>
-      </div>
-      <button onclick="showScreen('dash'); setTimeout(toggleWidgetEdit, 200)"
-        style="padding:0.35rem 0.85rem;border-radius:8px;border:1.5px solid rgba(88,166,255,0.4);
-        background:rgba(88,166,255,0.08);color:var(--accent);font-family:var(--font-mono);
-        font-size:0.62rem;cursor:pointer;flex-shrink:0">
-        ✦ Modifica
-      </button>
-    </div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Ripristina layout predefinito</div>
-        <div class="setting-desc">Riporta i widget alle posizioni originali</div>
-      </div>
-      <button onclick="resetWidgetLayout()"
-        style="padding:0.35rem 0.85rem;border-radius:8px;border:1.5px solid var(--border);
-        background:none;color:var(--text-muted);font-family:var(--font-mono);
-        font-size:0.62rem;cursor:pointer;flex-shrink:0">
-        ↺ Reset
-      </button>
-    </div>
-
-    <div class="section-label">Debug</div>
-    <div class="setting-row">
-      <div class="setting-info">
-        <div class="setting-title">Pannello debug</div>
-        <div class="setting-desc">Apri il pannello simulazione e diagnostica</div>
-      </div>
-      <button onclick="showScreen('dash'); setTimeout(toggleDebug, 200)"
-        style="padding:0.35rem 0.85rem;border-radius:8px;border:1.5px solid rgba(57,211,83,0.5);
-        background:rgba(57,211,83,0.1);color:#39d353;font-family:var(--font-mono);
-        font-size:0.65rem;cursor:pointer;flex-shrink:0">
-        ⬡ Apri Debug
-      </button>
-    </div>
-
+    <div class="setting-row"><div class="setting-info"><div class="setting-title">Voce</div><div class="setting-desc">Commenti durante la guida</div></div><div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="tog-voice" onchange="voiceEnabled=this.checked;saveAppSettings()"><label class="toggle-track" for="tog-voice"></label></div></div>
+    <div class="setting-row"><div class="setting-info"><div class="setting-title">Silenzia autostrada</div><div class="setting-desc">Niente voci oltre soglia</div></div><div class="highway-row"><input type="number" class="highway-speed-input" id="highway-speed" value="110" min="60" max="200" step="10" onchange="saveAppSettings()"><span style="font-size:.5rem;color:var(--text-muted)">km/h</span><div class="toggle-wrap"><input type="checkbox" class="toggle-input" id="tog-highway" checked onchange="saveAppSettings()"><label class="toggle-track" for="tog-highway"></label></div></div></div>
     <div class="section-label">Zona pericolosa</div>
-    <div class="danger-zone">
-      <div class="danger-title">⚠ Azioni irreversibili</div>
-      <button class="btn-danger" onclick="resetHistory()">🗑 Cancella storico sessioni</button>
-      <button class="btn-danger" onclick="resetAll()">💣 Reset completo app</button>
-    </div>
-
-    <div style="height:0.5rem"></div>
+    <div class="danger-zone"><div class="danger-title">⚠ Irreversibili</div><button class="btn-danger" onclick="if(confirm('Cancellare storico?')){localStorage.removeItem('ppCS_history');alert('Fatto.')}">🗑 Cancella storico</button><button class="btn-danger" onclick="if(confirm('Reset completo?')){localStorage.clear();location.reload()}">💣 Reset completo</button></div>
+    <div style="height:3rem"></div>
   </div>
-
-  <nav class="bottom-nav">
-    <button class="nav-btn" onclick="showScreen('dash')"><span class="icon">🏠</span>Dashboard</button>
-    <button class="nav-btn" onclick="showScreen('history')"><span class="icon">📋</span>Storico</button>
-    <button class="nav-btn" onclick="showScreen('vehicle')"><span class="icon">🚗</span>Veicolo</button>
-    <button class="nav-btn active" onclick="showScreen('appsettings')"><span class="icon">⚙️</span>App</button>
-  </nav>
+  <nav class="bottom-nav"><button class="nav-btn" onclick="showScreen('dash')"><span>🏠</span>Dash</button><button class="nav-btn" onclick="showScreen('history')"><span>📋</span>Storico</button><button class="nav-btn" onclick="showScreen('vehicle')"><span>🚗</span>Veicolo</button><button class="nav-btn active" onclick="showScreen('settings')"><span>⚙️</span>App</button></nav>
 </div>
 
-<!-- ======================== DEBUG PANEL (FLOATING) ======================== -->
-<div id="debug-panel">
-  <div class="debug-header" id="debug-drag-handle">
-    <span class="debug-title">⬡ DEBUG <span class="debug-drag-hint">· trascina</span></span>
-    <button class="debug-close" onclick="toggleDebug()">✕</button>
-  </div>
-  <div class="debug-body">
-    <div class="debug-row"><span>Mode</span><span id="db-mode">SIMULATOR</span></div>
-    <div class="debug-row"><span>Velocità</span><span id="db-speed">0 km/h</span></div>
-    <div class="debug-row"><span>Accel. long.</span><span id="db-acc">0.00 m/s²</span></div>
-    <div class="debug-row"><span>Accel. lat.</span><span id="db-lat">0.00 m/s²</span></div>
-    <div class="debug-row"><span>Consumo ist.</span><span id="db-cons">–</span></div>
-    <div class="debug-row"><span>Potenza est.</span><span id="db-pow">– kW</span></div>
-    <div class="debug-row"><span>Score</span><span id="db-score">–</span></div>
-    <div class="debug-row"><span>Ultimo evento</span><span id="db-event">–</span></div>
-    <div class="debug-row"><span>Copilota</span><span id="db-voice">–</span></div>
-    <div class="debug-row"><span>localStorage</span><span id="db-storage">–</span></div>
+<div id="overlay-end"><div class="end-card"><div class="end-face" id="end-face">😊</div><div style="font-size:.58rem;color:var(--text-muted)">SCORE FINALE</div><div class="end-score-big" id="end-score">75</div><div class="end-stats"><div class="end-stat"><div class="end-stat-val" id="end-km">0</div><div class="end-stat-lbl">km</div></div><div class="end-stat"><div class="end-stat-val" id="end-cons">0</div><div class="end-stat-lbl">L</div></div><div class="end-stat"><div class="end-stat-val" id="end-cost">0</div><div class="end-stat-lbl">€</div></div><div class="end-stat"><div class="end-stat-val" id="end-dur">0</div><div class="end-stat-lbl">min</div></div></div><div id="session-chart-wrap"><div id="session-chart-label">Andamento</div><canvas id="session-chart" height="40"></canvas></div><div class="end-badges" id="end-badges"></div><div class="end-buttons"><button class="btn-outline" onclick="closeEnd(true)">💾 Salva</button><button class="btn-outline" onclick="closeEnd(false)">✕ Scarta</button></div></div></div>
+<div id="copilot-toast"></div>
+<div id="cpbar"><span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppCarSmile v.07.00</span></div>
 
-    <div class="debug-scenario-label">Scenari</div>
-    <div class="scenario-btns">
-      <button class="scenario-btn" onclick="setScenario('zen',this)">🧘 Zen</button>
-      <button class="scenario-btn" onclick="setScenario('urban',this)">🏙 Urbana</button>
-      <button class="scenario-btn" onclick="setScenario('mixed',this)">🛣 Mista</button>
-      <button class="scenario-btn" onclick="setScenario('neurotic',this)">😤 Nevrotic.</button>
-      <button class="scenario-btn" onclick="setScenario('ev',this)">⚡ EV</button>
-      <button class="scenario-btn" onclick="setScenario('stress',this)">🔥 Stress</button>
-    </div>
 
-    <div class="debug-scenario-label">Controlli</div>
-    <div class="slider-row">
-      <label>Velocità (km/h) <span id="sl-speed-val">70</span></label>
-      <input type="range" min="0" max="180" value="70" id="sl-speed" oninput="simCtrl.setSpeed(+this.value)">
-    </div>
-    <div class="slider-row">
-      <label>Accel. long. (m/s²) <span id="sl-acc-val">0.0</span></label>
-      <input type="range" min="-8" max="8" value="0" step="0.5" id="sl-acc" oninput="simCtrl.setAcc(+this.value)">
-    </div>
-    <div class="slider-row">
-      <label>Accel. lat. (m/s²) <span id="sl-lat-val">0.0</span></label>
-      <input type="range" min="-6" max="6" value="0" step="0.5" id="sl-lat" oninput="simCtrl.setLat(+this.value)">
-    </div>
-
-    <div class="debug-scenario-label">Inject evento</div>
-    <div class="scenario-btns">
-      <button class="scenario-btn" onclick="simCtrl.injectEvent('brake')">🛑 Frenata</button>
-      <button class="scenario-btn" onclick="simCtrl.injectEvent('accel')">🚀 Accelerata</button>
-      <button class="scenario-btn" onclick="simCtrl.injectEvent('curve')">↩ Curva</button>
-    </div>
+<!--
+<div id="about-popup" class="popup-bg hidden">
+  <div class="popup-box">
+    <div class="popup-title">🚗 ppCarSmile</div>
+    <div class="popup-row"><strong>Versione:</strong> 07.00 — Aprile 2026</div>
+    <div class="popup-row"><strong>Categoria:</strong> Eco Driving Assistant</div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista</div>
+    <div class="popup-row"><strong>Sensori:</strong> Geolocation · DeviceMotion · Web Speech · Wake Lock</div>
+    <div class="lic"><span class="lt">⚖ LICENSE</span><p>Personal, non-commercial use only. Commercial use requires authorization. Copyright (c) 2026 PISTINO DEVELOPMENT.</p></div>
+  <button class="popup-close" id="about-close">✕ Chiudi</button>
   </div>
 </div>
-
-<!-- ══════════════════════════════════════
-     ABOUT / COPYRIGHT POPUP (from ppTemplate v1.0)
-     ══════════════════════════════════════ -->
+-->
 <div id="about-popup" class="popup-bg hidden">
   <div class="popup-box">
     <div class="popup-title">🚗 ppCarSmile</div>
     <div class="popup-row"><strong>Versione:</strong> 04.00 — Aprile 2026</div>
     <div class="popup-row"><strong>Categoria:</strong> Driver Helper — Eco Driving Assistant</div>
-    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉ : <a style="color:var(--accent)" href="mailto:ppista@pistino.dev">ppista@pistino.dev</a></div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉ : <a style="color:var(--accent)" href="mailto:pistino@libero.it">pistino@libero.it</a></div>
     <div class="popup-row"><strong>Piattaforma:</strong> Single-file HTML5 — funziona su qualsiasi browser moderno e smartphone</div>
     <div class="popup-row"><strong>Sensori:</strong> Geolocation API · DeviceMotion API · Web Speech API · Wake Lock API</div>
     <div class="lic">
@@ -1437,926 +273,62 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     COPYRIGHT BAR (from ppTemplate v1.0)
-     ══════════════════════════════════════ -->
-<div id="cpbar">
-  <span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppCarSmile v.04.00 — tocca per info &amp; licenza</span>
-</div>
 
-<!-- FAB Debug -->
-<button id="debug-fab" onclick="toggleDebug()" title="Pannello Debug">DBG</button>
 
-<!-- Voice toggle -->
-<button class="voice-toggle" id="voice-btn" onclick="toggleVoice()">🔇</button>
 
-<!-- Copilota toast -->
-<div id="copilot-toast"></div>
-
-<!-- End session overlay -->
-<div id="overlay-end">
-  <div class="end-card">
-    <div class="end-face" id="end-face">😊</div>
-    <div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted)">SCORE FINALE</div>
-    <div class="end-score-big" id="end-score">75</div>
-    <div class="end-stats">
-      <div class="end-stat"><div class="end-stat-val" id="end-km">0</div><div class="end-stat-lbl">km percorsi</div></div>
-      <div class="end-stat"><div class="end-stat-val" id="end-cons">0</div><div class="end-stat-lbl">L consumati</div></div>
-      <div class="end-stat"><div class="end-stat-val" id="end-cost">0</div><div class="end-stat-lbl">€ spesi</div></div>
-      <div class="end-stat"><div class="end-stat-val" id="end-dur">0</div><div class="end-stat-lbl">minuti</div></div>
-    </div>
-    <div id="session-chart-wrap">
-      <div id="session-chart-label">Andamento guida</div>
-      <canvas id="session-chart" height="48"></canvas>
-    </div>
-    <div class="end-badges" id="end-badges"></div>
-    <div class="end-buttons">
-      <button class="btn-outline" onclick="closeEnd(true)">💾 Salva</button>
-      <button class="btn-outline" onclick="closeEnd(false)">✕ Scarta</button>
-    </div>
-  </div>
-</div>
 
 <script>
-// ============================================================
-// CONSTANTS
-// ============================================================
-const CX_MAP = { utilitaria:0.31, berlina:0.28, suv:0.35, monovolume:0.33, sportiva:0.26 };
-const FUEL_UNIT = { benzina:'L/100km', diesel:'L/100km', ibrida:'L/100km', ev:'kWh/100km' };
-const OPTIMAL_SPEED = { benzina:[60,90], diesel:[70,100], ibrida:[50,80], ev:[50,70] };
+const CX_MAP={utilitaria:.31,berlina:.28,suv:.35,monovolume:.33,sportiva:.26};
+const FUEL_UNIT={benzina:'L/100km',diesel:'L/100km',ibrida:'L/100km',ev:'kWh/100km'};
+const OPTIMAL_SPEED={benzina:[60,90],diesel:[70,100],ibrida:[50,80],ev:[50,70]};
+const THEMES=['dark','light','sport','racing'];
+const THEME_ICONS={dark:'🌙 Notte',light:'☀️ Giorno',sport:'💜 Sport',racing:'🔥 Racing'};
+let vehicles=[],activeVehicleId=0,config={};
+let session=null,sensorLoop=null,voiceEnabled=false,lastVoiceTime=0;
+let speedHistory=[],sessionTimeline=[],timelineTimer=0;
+let appSettings={theme:'dark',nightMode:true,voice:false,highway:true,highwaySpeed:110};
+let currentScreen='dash';
+let usingRealSensors=false,sensorData={speed:0,acc:0,lat:0,altitude:null},gpsWatchId=null,lastGpsTime=0,lastGpsSpeed=0;
+let wakeLock=null;
 
-// ============================================================
-// MULTI-VEHICLE CONFIG
-// ============================================================
-let vehicles = [];       // array of vehicle configs
-let activeVehicleId = 0; // index of active vehicle
-let config = {};         // shortcut → active vehicle
-
-const DEFAULT_VEHICLE = {
-  id: 0,
-  name: 'La mia auto',
-  fuel: 'benzina', gearbox: 'manuale', cc: 1200, cv: 75,
-  weight: 1100, gears: 6, cx: 0.31, bodyType: 'utilitaria',
-  consUrb: 6.5, consMix: 5.0,
-  tank: 45, fuelLevel: 30, costPerL: 1.85,
-};
-
-function loadVehicles() {
-  const saved = localStorage.getItem('ppCarSmile_vehicles');
-  if (saved) {
-    vehicles = JSON.parse(saved);
-  } else {
-    // Check legacy single config
-    const legacy = localStorage.getItem('ppCarSmile_config');
-    if (legacy) {
-      const v = { ...DEFAULT_VEHICLE, ...JSON.parse(legacy), id: 0 };
-      vehicles = [v];
-    } else {
-      vehicles = [{ ...DEFAULT_VEHICLE }];
-    }
-  }
-  const savedActive = localStorage.getItem('ppCarSmile_activeVehicle');
-  activeVehicleId = savedActive !== null ? +savedActive : 0;
-  if (activeVehicleId >= vehicles.length) activeVehicleId = 0;
-  config = vehicles[activeVehicleId] || vehicles[0];
-  updateFuelUnits();
-}
-
-function saveVehicles() {
-  localStorage.setItem('ppCarSmile_vehicles', JSON.stringify(vehicles));
-  localStorage.setItem('ppCarSmile_activeVehicle', activeVehicleId);
-  config = vehicles[activeVehicleId];
-  updateFuelUnits();
-}
-
-function addVehicle() {
-  const newId = Date.now();
-  const newV = { ...DEFAULT_VEHICLE, id: newId, name: 'Nuovo veicolo ' + (vehicles.length + 1) };
-  vehicles.push(newV);
-  activeVehicleId = vehicles.length - 1;
-  saveVehicles();
-  renderVehicleTabs();
-  renderVehicleForm();
-}
-
-function deleteVehicle(idx) {
-  if (vehicles.length <= 1) { alert('Deve esserci almeno un veicolo.'); return; }
-  if (!confirm('Eliminare questo veicolo?')) return;
-  vehicles.splice(idx, 1);
-  if (activeVehicleId >= vehicles.length) activeVehicleId = vehicles.length - 1;
-  saveVehicles();
-  renderVehicleTabs();
-  renderVehicleForm();
-}
-
-function switchVehicle(idx) {
-  activeVehicleId = idx;
-  saveVehicles();
-  renderVehicleTabs();
-  renderVehicleForm();
-}
-
-function renderVehicleTabs() {
-  const wrap = document.getElementById('vehicle-tabs');
-  wrap.innerHTML = vehicles.map((v, i) => `
-    <div class="vehicle-tab ${i === activeVehicleId ? 'active' : ''}" onclick="switchVehicle(${i})">
-      ${v.fuel === 'ev' ? '⚡' : v.fuel === 'ibrida' ? '🔋' : '⛽'} ${v.name}
-      ${vehicles.length > 1 ? `<button class="tab-del" onclick="event.stopPropagation();deleteVehicle(${i})">✕</button>` : ''}
-    </div>
-  `).join('') + `<button class="btn-add-vehicle" onclick="addVehicle()">＋ Aggiungi</button>`;
-}
-
-function renderVehicleForm() {
-  const v = vehicles[activeVehicleId];
-  const wrap = document.getElementById('vehicle-form-wrap');
-  wrap.innerHTML = vehicleFormHTML(v);
-  renderCalibHistory();
-}
-
-function vehicleFormHTML(v) { return `
-    <div class="section-label">Veicolo</div>
-    <div class="field-row">
-      <label>Nome veicolo</label>
-      <input type="text" id="cfg-name" placeholder="es. La mia Panda" value="${v.name}">
-    </div>
-    <div class="field-grid">
-      <div class="field-row">
-        <label>Motorizzazione</label>
-        <select id="cfg-fuel">
-          <option value="benzina" ${v.fuel==='benzina'?'selected':''}>Benzina</option>
-          <option value="diesel" ${v.fuel==='diesel'?'selected':''}>Diesel</option>
-          <option value="ibrida" ${v.fuel==='ibrida'?'selected':''}>Ibrida HEV/PHEV</option>
-          <option value="ev" ${v.fuel==='ev'?'selected':''}>Full Electric</option>
-        </select>
-      </div>
-      <div class="field-row">
-        <label>Cambio</label>
-        <select id="cfg-gearbox">
-          <option value="manuale" ${v.gearbox==='manuale'?'selected':''}>Manuale</option>
-          <option value="automatico" ${v.gearbox==='automatico'?'selected':''}>Automatico</option>
-          <option value="paddle" ${v.gearbox==='paddle'?'selected':''}>Aut. con paddle</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-grid">
-      <div class="field-row"><label>Cilindrata (cc)</label><input type="number" id="cfg-cc" value="${v.cc}" placeholder="1200"></div>
-      <div class="field-row"><label>Potenza (CV)</label><input type="number" id="cfg-cv" value="${v.cv}" placeholder="75"></div>
-    </div>
-    <div class="field-grid">
-      <div class="field-row"><label>Peso (kg)</label><input type="number" id="cfg-weight" value="${v.weight}" placeholder="1100"></div>
-      <div class="field-row"><label>Marce (solo manuale)</label><input type="number" id="cfg-gears" value="${v.gears}" placeholder="6"></div>
-    </div>
-    <div class="section-label">Carrozzeria</div>
-    <div class="field-row">
-      <label>Categoria</label>
-      <select id="cfg-body">
-        <option value="utilitaria" ${v.bodyType==='utilitaria'?'selected':''}>Utilitaria (Cx 0.31)</option>
-        <option value="berlina" ${v.bodyType==='berlina'?'selected':''}>Berlina (Cx 0.28)</option>
-        <option value="suv" ${v.bodyType==='suv'?'selected':''}>SUV (Cx 0.35)</option>
-        <option value="monovolume" ${v.bodyType==='monovolume'?'selected':''}>Monovolume (Cx 0.33)</option>
-        <option value="sportiva" ${v.bodyType==='sportiva'?'selected':''}>Sportiva (Cx 0.26)</option>
-      </select>
-    </div>
-    <div class="section-label">Consumi & Serbatoio</div>
-    <div class="field-grid">
-      <div class="field-row"><label>Consumo urbano</label><input type="number" id="cfg-cons-urb" value="${v.consUrb}" step="0.1" placeholder="6.5"></div>
-      <div class="field-row"><label>Consumo misto</label><input type="number" id="cfg-cons-mix" value="${v.consMix}" step="0.1" placeholder="5.0"></div>
-    </div>
-    <div class="field-grid">
-      <div class="field-row"><label>Capacità serbatoio (L)</label><input type="number" id="cfg-tank" value="${v.tank}" placeholder="45"></div>
-      <div class="field-row"><label>Livello attuale (L)</label><input type="number" id="cfg-fuel-level" value="${v.fuelLevel}" placeholder="30"></div>
-    </div>
-    <div class="field-row">
-      <label>Costo carburante (€/L o €/kWh)</label>
-      <input type="number" id="cfg-cost" value="${v.costPerL}" step="0.01" placeholder="1.85">
-    </div>
-    <button class="btn-primary" onclick="saveVehicleForm()">🚗 Salva e vai alla dashboard</button>
-
-    <div class="section-label">Calibrazione adattiva</div>
-    <div class="calib-card">
-      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.5rem">
-        Inserisci i dati del tuo ultimo rifornimento reale per migliorare la precisione del modello.
-      </div>
-      <div class="calib-row">
-        <div class="field-row">
-          <label>Km percorsi</label>
-          <input type="number" id="calib-km" placeholder="es. 320" step="1">
-        </div>
-        <div class="field-row">
-          <label>Litri / kWh inseriti</label>
-          <input type="number" id="calib-liters" placeholder="es. 28.5" step="0.1">
-        </div>
-        <button class="btn-calib" onclick="applyCalibration()">✓</button>
-      </div>
-      <div class="calib-history" id="calib-history-list">Nessuna calibrazione ancora.</div>
-    </div>
-    <div style="height:0.5rem"></div>
-  `;}
-
-function saveVehicleForm() {
-  const v = vehicles[activeVehicleId];
-  v.name     = document.getElementById('cfg-name').value || 'La mia auto';
-  v.fuel     = document.getElementById('cfg-fuel').value;
-  v.gearbox  = document.getElementById('cfg-gearbox').value;
-  v.cc       = +document.getElementById('cfg-cc').value || 1200;
-  v.cv       = +document.getElementById('cfg-cv').value || 75;
-  v.weight   = +document.getElementById('cfg-weight').value || 1100;
-  v.gears    = +document.getElementById('cfg-gears').value || 6;
-  v.bodyType = document.getElementById('cfg-body').value;
-  v.cx       = CX_MAP[v.bodyType] || 0.31;
-  v.consUrb  = +document.getElementById('cfg-cons-urb').value || 6.5;
-  v.consMix  = +document.getElementById('cfg-cons-mix').value || 5.0;
-  v.tank     = +document.getElementById('cfg-tank').value || 45;
-  v.fuelLevel = +document.getElementById('cfg-fuel-level').value || 30;
-  v.costPerL  = +document.getElementById('cfg-cost').value || 1.85;
-  saveVehicles();
-  renderVehicleTabs();
-  showScreen('dash');
-}
-
-// ============================================================
-// APP SETTINGS
-// ============================================================
-let appSettings = {
-  theme: 'dark', nightMode: true, voice: false,
-  highway: true, highwaySpeed: 110,
-  debugFab: true, units: 'km'
-};
-let voiceEnabled = false;
-
-function setUnits(u) {
-  appSettings.units = u;
-  applyUnits(u);
-  saveAppSettings();
-}
-
-function applyUnits(u) {
-  // Speed widget unit
-  const wsu = document.getElementById('speed-unit-label');
-  if (wsu) wsu.textContent = u === 'mi' ? 'mph' : 'km/h';
-  // Highway unit label in settings
-  const hu = document.getElementById('highway-unit-label');
-  if (hu) hu.textContent = u === 'mi' ? 'mph' : 'km/h';
-  // Speed label (legacy, kept for debug compat)
-  const sl = document.getElementById('speed-unit-label');
-  if (sl) sl.textContent = u === 'mi' ? 'mph' : 'km/h';
-  // Km widget
-  const wku = document.getElementById('w-km-unit');
-  if (wku) wku.textContent = u === 'mi' ? 'mi' : 'km';
-  const wkl = document.getElementById('w-km-label');
-  if (wkl) wkl.textContent = u === 'mi' ? 'Miglia sess.' : 'Km sessione';
-  // Cost per distance
-  const wcu = document.getElementById('w-cost-unit');
-  if (wcu) wcu.textContent = u === 'mi' ? '€/mi' : '€/km';
-  const wcl = document.getElementById('w-cost-label');
-  if (wcl) wcl.textContent = u === 'mi' ? 'Costo / mi' : 'Costo / km';
-  // Buttons style
-  const km = document.getElementById('unit-km-btn');
-  const mi = document.getElementById('unit-mi-btn');
-  if (km && mi) {
-    const activeStyle = 'padding:0.3rem 0.7rem;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:#000;font-family:var(--font-mono);font-size:0.62rem;cursor:pointer;transition:all 0.2s';
-    const inactiveStyle = 'padding:0.3rem 0.7rem;border-radius:8px;border:1.5px solid var(--border);background:none;color:var(--text-muted);font-family:var(--font-mono);font-size:0.62rem;cursor:pointer;transition:all 0.2s';
-    km.style.cssText = u === 'mi' ? inactiveStyle : activeStyle;
-    mi.style.cssText = u === 'mi' ? activeStyle : inactiveStyle;
+function startRealSensors(){
+  if(!('geolocation' in navigator)){alert('GPS non disponibile');return}
+  gpsWatchId=navigator.geolocation.watchPosition(pos=>{
+    const now=Date.now(),spd=(pos.coords.speed||0)*3.6;
+    if(lastGpsTime>0){const dt=(now-lastGpsTime)/1000;sensorData.acc=dt>.1?(spd-lastGpsSpeed)/3.6/dt:sensorData.acc}
+    lastGpsSpeed=spd;sensorData.speed=spd;sensorData.altitude=pos.coords.altitude;lastGpsTime=now;
+    usingRealSensors=true;
+    const sm=document.getElementById('sensor-mode');sm.textContent='GPS';sm.classList.remove('off');
+    document.getElementById('gps-dot').classList.add('gps');document.getElementById('gps-status').textContent='GPS+Sensor';
+  },err=>{console.warn('GPS:',err.message)},{enableHighAccuracy:true,maximumAge:1000,timeout:10000});
+  if(typeof DeviceMotionEvent!=='undefined'){
+    const bind=()=>{window.addEventListener('devicemotion',e=>{if(!e.accelerationIncludingGravity||!usingRealSensors)return;sensorData.lat=e.accelerationIncludingGravity.x||0},{passive:true})};
+    if(typeof DeviceMotionEvent.requestPermission==='function'){DeviceMotionEvent.requestPermission().then(s=>{if(s==='granted')bind()})}else{bind()}
   }
 }
+function stopRealSensors(){if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null}usingRealSensors=false;sensorData={speed:0,acc:0,lat:0,altitude:null};const sm=document.getElementById('sensor-mode');sm.textContent='OFF';sm.classList.add('off');document.getElementById('gps-dot').classList.remove('gps');document.getElementById('gps-status').textContent='GPS+Sensor'}
+function toggleSensorMode(){if(usingRealSensors)stopRealSensors();else startRealSensors()}
 
-function kmToDisplay(km) {
-  return appSettings.units === 'mi' ? (km * 0.621371) : km;
-}
-function speedToDisplay(kmh) {
-  return appSettings.units === 'mi' ? (kmh * 0.621371) : kmh;
-}
+const DEFAULT_VEHICLE={id:0,name:'La mia auto',fuel:'benzina',gearbox:'manuale',cc:1200,cv:75,weight:1100,gears:6,cx:.31,bodyType:'utilitaria',consUrb:6.5,consMix:5,tank:45,fuelLevel:30,costPerL:1.85};
+function loadVehicles(){const s=localStorage.getItem('ppCS_vehicles');vehicles=s?JSON.parse(s):[{...DEFAULT_VEHICLE}];const a=localStorage.getItem('ppCS_activeV');activeVehicleId=a!==null?+a:0;if(activeVehicleId>=vehicles.length)activeVehicleId=0;config=vehicles[activeVehicleId]||vehicles[0];updateFuelUnits()}
+function saveVehicles(){localStorage.setItem('ppCS_vehicles',JSON.stringify(vehicles));localStorage.setItem('ppCS_activeV',activeVehicleId);config=vehicles[activeVehicleId];updateFuelUnits()}
+function updateFuelUnits(){const u=FUEL_UNIT[config.fuel]||'L/100km';const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};s('w-cons-unit',u);s('w-cumcons-unit',config.fuel==='ev'?'kWh':'L');s('w-tank-unit',config.fuel==='ev'?'% batt.':'L rimasti')}
+function addVehicle(){vehicles.push({...DEFAULT_VEHICLE,id:Date.now(),name:'Veicolo '+(vehicles.length+1)});activeVehicleId=vehicles.length-1;saveVehicles();renderVehicleTabs();renderVehicleForm()}
+function deleteVehicle(i){if(vehicles.length<=1)return alert('Almeno un veicolo.');if(!confirm('Eliminare?'))return;vehicles.splice(i,1);if(activeVehicleId>=vehicles.length)activeVehicleId=vehicles.length-1;saveVehicles();renderVehicleTabs();renderVehicleForm()}
+function switchVehicle(i){activeVehicleId=i;saveVehicles();renderVehicleTabs();renderVehicleForm()}
+function renderVehicleTabs(){const w=document.getElementById('vehicle-tabs');w.innerHTML=vehicles.map((v,i)=>`<div class="vehicle-tab ${i===activeVehicleId?'active':''}" onclick="switchVehicle(${i})">${v.fuel==='ev'?'⚡':'⛽'} ${v.name}${vehicles.length>1?`<button class="tab-del" onclick="event.stopPropagation();deleteVehicle(${i})">✕</button>`:''}</div>`).join('')+`<button class="btn-add-vehicle" onclick="addVehicle()">＋</button>`}
+function renderVehicleForm(){const v=vehicles[activeVehicleId],w=document.getElementById('vehicle-form-wrap');w.innerHTML=`<div class="section-label">Veicolo</div><div class="field-row"><label>Nome</label><input type="text" id="cfg-name" value="${v.name}"></div><div class="field-grid"><div class="field-row"><label>Motore</label><select id="cfg-fuel"><option value="benzina"${v.fuel==='benzina'?' selected':''}>Benzina</option><option value="diesel"${v.fuel==='diesel'?' selected':''}>Diesel</option><option value="ibrida"${v.fuel==='ibrida'?' selected':''}>Ibrida</option><option value="ev"${v.fuel==='ev'?' selected':''}>Electric</option></select></div><div class="field-row"><label>Cambio</label><select id="cfg-gearbox"><option value="manuale"${v.gearbox==='manuale'?' selected':''}>Manuale</option><option value="automatico"${v.gearbox==='automatico'?' selected':''}>Automatico</option></select></div></div><div class="field-grid"><div class="field-row"><label>CC</label><input type="number" id="cfg-cc" value="${v.cc}"></div><div class="field-row"><label>CV</label><input type="number" id="cfg-cv" value="${v.cv}"></div></div><div class="field-grid"><div class="field-row"><label>Peso kg</label><input type="number" id="cfg-weight" value="${v.weight}"></div><div class="field-row"><label>Marce</label><input type="number" id="cfg-gears" value="${v.gears}"></div></div><div class="section-label">Carrozzeria</div><div class="field-row"><label>Tipo</label><select id="cfg-body"><option value="utilitaria"${v.bodyType==='utilitaria'?' selected':''}>Utilitaria</option><option value="berlina"${v.bodyType==='berlina'?' selected':''}>Berlina</option><option value="suv"${v.bodyType==='suv'?' selected':''}>SUV</option><option value="monovolume"${v.bodyType==='monovolume'?' selected':''}>Monovolume</option><option value="sportiva"${v.bodyType==='sportiva'?' selected':''}>Sportiva</option></select></div><div class="section-label">Consumi</div><div class="field-grid"><div class="field-row"><label>Urbano</label><input type="number" id="cfg-curb" value="${v.consUrb}" step="0.1"></div><div class="field-row"><label>Misto</label><input type="number" id="cfg-cmix" value="${v.consMix}" step="0.1"></div></div><div class="field-grid"><div class="field-row"><label>Serbatoio L</label><input type="number" id="cfg-tank" value="${v.tank}"></div><div class="field-row"><label>Livello L</label><input type="number" id="cfg-flevel" value="${v.fuelLevel}"></div></div><div class="field-row"><label>€/L</label><input type="number" id="cfg-costl" value="${v.costPerL}" step="0.01"></div><button class="btn-primary" onclick="saveVehicleForm()">🚗 Salva</button><div class="section-label">Calibrazione</div><div class="calib-card"><div style="font-size:.68rem;color:var(--text-muted);margin-bottom:.3rem">Dati ultimo rifornimento reale.</div><div class="calib-row"><div class="field-row"><label>Km</label><input type="number" id="calib-km" placeholder="320"></div><div class="field-row"><label>Litri</label><input type="number" id="calib-l" placeholder="28.5" step="0.1"></div><button class="btn-calib" onclick="applyCalibration()">✓</button></div><div class="calib-history" id="calib-hist">Nessuna calibrazione.</div></div><div style="height:2rem"></div>`;renderCalibHistory()}
+function saveVehicleForm(){const v=vehicles[activeVehicleId];v.name=document.getElementById('cfg-name').value||'Auto';v.fuel=document.getElementById('cfg-fuel').value;v.gearbox=document.getElementById('cfg-gearbox').value;v.cc=+document.getElementById('cfg-cc').value||1200;v.cv=+document.getElementById('cfg-cv').value||75;v.weight=+document.getElementById('cfg-weight').value||1100;v.gears=+document.getElementById('cfg-gears').value||6;v.bodyType=document.getElementById('cfg-body').value;v.cx=CX_MAP[v.bodyType]||.31;v.consUrb=+document.getElementById('cfg-curb').value||6.5;v.consMix=+document.getElementById('cfg-cmix').value||5;v.tank=+document.getElementById('cfg-tank').value||45;v.fuelLevel=+document.getElementById('cfg-flevel').value||30;v.costPerL=+document.getElementById('cfg-costl').value||1.85;saveVehicles();renderVehicleTabs();showScreen('dash')}
+function applyCalibration(){const km=parseFloat(document.getElementById('calib-km').value),l=parseFloat(document.getElementById('calib-l').value);if(!km||!l||km<1||l<.1)return alert('Dati non validi.');const rc=(l/km)*100,f=rc/(config.consMix||5),v=vehicles[activeVehicleId];v.calibFactor=f;if(!v.calibHistory)v.calibHistory=[];v.calibHistory.unshift({date:new Date().toLocaleDateString('it-IT'),km:km.toFixed(0),l:l.toFixed(1),rc:rc.toFixed(2),f:f.toFixed(3)});if(v.calibHistory.length>5)v.calibHistory.length=5;saveVehicles();renderCalibHistory();alert('Calibrazione: '+rc.toFixed(2)+' L/100km (×'+f.toFixed(3)+')')}
+function renderCalibHistory(){const e=document.getElementById('calib-hist');if(!e)return;const v=vehicles[activeVehicleId];e.innerHTML=(!v.calibHistory||!v.calibHistory.length)?'Nessuna calibrazione.':v.calibHistory.map(c=>c.date+' · '+c.km+'km · '+c.l+'L → '+c.rc+' (×'+c.f+')').join('<br>')}
+function getCalibFactor(){return vehicles[activeVehicleId]?.calibFactor||1}
 
-function loadAppSettings() {
-  const saved = localStorage.getItem('ppCarSmile_appsettings');
-  if (saved) appSettings = { ...appSettings, ...JSON.parse(saved) };
-  appSettings.debugFab = true;
-  applyTheme(appSettings.theme);
-  applyUnits(appSettings.units || 'km');
-  document.getElementById('tog-nightmode').checked = appSettings.nightMode;
-  document.getElementById('tog-voice').checked = appSettings.voice;
-  document.getElementById('tog-highway').checked = appSettings.highway;
-  document.getElementById('highway-speed').value = appSettings.highwaySpeed || 110;
-  voiceEnabled = appSettings.voice;
-  toggleDebugFab(true);
-}
-
-function saveAppSettings() {
-  appSettings.nightMode = document.getElementById('tog-nightmode').checked;
-  appSettings.voice = document.getElementById('tog-voice').checked;
-  appSettings.highway = document.getElementById('tog-highway').checked;
-  appSettings.highwaySpeed = parseInt(document.getElementById('highway-speed').value) || 110;
-  appSettings.debugFab = true;
-  voiceEnabled = appSettings.voice;
-  // Update unit label in settings
-  const hu = document.getElementById('highway-unit-label');
-  if (hu) hu.textContent = appSettings.units === 'mi' ? 'mph' : 'km/h';
-  localStorage.setItem('ppCarSmile_appsettings', JSON.stringify(appSettings));
-}
-
-function setTheme(name) {
-  appSettings.theme = name;
-  applyTheme(name);
-  localStorage.setItem('ppCarSmile_appsettings', JSON.stringify(appSettings));
-}
-
-const THEME_ORDER = ['dark', 'light', 'sport', 'racing'];
-const THEME_ICONS = { dark: '🌙', light: '☀️', sport: '💜', racing: '🔥' };
-
-function cycleTheme() {
-  const cur = appSettings.theme || 'dark';
-  const idx = THEME_ORDER.indexOf(cur);
-  const next = THEME_ORDER[(idx + 1) % THEME_ORDER.length];
-  setTheme(next);
-}
-
-function applyTheme(name) {
-  document.body.className = name !== 'dark' ? 'theme-' + name : '';
-  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-  const el = document.getElementById('theme-' + name);
-  if (el) el.classList.add('active');
-  // Update wake-status to show current theme
-  const ws = document.getElementById('wake-status');
-  if (ws) {
-    const icon = THEME_ICONS[name] || '🌙';
-    const label = name === 'dark' ? 'Notte' : name === 'light' ? 'Giorno' : name === 'sport' ? 'Sport' : 'Racing';
-    ws.textContent = icon + ' ' + label;
-  }
-  // Update voice btn visibility
-  const vbtn = document.getElementById('voice-btn');
-  if (vbtn) vbtn.style.display = currentScreen === 'dash' ? 'block' : 'none';
-}
-
-function toggleDebugFab(show) {
-  document.getElementById('debug-fab').style.display = show ? 'flex' : 'none';
-}
-
-// ============================================================
-// FUEL UNITS
-// ============================================================
-function updateFuelUnits() {
-  const unit = FUEL_UNIT[config.fuel] || 'L/100km';
-  const el1 = document.getElementById('w-cons-unit');
-  const el2 = document.getElementById('w-cumcons-unit');
-  const el3 = document.getElementById('w-tank-unit');
-  if (el1) el1.textContent = unit;
-  if (el2) el2.textContent = config.fuel === 'ev' ? 'kWh' : 'L';
-  if (el3) el3.textContent = config.fuel === 'ev' ? '% batteria' : 'L rimasti';
-}
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-let currentScreen = 'dash';
-
-function showScreen(name) {
-  currentScreen = name;
-  // hide all
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  // show target
-  const target = document.getElementById('screen-' + name);
-  if (target) target.classList.add('active');
-  // update nav buttons: each screen has its own nav, update all
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    b.classList.remove('active');
-    // match by onclick content
-    const oc = b.getAttribute('onclick') || '';
-    if (oc.includes("'" + name + "'")) b.classList.add('active');
-  });
-  // voice btn
-  document.getElementById('voice-btn').style.display = name === 'dash' ? 'block' : 'none';
-  // history render
-  if (name === 'history') renderHistory();
-  // vehicle screen render
-  if (name === 'vehicle') { renderVehicleTabs(); renderVehicleForm(); }
-}
-
-// ============================================================
-// SESSION
-// ============================================================
-let session = null;
-let simLoop = null;
-let clockLoop = null;
-
-function startSession() {
-  if (!config.fuel) { showScreen('vehicle'); return; }
-  session = {
-    startTime: Date.now(),
-    km: 0, consumedL: 0, totalCost: 0,
-    score: 75, events: [],
-    fuelLevel: config.fuelLevel,
-    _prevScore: 75,
-  };
-  speedHistory = [];
-  accelHistory = [];
-  lateralHistory = [];
-  sessionTimeline = [];
-  timelineTimer = 0;
-  document.getElementById('btn-start').style.display = 'none';
-  document.getElementById('btn-stop').classList.add('visible');
-  document.getElementById('gps-dot').classList.add('gps');
-  document.getElementById('gps-status').textContent = 'Avvio...';
-  simLoop = setInterval(simStep, 500);
-  voiceSpeak(`Sessione avviata. Buona guida con ${config.name}!`);
-  requestWakeLock();
-  startRealSensors();
-}
-
-function stopSession() {
-  clearInterval(simLoop); simLoop = null;
-  stopRealSensors();
-  document.getElementById('btn-stop').classList.remove('visible');
-  document.getElementById('btn-start').style.display = '';
-  document.getElementById('gps-dot').classList.remove('gps');
-  document.getElementById('gps-status').textContent = 'GPS off';
-  showEndOverlay();
-}
-
-function showEndOverlay() {
-  if (!session) return;
-  const dur = Math.round((Date.now() - session.startTime) / 60000);
-  const face = scoreToFace(session.score);
-  document.getElementById('end-face').textContent = face.emoji;
-  document.getElementById('end-score').textContent = Math.round(session.score);
-  document.getElementById('end-km').textContent = kmToDisplay(session.km).toFixed(1);
-  document.getElementById('end-cons').textContent = session.consumedL.toFixed(2);
-  document.getElementById('end-cost').textContent = session.totalCost.toFixed(2);
-  document.getElementById('end-dur').textContent = dur;
-  const badges = computeBadges(session);
-  document.getElementById('end-badges').textContent = badges.join(' ');
-  document.getElementById('overlay-end').classList.add('visible');
-  // Draw session chart after layout settles
-  setTimeout(drawSessionChart, 80);
-}
-
-function closeEnd(save) {
-  document.getElementById('overlay-end').classList.remove('visible');
-  if (save && session) {
-    const history = getHistory();
-    const badges = computeBadges(session);
-    history.unshift({
-      date: new Date().toLocaleString('it-IT'),
-      vehicle: config.name,
-      km: +session.km.toFixed(1),
-      cons: +session.consumedL.toFixed(2),
-      cost: +session.totalCost.toFixed(2),
-      score: Math.round(session.score),
-      dur: Math.round((Date.now() - session.startTime) / 60000),
-      badges,
-    });
-    localStorage.setItem('ppCarSmile_history', JSON.stringify(history));
-  }
-  session = null;
-  resetDashWidgets();
-}
-
-function resetDashWidgets() {
-  ['w-cons','w-cost','w-score','w-cumcons','w-km','w-totalcost','w-tank','w-gear','score-num']
-    .forEach(id => { const el=document.getElementById(id); if(el) el.textContent='–'; });
-  document.getElementById('speed-val').textContent = '0';
-  const sb = document.getElementById('score-bar');
-  if (sb) sb.style.width = '0%';
-  setFaceState(75);
-}
-
-// ============================================================
-// SIMULATOR
-// ============================================================
-const simState = { speed:0, acc:0, lat:0, scenario:null };
-
-const simCtrl = {
-  setSpeed(v) { simState.speed=v; document.getElementById('sl-speed-val').textContent=v; },
-  setAcc(v)   { simState.acc=v;   document.getElementById('sl-acc-val').textContent=v.toFixed(1); },
-  setLat(v)   { simState.lat=v;   document.getElementById('sl-lat-val').textContent=v.toFixed(1); },
-  injectEvent(type) {
-    if (type==='brake') { simState.acc=-6; setTimeout(()=>simState.acc=0,1200); }
-    if (type==='accel') { simState.acc=4;  setTimeout(()=>simState.acc=0,1200); }
-    if (type==='curve') { simState.lat=4;  setTimeout(()=>simState.lat=0,1000); }
-  }
-};
-
-const SCENARIOS = {
-  zen:      { speed:[65,75],  acc:[-0.3,0.3], lat:[-0.2,0.2] },
-  urban:    { speed:[0,50],   acc:[-2,3],     lat:[-1,1] },
-  mixed:    { speed:[40,130], acc:[-1.5,2],   lat:[-1,1] },
-  neurotic: { speed:[20,160], acc:[-6,6],     lat:[-4,4] },
-  ev:       { speed:[50,70],  acc:[-3,2],     lat:[-0.5,0.5] },
-  stress:   { speed:[0,180],  acc:[-8,8],     lat:[-6,6] },
-};
-
-function setScenario(name, btn) {
-  simState.scenario = name;
-  document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-}
-
-function scenarioStep() {
-  if (!simState.scenario) return;
-  const s = SCENARIOS[simState.scenario];
-  const rnd = (a,b) => a + Math.random()*(b-a);
-  simState.speed = Math.max(0, simState.speed + rnd(-5,5));
-  simState.speed = Math.max(s.speed[0]-10, Math.min(s.speed[1]+10, simState.speed));
-  simState.acc = rnd(s.acc[0], s.acc[1]);
-  simState.lat = rnd(s.lat[0], s.lat[1]);
-  document.getElementById('sl-speed').value = simState.speed;
-  document.getElementById('sl-speed-val').textContent = Math.round(simState.speed);
-  document.getElementById('sl-acc').value = simState.acc;
-  document.getElementById('sl-acc-val').textContent = simState.acc.toFixed(1);
-  document.getElementById('sl-lat').value = simState.lat;
-  document.getElementById('sl-lat-val').textContent = simState.lat.toFixed(1);
-}
-
-// ============================================================
-// ENGINE
-// ============================================================
-function computeConsumption(speed, acc, lat, cfg) {
-  if (speed < 1) return 0;
-  const speedMs = speed / 3.6;
-  const frontalArea = 2.2, rhoAir = 1.225, Cr = 0.012, g = 9.81;
-  const m = cfg.weight || 1100, cx = cfg.cx || 0.31;
-  const Faero = 0.5 * rhoAir * cx * frontalArea * speedMs * speedMs;
-  const Froll = Cr * m * g;
-  const Faccel = m * Math.max(acc, 0);
-  const Ptot = Math.max((Faero + Froll + Faccel) * speedMs, 0);
-  let cons;
-  if (cfg.fuel === 'ev') {
-    cons = (Ptot / 0.85) / 1000 / speedMs * 100;
-  } else {
-    const etaFuel = cfg.fuel === 'diesel' ? 0.33 : 0.30;
-    const Qfuel = 33600;
-    const flowKgs = Ptot / (etaFuel * Qfuel * 1000);
-    const fuelDensity = cfg.fuel === 'diesel' ? 0.835 : 0.74;
-    cons = (flowKgs / fuelDensity / speedMs) * 100 * 1000;
-  }
-  if (cfg.fuel === 'diesel') cons *= 0.82;
-  if (cfg.fuel === 'ibrida' && acc < -0.5) cons *= 0.6;
-  if (cfg.fuel === 'ev' && acc < -0.5) cons *= 0.5;
-  return Math.max(cons, 0);
-}
-
-function computeScoreDelta(speed, acc, lat, cfg) {
-  let delta = 0, eventName = null;
-  const opt = OPTIMAL_SPEED[cfg.fuel] || [60,90];
-  if (acc > 3.5)                  { delta=-8; eventName='Accelerata brusca'; }
-  else if (acc < -4.0)            { delta=-7; eventName='Frenata brusca'; }
-  else if (Math.abs(lat) > 3.0)  { delta=-5; eventName='Curva aggressiva'; }
-  else if (speed > opt[1]+30)     { delta=-3; eventName='Velocità elevata'; }
-  else if (speed>=opt[0] && speed<=opt[1] && Math.abs(acc)<1.0) { delta=+1; }
-  if ((cfg.fuel==='ibrida'||cfg.fuel==='ev') && acc<-0.5 && acc>-4.0) {
-    delta=+2; eventName='Frenata rigenera';
-  }
-  return { delta, eventName };
-}
-
-function estimateGear(speed, acc, cfg) {
-  if (cfg.gearbox !== 'manuale') return '–';
-  if (speed < 5) return 'N';
-  const thresholds = [10,20,35,55,80,110,140,180].slice(0, cfg.gears||6);
-  for (let i=0; i<thresholds.length; i++) { if (speed<=thresholds[i]) return i+1; }
-  return cfg.gears;
-}
-
-// ============================================================
-// MAIN SIM STEP
-// ============================================================
-let timelineTimer = 0;
-
-function simStep() {
-  if (!session) return;
-  if (!usingRealSensors) scenarioStep();
-
-  const sdata = getSensorData();
-  const speed = sdata.speed, acc = sdata.acc, lat = sdata.lat;
-
-  const rawCons = computeConsumption(speed, acc, lat, config);
-  const cons = rawCons * getCalibFactor();
-  const { delta, eventName } = computeScoreDelta(speed, acc, lat, config);
-
-  const dt = 0.5 / 3600;
-  const distKm = speed * dt;
-  const usedFuel = cons * distKm / 100;
-
-  session.km += distKm;
-  session.consumedL += usedFuel;
-  session.totalCost += usedFuel * config.costPerL;
-  session.fuelLevel = Math.max(0, session.fuelLevel - usedFuel);
-  session.score = Math.max(0, Math.min(100, session.score + delta * 0.15));
-  if (eventName) session.events.push({ t: Date.now(), name: eventName, delta });
-
-  // Sparkline
-  pushSpeedHistory(speed);
-  drawSparkline();
-
-  // Sensor sparklines
-  pushSensorHistory(acc, lat);
-  drawAllSensorSparklines();
-  updateSensorWidgets(acc, lat, sdata.altitude || null);
-
-  // Timeline sample every 5 seconds (10 steps @ 500ms)
-  timelineTimer++;
-  if (timelineTimer >= 10) { sampleTimeline(session.score); timelineTimer = 0; }
-
-  updateDashUI(speed, cons, session);
-
-  const highwayThreshold = appSettings.highwaySpeed || 110;
-  const highwaySilence = appSettings.highway && speed > highwayThreshold;
-  const now = Date.now();
-  let lastVoiceTime = now;
-  if (!highwaySilence && now - lastVoiceTime > 8000) {}
-  if (!highwaySilence ) 
-  {
-    let msg = '';
-    if (eventName) {
-      msg = getCopilotMessage(eventName, config.fuel);
-    } else if (session.score >= 70 && session._prevScore < 70) {
-      msg = getCopilotMessage('rientro_verde', config.fuel);
-    } else if (speed >= OPTIMAL_SPEED[config.fuel||'benzina'][0] &&
-               speed <= OPTIMAL_SPEED[config.fuel||'benzina'][1] &&
-               Math.abs(acc) < 0.5 && session.score >= 80 &&
-               now - lastVoiceTime > 30000) {
-      msg = getCopilotMessage('guida_fluida', config.fuel);
-    }
-    if (msg) { voiceSpeak(msg); lastVoiceTime = now; }
-  }
-  session._prevScore = session.score;
-  updateDebugPanel(speed, acc, lat, cons, session.score, eventName);
-}
-
-// ============================================================
-// DASHBOARD UI
-// ============================================================
-function updateDashUI(speed, cons, sess) {
-  const dispSpeed = speedToDisplay(speed);
-  const dispKm    = kmToDisplay(sess.km);
-  const miAdj     = appSettings.units === 'mi' ? 0.621371 : 1;
-  // Speed widget (new)
-  const wsb = document.getElementById('w-speed-big');
-  if (wsb) wsb.textContent = Math.round(dispSpeed);
-  // Legacy speed-val (kept for debug panel compat)
-  const sv = document.getElementById('speed-val');
-  if (sv) sv.textContent = Math.round(dispSpeed);
-  document.getElementById('w-cons').textContent = speed>1 ? cons.toFixed(1) : '–';
-  document.getElementById('w-cost').textContent = speed>1 ? (cons/100*config.costPerL/miAdj).toFixed(3) : '–';
-  document.getElementById('w-score').textContent = Math.round(sess.score);
-  document.getElementById('score-num').textContent = Math.round(sess.score);
-  document.getElementById('w-cumcons').textContent = sess.consumedL.toFixed(2);
-  document.getElementById('w-km').textContent = dispKm.toFixed(1);
-  document.getElementById('w-totalcost').textContent = sess.totalCost.toFixed(2);
-  document.getElementById('w-tank').textContent = config.fuel==='ev'
-    ? Math.round(sess.fuelLevel/config.tank*100)+'%'
-    : sess.fuelLevel.toFixed(1);
-  document.getElementById('w-gear').textContent = estimateGear(speed, simState.acc, config);
-  setFaceState(sess.score);
-}
-
-// ============================================================
-// FACE STATE
-// ============================================================
-const FACE_STATES = [
-  { min:90, emoji:'🤩', label:'Guida perfetta!', bg:'#1A4731', anim:'face-breathe 3s ease-in-out infinite' },
-  { min:70, emoji:'🙂', label:'Guida ok',        bg:'#276749', anim:'face-breathe 4s ease-in-out infinite' },
-  { min:50, emoji:'😐', label:'Attenzione',      bg:'#744210', anim:'none' },
-  { min:25, emoji:'😤', label:'Nevrotico!',      bg:'#7B341E', anim:'none' },
-  { min:0,  emoji:'😡', label:'Pericoloso!',     bg:'#742A2A', anim:'none' },
-];
-
-function scoreToFace(score) {
-  for (const s of FACE_STATES) { if (score >= s.min) return s; }
-  return FACE_STATES[4];
-}
-
-function setFaceState(score) {
-  const f = scoreToFace(score);
-  const el = document.getElementById('face-emoji');
-  el.textContent = f.emoji;
-  document.getElementById('face-label').textContent = f.label;
-  if (score < 25) el.style.animation = 'face-vibrate 0.2s linear infinite';
-  else if (score < 50) el.style.animation = 'face-shake 0.6s ease-in-out infinite';
-  else el.style.animation = f.anim;
-  document.documentElement.style.setProperty('--state-color', f.bg);
-  const pct = Math.min(100, Math.max(0, score));
-  const sb = document.getElementById('score-bar');
-  if (sb) { sb.style.width=pct+'%'; sb.style.backgroundPosition=(100-pct)+'% 0'; }
-}
-
-// ============================================================
-// VOICE
-// ============================================================
-const COPILOT_PHRASES = {
-  'Accelerata brusca': {
-    benzina: [
-      "Stai andando alle qualifiche o al supermercato?",
-      "Il tuo portafoglio ha appena pianto.",
-      "Bravo pilota, pessimo risparmio.",
-      "Formula 1 chiamava. Ha rifiutato.",
-      "Accelerare così non ti fa arrivare prima. Ti fa arrivare più povero.",
-      "Il motore ti ha chiesto: ma davvero?",
-    ],
-    diesel: [
-      "Frena, l'ha detto anche la coppia.",
-      "Il diesel ama i bassi regimi. Non questa roba.",
-      "Stai bruciando quello che hai risparmiato al distributore.",
-      "La coppia massima è a 1800 giri. Non a 4500.",
-    ],
-    ibrida: [
-      "Attenzione, stai sprecando la modalità elettrica.",
-      "Hai appena svegliato il motore termico. Senza motivo.",
-      "Dolce. Dolce. Questa è una ibrida, non una muscle car.",
-      "La batteria ti guardava con speranza. L'hai delusa.",
-    ],
-    ev: [
-      "A questo ritmo arrivi a casa a piedi.",
-      "Ogni watt conta. Ne hai appena sprecati parecchi.",
-      "L'autonomia residua ti dice grazie per niente.",
-      "Sei sicuro di voler finire la carica qui?",
-      "Tesla mode: off. Risparmio mode: anche.",
-    ],
-  },
-  'Frenata brusca': {
-    benzina: [
-      "Freno motore. Ricordatelo.",
-      "Quella energia cinética è andata. Per sempre.",
-      "Hai visto il semaforo solo adesso?",
-      "Le pastiglie dei freni ti ringraziano. In modo sarcastico.",
-      "Anticipare la frenata si chiama previsione. Prova.",
-      "Prossima volta: alzare il piede prima.",
-    ],
-    diesel: [
-      "Piano, che è una berlina non un kart.",
-      "Il diesel frena col motore. Usalo.",
-      "Frenare così è buttare carburante nel nulla.",
-      "Quei 200 metri prima li potevi usare per scalare.",
-    ],
-    ibrida: [
-      "Frena piano, stai caricando la batteria.",
-      "Frenata graduale = energia recuperata. Ricordatelo.",
-      "Questo è il momento in cui la batteria si ricarica. Non sprecarla.",
-      "Freno rigenerativo: funziona solo se non schiacci.",
-    ],
-    ev: [
-      "Ottimo recupero in frenata! Continua così.",
-      "Perfetto. Stai convertendo inerzia in autonomia.",
-      "Così si fa. Energia recuperata.",
-      "Questo si chiama one-pedal driving. Bello vero?",
-    ],
-  },
-  'Curva aggressiva': {
-    benzina: [
-      "Non siamo al Nürburgring, eh.",
-      "Le gomme hanno memoria. E rancore.",
-      "Curva presa con stile... e con consumo.",
-      "Più dolce in curva, meno soldi al gommista.",
-      "Sentivi lo spostamento laterale? Quello costa.",
-      "Rallenta prima della curva. È fisica, non opinione.",
-    ],
-    diesel: [
-      "Curva presa bene... quasi.",
-      "Il baricentro alto non è tuo amico in curva.",
-      "Più largo, più dolce. Meno stress al differenziale.",
-    ],
-    ibrida: [
-      "Morbido in curva, risparmia energia.",
-      "La batteria non ama le forze laterali.",
-      "Curva liscia = risparmio reale.",
-    ],
-    ev: [
-      "Le gomme hanno sentito anche quelle.",
-      "Peso batterie + curva aggressiva = usura veloce.",
-      "Più dolce. L'autonomia te ne sarà grata.",
-    ],
-  },
-  'Velocità elevata': {
-    benzina: [
-      "Ogni km/h in più vale il tuo portafoglio.",
-      "A 130 consumi il 40% in più che a 90. Matematica.",
-      "Il vento non è tuo amico a questa velocità.",
-      "Sei sicuro che valga la pena arrivare 3 minuti prima?",
-      "La resistenza dell'aria cresce col quadrato della velocità. E così il consumo.",
-      "Rallenta. Il serbatoio ti sta guardando.",
-    ],
-    diesel: [
-      "Il diesel ama la costanza, non la velocità.",
-      "Regime ottimale superato. Stai bruciando soldi.",
-      "A questa velocità il vantaggio diesel scompare.",
-    ],
-    ibrida: [
-      "Sei uscito dalla zona ottimale.",
-      "Il motore termico è entrato. La batteria non basta più.",
-      "Tra 80 e 120 sei nel range ideale. Torna lì.",
-    ],
-    ev: [
-      "A questa velocità arrivi a casa con il 12%. Rallenta.",
-      "L'autonomia crolla esponenzialmente oltre i 110 km/h.",
-      "Ogni 10 km/h in più oltre 100 = -8% autonomia.",
-      "Rallenta di 20. Guadagni 30 km di autonomia.",
-    ],
-  },
-  'Frenata rigenera': {
-    ibrida: [
-      "Frena piano, stai caricando la batteria.",
-      "Perfetto. Energia recuperata.",
-      "Questa si chiama guida efficiente.",
-      "La batteria cresce. Il consumo scende.",
-    ],
-    ev: [
-      "Ottimo recupero in frenata!",
-      "Energia recuperata. Autonomia estesa.",
-      "Così si fa. Stai guidando da manuale.",
-      "One-pedal driving attivo. Efficienza massima.",
-    ],
-    benzina: [], diesel: [],
-  },
-  'guida_fluida': {
-    benzina: [
-      "Questo è il ritmo. Il serbatoio ti ringrazia.",
-      "Perfetto. Stai consumando meno di un ciclomotore.",
-      "Così si guida. Fluido, costante, efficiente.",
-      "Score in salita. Continua.",
-      "Sei nella fascia ottimale. Goditi il viaggio.",
-    ],
-    diesel: [
-      "Il diesel in modalità crociera. Imbattibile.",
-      "Perfetto. Coppia bassa, consumi minimi.",
-      "Regime ideale. Così si risparmia.",
-    ],
-    ibrida: [
-      "Il motore elettrico ringrazia.",
-      "Stai sfruttando al massimo la modalità ibrida.",
-      "Fluido e costante. Efficienza al top.",
-    ],
-    ev: [
-      "Autonomia ottimizzata. Continua così.",
-      "Gestione energetica perfetta.",
-      "Sei in zona verde. Il grafico sorride.",
-    ],
-  },
-  'rientro_verde': {
-    benzina: [
-      "Bene, sei tornato umano.",
-      "Ecco. Questo è il guidatore che speravo di trovare.",
-      "Rientrato in zona verde. Così si fa.",
-      "Il portafoglio respira.",
-    ],
-    diesel: [
-      "Bene. Il diesel torna a fare il diesel.",
-      "Rientrato nel range. Il motore ti applaude.",
-    ],
-    ibrida: [
-      "Modalità efficiente ripristinata.",
-      "Batteria contenta. Tu dovresti esserlo anche tu.",
-    ],
-    ev: [
-      "Autonomia in recupero. Ben fatto.",
-      "Sei tornato in zona verde. La batteria ti abbraccia.",
-    ],
-  },
-};
-
-function getCopilotMessage(event, fuel) {
-  const map = COPILOT_PHRASES[event];
-  if (!map) return '';
-  const arr = map[fuel] || map['benzina'] || [];
-  if (!arr.length) return '';
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-let bubbleTimer = null;
-function showCopilotaBubble(text) {
-  if (!text) return;
-  const el = document.getElementById('copilota-text');
-  if (!el) return;
-  el.textContent = text;
-  el.style.opacity = '1';
-  clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => { el.style.opacity = '0.6'; }, 6000);
-}
-
-function hideCopilotaBubble() {
-  const el = document.getElementById('copilota-text');
-  if (el) el.style.opacity = '0.6';
-}
-
-function voiceSpeak(text) {
-  if (!text) return;
-  showToast(text);
-  showCopilotaBubble(text);
-  const dbv = document.getElementById('db-voice');
-  if (dbv) dbv.textContent = text.substring(0,35) + (text.length>35?'…':'');
-  if (!voiceEnabled) return;
-  if ('speechSynthesis' in window) {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang='it-IT'; u.rate=0.9; u.pitch=1.1;
-    window.speechSynthesis.speak(u);
-  }
-}
-
-function showToast(msg) {
-  const t = document.getElementById('copilot-toast');
-  t.textContent = '🗣 ' + msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 4000);
-}
+function loadAppSettings(){const s=localStorage.getItem('ppCS_settings');if(s)appSettings={...appSettings,...JSON.parse(s)};applyTheme(appSettings.theme);document.getElementById('tog-nightmode').checked=appSettings.nightMode;document.getElementById('tog-voice').checked=appSettings.voice;document.getElementById('tog-highway').checked=appSettings.highway;document.getElementById('highway-speed').value=appSettings.highwaySpeed||110;voiceEnabled=appSettings.voice}
+function saveAppSettings(){appSettings.nightMode=document.getElementById('tog-nightmode').checked;appSettings.voice=document.getElementById('tog-voice').checked;appSettings.highway=document.getElementById('tog-highway').checked;appSettings.highwaySpeed=parseInt(document.getElementById('highway-speed').value)||110;voiceEnabled=appSettings.voice;localStorage.setItem('ppCS_settings',JSON.stringify(appSettings))}
+function setTheme(n){appSettings.theme=n;applyTheme(n);saveAppSettings()}
+function cycleTheme(){const i=THEMES.indexOf(appSettings.theme||'dark');setTheme(THEMES[(i+1)%THEMES.length])}
+function applyTheme(n){document.body.className=n!=='dark'?'theme-'+n:'';document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));const e=document.getElementById('theme-'+n);if(e)e.classList.add('active');const b=document.querySelector('.theme-btn');if(b)b.textContent=THEME_ICONS[n]||'🌙 Notte'}
+function showScreen(n){currentScreen=n;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const t=document.getElementById('screen-'+n);if(t)t.classList.add('active');document.querySelectorAll('.nav-btn').forEach(b=>{b.classList.remove('active');if((b.getAttribute('onclick')||'').includes("'"+n+"'"))b.classList.add('active')});if(n==='history')renderHistory();if(n==='vehicle'){renderVehicleTabs();renderVehicleForm()}}
 
 function toggleVoice() {
   voiceEnabled = !voiceEnabled;
@@ -2369,778 +341,44 @@ function toggleVoice() {
   saveAppSettings();
 }
 
-// ============================================================
-// DEBUG PANEL — FLOATING + DRAGGABLE
-// ============================================================
-let debugOpen = false;
 
-function toggleDebug() {
-  debugOpen = !debugOpen;
-  const panel = document.getElementById('debug-panel');
-  const fab = document.getElementById('debug-fab');
-  panel.classList.toggle('open', debugOpen);
-  fab.classList.toggle('panel-open', debugOpen);
-}
 
-function updateDebugPanel(speed, acc, lat, cons, score, eventName) {
-  const unit = FUEL_UNIT[config.fuel] || 'L/100km';
-  document.getElementById('db-speed').textContent = Math.round(speed) + ' km/h';
-  document.getElementById('db-acc').textContent = acc.toFixed(2) + ' m/s²';
-  document.getElementById('db-lat').textContent = lat.toFixed(2) + ' m/s²';
-  document.getElementById('db-cons').textContent = cons.toFixed(2) + ' ' + unit;
-  const Ptot = Math.max((config.weight||1100)*Math.abs(acc)*(speed/3.6)/1000, 0);
-  document.getElementById('db-pow').textContent = Ptot.toFixed(1) + ' kW';
-  document.getElementById('db-score').textContent = score.toFixed(1);
-  if (eventName) document.getElementById('db-event').textContent = eventName;
-  document.getElementById('db-storage').textContent = JSON.stringify(localStorage).length + ' B';
-}
+function startSession(){if(!config.fuel){showScreen('vehicle');return}session={startTime:Date.now(),km:0,consumedL:0,totalCost:0,score:75,events:[],fuelLevel:config.fuelLevel,_prevScore:75};speedHistory=[];sessionTimeline=[];timelineTimer=0;lastVoiceTime=0;document.getElementById('btn-start').style.display='none';document.getElementById('btn-stop').classList.add('visible');if(!usingRealSensors)startRealSensors();sensorLoop=setInterval(engineStep,500);voiceSpeak('Sessione avviata!');requestWakeLock()}
+function stopSession(){clearInterval(sensorLoop);sensorLoop=null;document.getElementById('btn-stop').classList.remove('visible');document.getElementById('btn-start').style.display='';showEndOverlay()}
 
-// Drag logic for floating panel
-(function initDrag() {
-  const panel = document.getElementById('debug-panel');
-  const handle = document.getElementById('debug-drag-handle');
-  let dragging=false, ox=0, oy=0, px=0, py=0;
+function computeConsumption(speed,acc,cfg){if(speed<1)return 0;const v=speed/3.6,m=cfg.weight||1100,cx=cfg.cx||.31;const Fa=.5*1.225*cx*2.2*v*v,Fr=.012*m*9.81,Fac=m*Math.max(acc,0),P=Math.max((Fa+Fr+Fac)*v,0);let c;if(cfg.fuel==='ev'){c=(P/.85)/1000/v*100}else{const eta=cfg.fuel==='diesel'?.33:.30,flow=P/(eta*33600000),dens=cfg.fuel==='diesel'?.835:.74;c=(flow/dens/v)*100000}if(cfg.fuel==='diesel')c*=.82;if((cfg.fuel==='ibrida'||cfg.fuel==='ev')&&acc<-.5)c*=cfg.fuel==='ev'?.5:.6;return Math.max(c,0)}
+function computeScore(speed,acc,lat,cfg){let d=0,ev=null;const opt=OPTIMAL_SPEED[cfg.fuel]||[60,90];if(acc>3.5){d=-8;ev='Accelerata brusca'}else if(acc<-4){d=-7;ev='Frenata brusca'}else if(Math.abs(lat)>3){d=-5;ev='Curva aggressiva'}else if(speed>opt[1]+30){d=-3;ev='Velocità elevata'}else if(speed>=opt[0]&&speed<=opt[1]&&Math.abs(acc)<1)d=1;if((cfg.fuel==='ibrida'||cfg.fuel==='ev')&&acc<-.5&&acc>-4){d=2;ev='Frenata rigenera'}return{delta:d,eventName:ev}}
+function estimateGear(speed,cfg){if(cfg.gearbox!=='manuale')return'–';if(speed<5)return'N';const t=[10,20,35,55,80,110,140,180].slice(0,cfg.gears||6);for(let i=0;i<t.length;i++)if(speed<=t[i])return i+1;return cfg.gears}
 
-  function startDrag(ex, ey) {
-    dragging = true;
-    const rect = panel.getBoundingClientRect();
-    ox = ex - rect.left; oy = ey - rect.top;
-    px = rect.left; py = rect.top;
-    panel.style.transition = 'none';
-    handle.style.cursor = 'grabbing';
-  }
-  function moveDrag(ex, ey) {
-    if (!dragging) return;
-    px = ex - ox; py = ey - oy;
-    const maxX = window.innerWidth - panel.offsetWidth;
-    const maxY = window.innerHeight - panel.offsetHeight;
-    px = Math.max(0, Math.min(px, maxX));
-    py = Math.max(0, Math.min(py, maxY));
-    panel.style.left = px + 'px';
-    panel.style.top  = py + 'px';
-    panel.style.right = 'auto';
-  }
-  function endDrag() {
-    if (!dragging) return;
-    dragging = false;
-    panel.style.transition = '';
-    handle.style.cursor = 'grab';
-  }
-  handle.addEventListener('mousedown',  e => startDrag(e.clientX, e.clientY));
-  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-  document.addEventListener('mouseup',   () => endDrag());
-  handle.addEventListener('touchstart',  e => { const t=e.touches[0]; startDrag(t.clientX, t.clientY); }, {passive:true});
-  document.addEventListener('touchmove',  e => { const t=e.touches[0]; moveDrag(t.clientX, t.clientY); }, {passive:true});
-  document.addEventListener('touchend',   () => endDrag());
-})();
+function engineStep(){if(!session)return;const s=sensorData,speed=s.speed,acc=s.acc,lat=s.lat;const rawC=computeConsumption(speed,acc,config),cons=rawC*getCalibFactor();const{delta,eventName}=computeScore(speed,acc,lat,config);const dt=.5/3600,dist=speed*dt,fuel=cons*dist/100;session.km+=dist;session.consumedL+=fuel;session.totalCost+=fuel*config.costPerL;session.fuelLevel=Math.max(0,session.fuelLevel-fuel);session.score=Math.max(0,Math.min(100,session.score+delta*.15));if(eventName)session.events.push({t:Date.now(),name:eventName,delta});speedHistory.push(speed);if(speedHistory.length>240)speedHistory.shift();drawSparkline();timelineTimer++;if(timelineTimer>=10){sessionTimeline.push(session.score);timelineTimer=0}updateDash(speed,acc,lat,cons,session);const now=Date.now(),hwSilence=appSettings.highway&&speed>(appSettings.highwaySpeed||110);if(!hwSilence&&now-lastVoiceTime>10000){let msg='';if(eventName)msg=getCopilotMessage(eventName,config.fuel);else if(session.score>=70&&session._prevScore<70)msg=getCopilotMessage('rientro_verde',config.fuel);if(msg){voiceSpeak(msg);lastVoiceTime=now}}session._prevScore=session.score}
 
-// ============================================================
-// HISTORY
-// ============================================================
-function getHistory() {
-  const h = localStorage.getItem('ppCarSmile_history');
-  return h ? JSON.parse(h) : [];
-}
+function updateDash(speed,acc,lat,cons,s){const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('w-speed',Math.round(speed));set('w-cons',speed>1?cons.toFixed(1):'–');set('w-cost',speed>1?(cons/100*config.costPerL).toFixed(3):'–');set('w-score',Math.round(s.score));set('score-num',Math.round(s.score));set('w-cumcons',s.consumedL.toFixed(2));set('w-km',s.km.toFixed(1));set('w-totalcost',s.totalCost.toFixed(2));set('w-tank',config.fuel==='ev'?Math.round(s.fuelLevel/config.tank*100)+'%':s.fuelLevel.toFixed(1));set('w-gear',estimateGear(speed,config));set('w-acc',acc.toFixed(1));set('w-lat',lat.toFixed(1));set('w-gforce',(Math.sqrt(acc*acc+lat*lat)/9.81).toFixed(2));set('w-alt',sensorData.altitude!==null?Math.round(sensorData.altitude):'–');setFaceState(s.score);const pct=Math.max(0,Math.min(100,s.score)),sb=document.getElementById('score-bar');if(sb){sb.style.width=pct+'%';sb.style.backgroundPosition=(100-pct)+'% 0'}}
+const FACES=[{min:90,emoji:'🤩',label:'Guida perfetta!',bg:'#1A4731',anim:'breathe 3s ease-in-out infinite'},{min:70,emoji:'🙂',label:'Guida ok',bg:'#276749',anim:'breathe 4s ease-in-out infinite'},{min:50,emoji:'😐',label:'Attenzione',bg:'#744210',anim:'none'},{min:25,emoji:'😤',label:'Nevrotico!',bg:'#7B341E',anim:'none'},{min:0,emoji:'😡',label:'Pericoloso!',bg:'#742A2A',anim:'none'}];
+function scoreToFace(sc){for(const f of FACES)if(sc>=f.min)return f;return FACES[4]}
+function setFaceState(sc){const f=scoreToFace(sc),el=document.getElementById('face-emoji');el.textContent=f.emoji;document.getElementById('face-label').textContent=f.label;if(sc<25)el.style.animation='vibrate .2s linear infinite';else if(sc<50)el.style.animation='shake .6s ease-in-out infinite';else el.style.animation=f.anim;document.documentElement.style.setProperty('--state-color',f.bg)}
+function drawSparkline(){const c=document.getElementById('sparkline');if(!c||speedHistory.length<2)return;const ctx=c.getContext('2d'),W=c.offsetWidth||100,H=26;c.width=W;c.height=H;ctx.clearRect(0,0,W,H);const mx=Math.max(...speedHistory,20),pts=speedHistory.slice(-W),st=W/(pts.length-1);ctx.beginPath();pts.forEach((v,i)=>{const x=i*st,y=H-(v/mx)*(H-2)-1;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.strokeStyle='rgba(57,211,83,.8)';ctx.lineWidth=1.5;ctx.lineJoin='round';ctx.stroke()}
 
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  const history = getHistory();
-  if (!history.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>Nessuna sessione salvata ancora.<br>Avvia la tua prima sessione!</div>';
-    return;
-  }
-  list.innerHTML = history.map(s => {
-    const face = scoreToFace(s.score);
-    return `<div class="session-card">
-      <div class="session-score-badge" style="background:${face.bg}">${s.score}</div>
-      <div>
-        <div class="session-date">${face.emoji} ${s.date}${s.vehicle ? ' · ' + s.vehicle : ''}</div>
-        <div class="session-meta">${s.km} km · ${s.cons}L · €${s.cost} · ${s.dur} min</div>
-      </div>
-      <div class="session-badges">${(s.badges||[]).join(' ')}</div>
-    </div>`;
-  }).join('');
-}
+function showEndOverlay(){if(!session)return;const dur=Math.round((Date.now()-session.startTime)/60000),f=scoreToFace(session.score);document.getElementById('end-face').textContent=f.emoji;document.getElementById('end-score').textContent=Math.round(session.score);document.getElementById('end-km').textContent=session.km.toFixed(1);document.getElementById('end-cons').textContent=session.consumedL.toFixed(2);document.getElementById('end-cost').textContent=session.totalCost.toFixed(2);document.getElementById('end-dur').textContent=dur;document.getElementById('end-badges').textContent=computeBadges(session).join(' ');document.getElementById('overlay-end').classList.add('visible');setTimeout(drawSessionChart,80)}
+function closeEnd(save){document.getElementById('overlay-end').classList.remove('visible');if(save&&session){const h=JSON.parse(localStorage.getItem('ppCS_history')||'[]');h.unshift({date:new Date().toLocaleString('it-IT'),vehicle:config.name,km:+session.km.toFixed(1),cons:+session.consumedL.toFixed(2),cost:+session.totalCost.toFixed(2),score:Math.round(session.score),dur:Math.round((Date.now()-session.startTime)/60000),badges:computeBadges(session)});localStorage.setItem('ppCS_history',JSON.stringify(h))}session=null;resetDash()}
+function resetDash(){['w-cons','w-cost','w-score','w-cumcons','w-km','w-totalcost','w-tank','w-gear','w-acc','w-lat','w-gforce','w-alt','score-num'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='–'});document.getElementById('w-speed').textContent='0';const sb=document.getElementById('score-bar');if(sb)sb.style.width='0%';setFaceState(75)}
+function computeBadges(s){const b=[],h=JSON.parse(localStorage.getItem('ppCS_history')||'[]');if(s.score>=90)b.push('💎');if(s.score>=70&&s.consumedL<(config.consMix||5)*s.km/100)b.push('🌿');if(s.events.filter(e=>e.delta<0).length===0)b.push('🧘');if(!h.length||s.score>Math.max(...h.map(x=>x.score)))b.push('🏆');return b}
+function drawSessionChart(){const c=document.getElementById('session-chart');if(!c||sessionTimeline.length<2)return;const W=c.offsetWidth||300,H=40;c.width=W;c.height=H;const ctx=c.getContext('2d'),pts=sessionTimeline,st=W/(pts.length-1);pts.forEach((sc,i)=>{if(i===0)return;ctx.beginPath();ctx.moveTo((i-1)*st,H-(pts[i-1]/100)*(H-4)-2);ctx.lineTo(i*st,H-(sc/100)*(H-4)-2);const avg=(pts[i-1]+sc)/2;ctx.strokeStyle=avg>=70?'#39d353':avg>=40?'#f6ad55':'#f85149';ctx.lineWidth=3;ctx.lineCap='round';ctx.stroke()})}
 
-function computeBadges(sess) {
-  const badges = [];
-  const history = getHistory();
+function renderHistory(){const list=document.getElementById('history-list'),h=JSON.parse(localStorage.getItem('ppCS_history')||'[]');if(!h.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div>Nessuna sessione salvata.</div>';return}list.innerHTML=h.map(s=>{const f=scoreToFace(s.score);return`<div class="session-card"><div class="session-score-badge" style="background:${f.bg}">${s.score}</div><div><div class="session-date">${f.emoji} ${s.date}${s.vehicle?' · '+s.vehicle:''}</div><div class="session-meta">${s.km}km · ${s.cons}L · €${s.cost} · ${s.dur}min</div></div><div class="session-badges">${(s.badges||[]).join(' ')}</div></div>`}).join('')}
+function exportJSON(){const d={vehicles,history:JSON.parse(localStorage.getItem('ppCS_history')||'[]'),appSettings};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='ppCarSmile.json';a.click()}
+function exportCSV(){const h=JSON.parse(localStorage.getItem('ppCS_history')||'[]');if(!h.length)return alert('Nessuna sessione.');const csv='Data,Veicolo,Km,L,Euro,Score,Min\n'+h.map(s=>`"${s.date}","${s.vehicle||''}",${s.km},${s.cons},${s.cost},${s.score},${s.dur}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));a.download='ppCarSmile.csv';a.click()}
 
-  // 💎 Cristallo: score ≥ 90
-  if (sess.score >= 90) badges.push('💎');
+const COPILOT={'Accelerata brusca':{benzina:["Il portafoglio ha pianto.","Bravo pilota, pessimo risparmio."],diesel:["Il diesel ama i bassi regimi."],ibrida:["Stai sprecando la modalità elettrica."],ev:["A questo ritmo arrivi a piedi."]},'Frenata brusca':{benzina:["Freno motore. Ricordatelo."],diesel:["Il diesel frena col motore."],ibrida:["Frena piano, stai caricando."],ev:["Ottimo recupero!"]},'Curva aggressiva':{benzina:["Le gomme hanno memoria."],diesel:["Baricentro alto: attenzione."],ibrida:["Morbido in curva."],ev:["Peso batterie: più dolce."]},'Velocità elevata':{benzina:["A 130 consumi il 40% in più."],diesel:["Il diesel ama la costanza."],ibrida:["Zona ottimale superata."],ev:["Autonomia in calo rapido."]},'Frenata rigenera':{ibrida:["Energia recuperata."],ev:["One-pedal driving!"],benzina:[],diesel:[]},'rientro_verde':{benzina:["Sei tornato umano."],diesel:["Il diesel torna efficiente."],ibrida:["Modalità efficiente."],ev:["Autonomia in recupero."]}};
+function getCopilotMessage(ev,fuel){const m=COPILOT[ev];if(!m)return'';const a=m[fuel]||m.benzina||[];return a.length?a[Math.floor(Math.random()*a.length)]:''}
+function voiceSpeak(text){if(!text)return;const ct=document.getElementById('copilota-text');if(ct)ct.textContent=text;const t=document.getElementById('copilot-toast');t.textContent='🗣 '+text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);if(!voiceEnabled||!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='it-IT';u.rate=.9;u.pitch=1.1;window.speechSynthesis.speak(u)}
 
-  // 🌿 Foglia verde: sotto soglia consumi personale
-  if (sess.score >= 70 && sess.consumedL < (config.consMix||5) * sess.km / 100)
-    badges.push('🌿');
+async function requestWakeLock(){try{if('wakeLock' in navigator){wakeLock=await navigator.wakeLock.request('screen');const w=document.getElementById('w-wake');if(w)w.textContent='🔆';wakeLock.addEventListener('release',()=>{const w=document.getElementById('w-wake');if(w)w.textContent='🔒'})}}catch(e){}}
+document.addEventListener('visibilitychange',async()=>{if(document.visibilityState==='visible'&&session)await requestWakeLock()});
+function updateClock(){const n=new Date(),t=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');const e=document.getElementById('w-clock');if(e)e.textContent=t;if(appSettings.nightMode){const h=n.getHours();document.documentElement.style.filter=(h>=20||h<6)?'brightness(0.72)':''}else document.documentElement.style.filter=''}
 
-  // 🧘 Zen: zero eventi negativi
-  if (sess.events.filter(e=>e.delta<0).length === 0) badges.push('🧘');
-
-  // 🏆 Record: miglior score di sempre
-  if (!history.length || sess.score > Math.max(...history.map(h=>h.score)))
-    badges.push('🏆');
-
-  // 🔥 Streak: 5 sessioni consecutive in zona verde (score ≥ 70)
-  const recent = history.slice(0, 4); // last 4 saved (this will be 5th)
-  if (recent.length >= 4 && recent.every(h => h.score >= 70) && sess.score >= 70)
-    badges.push('🔥');
-
-  // 💰 Risparmiatore: risparmio mensile > soglia
-  const thisMonth = new Date().toLocaleString('it-IT', {month:'2-digit', year:'numeric'});
-  const monthSessions = history.filter(h => h.date && h.date.includes(thisMonth));
-  const monthSavings = monthSessions.reduce((acc, h) => {
-    const baseline = (config.consMix||5) * h.km / 100 * config.costPerL;
-    return acc + (baseline - h.cost);
-  }, 0);
-  const thisSaving = ((config.consMix||5) * sess.km / 100 * config.costPerL) - sess.totalCost;
-  if (monthSavings + thisSaving > 5) badges.push('💰');
-
-  return badges;
-}
-
-function exportJSON() {
-  const data = { vehicles, history: getHistory(), appSettings };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'ppCarSmile_export.json';
-  a.click();
-}
-
-function exportCSV() {
-  const history = getHistory();
-  if (!history.length) { alert('Nessuna sessione da esportare.'); return; }
-  const headers = ['Data','Veicolo','Km','Litri/kWh','Euro','Score','Durata(min)','Badge'];
-  const rows = history.map(s => [
-    `"${s.date}"`,
-    `"${s.vehicle||''}"`,
-    s.km, s.cons, s.cost, s.score, s.dur,
-    `"${(s.badges||[]).join(' ')}"`
-  ]);
-  const csv = [headers.join(','), ...rows.map(r=>r.join(','))].join('\n');
-  const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'ppCarSmile_storico.csv';
-  a.click();
-}
-
-// ============================================================
-// CALIBRATION ADAPTIVE
-// ============================================================
-function applyCalibration() {
-  const km = parseFloat(document.getElementById('calib-km').value);
-  const liters = parseFloat(document.getElementById('calib-liters').value);
-  if (!km || !liters || km < 1 || liters < 0.1) {
-    alert('Inserisci km e litri validi.'); return;
-  }
-  const realCons = (liters / km) * 100; // real L/100km
-  const declaredCons = config.consMix || 5;
-  const factor = realCons / declaredCons;
-  const v = vehicles[activeVehicleId];
-  v.calibFactor = factor;
-  // Store calibration history
-  if (!v.calibHistory) v.calibHistory = [];
-  v.calibHistory.unshift({
-    date: new Date().toLocaleDateString('it-IT'),
-    km: km.toFixed(0),
-    liters: liters.toFixed(1),
-    realCons: realCons.toFixed(2),
-    factor: factor.toFixed(3),
-  });
-  if (v.calibHistory.length > 10) v.calibHistory.length = 10;
-  saveVehicles();
-  document.getElementById('calib-km').value = '';
-  document.getElementById('calib-liters').value = '';
-  renderCalibHistory();
-  alert(`Calibrazione applicata ✓\nConsumo reale: ${realCons.toFixed(2)} L/100km\nFattore correttivo: ×${factor.toFixed(3)}`);
-}
-
-function renderCalibHistory() {
-  const el = document.getElementById('calib-history-list');
-  if (!el) return;
-  const v = vehicles[activeVehicleId];
-  if (!v.calibHistory || !v.calibHistory.length) {
-    el.textContent = 'Nessuna calibrazione ancora.'; return;
-  }
-  el.innerHTML = v.calibHistory.slice(0,5).map(c =>
-    `${c.date} · ${c.km}km · ${c.liters}L → ${c.realCons} L/100km (×${c.factor})`
-  ).join('<br>');
-}
-
-// Apply calibration factor in engine
-function getCalibFactor() {
-  return vehicles[activeVehicleId]?.calibFactor || 1.0;
-}
-
-// ============================================================
-// SPEED SPARKLINE (last 2 minutes = 240 samples @ 500ms)
-// ============================================================
-const SPARKLINE_MAX = 240;
-let speedHistory = [];
-
-function pushSpeedHistory(speed) {
-  speedHistory.push(speed);
-  if (speedHistory.length > SPARKLINE_MAX) speedHistory.shift();
-}
-
-function drawSparkline() {
-  const canvas = document.getElementById('speed-sparkline');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.offsetWidth || 140;
-  const H = 32;
-  canvas.width = W; canvas.height = H;
-  ctx.clearRect(0, 0, W, H);
-  if (speedHistory.length < 2) return;
-
-  const maxV = Math.max(...speedHistory, 20);
-  const pts = speedHistory.slice(-W); // one px per sample max
-  const step = W / (pts.length - 1);
-
-  // Color gradient line: green→orange→red based on score
-  ctx.beginPath();
-  pts.forEach((v, i) => {
-    const x = i * step;
-    const y = H - (v / maxV) * (H - 2) - 1;
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.strokeStyle = 'rgba(57,211,83,0.8)';
-  ctx.lineWidth = 1.5;
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-
-  // Current speed dot
-  const last = pts[pts.length-1];
-  const lx = (pts.length-1) * step;
-  const ly = H - (last / maxV) * (H-2) - 1;
-  ctx.beginPath();
-  ctx.arc(lx, ly, 2.5, 0, Math.PI*2);
-  ctx.fillStyle = '#58a6ff';
-  ctx.fill();
-}
-
-// ============================================================
-// SENSOR SPARKLINES (Accel long, Accel lat)
-// ============================================================
-let accelHistory = [];
-let lateralHistory = [];
-
-function pushSensorHistory(acc, lat) {
-  accelHistory.push(acc);
-  lateralHistory.push(lat);
-  if (accelHistory.length > SPARKLINE_MAX) accelHistory.shift();
-  if (lateralHistory.length > SPARKLINE_MAX) lateralHistory.shift();
-}
-
-function drawSensorSparkline(canvasId, data, color, minRange) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const W = canvas.offsetWidth || 100;
-  const H = 32;
-  canvas.width = W; canvas.height = H;
-  ctx.clearRect(0, 0, W, H);
-  if (data.length < 2) return;
-
-  const absMax = Math.max(Math.max(...data.map(Math.abs)), minRange || 2);
-  const pts = data.slice(-W);
-  const step = W / (pts.length - 1);
-  const mid = H / 2;
-
-  // Zero line
-  ctx.beginPath();
-  ctx.moveTo(0, mid); ctx.lineTo(W, mid);
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
-
-  // Data line
-  ctx.beginPath();
-  pts.forEach((v, i) => {
-    const x = i * step;
-    const y = mid - (v / absMax) * (mid - 2);
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.5;
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-
-  // Current value dot
-  const last = pts[pts.length - 1];
-  const lx = (pts.length - 1) * step;
-  const ly = mid - (last / absMax) * (mid - 2);
-  ctx.beginPath();
-  ctx.arc(lx, ly, 2.5, 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-function drawAllSensorSparklines() {
-  drawSensorSparkline('accel-sparkline', accelHistory, 'rgba(248,166,85,0.85)', 4);
-  drawSensorSparkline('lateral-sparkline', lateralHistory, 'rgba(168,139,250,0.85)', 4);
-}
-
-function updateSensorWidgets(acc, lat, altitude) {
-  const aEl = document.getElementById('w-accel-val');
-  if (aEl) aEl.textContent = acc.toFixed(1) + ' m/s²';
-  const lEl = document.getElementById('w-lateral-val');
-  if (lEl) lEl.textContent = lat.toFixed(1) + ' m/s²';
-  // G-force: combined vector magnitude / 9.81
-  const gforce = Math.sqrt(acc * acc + lat * lat) / 9.81;
-  const gEl = document.getElementById('w-gforce');
-  if (gEl) gEl.textContent = gforce.toFixed(2);
-  // Altitude
-  const altEl = document.getElementById('w-altitude');
-  if (altEl) altEl.textContent = altitude !== null ? Math.round(altitude) : '–';
-}
-
-// ============================================================
-// SESSION TIMELINE CHART (end overlay)
-// ============================================================
-let sessionTimeline = []; // {score, t} sampled every 5s
-
-function sampleTimeline(score) {
-  sessionTimeline.push(score);
-}
-
-function drawSessionChart() {
-  const canvas = document.getElementById('session-chart');
-  if (!canvas || sessionTimeline.length < 2) return;
-  const W = canvas.offsetWidth || 300;
-  const H = 48;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, W, H);
-
-  const pts = sessionTimeline;
-  const step = W / (pts.length - 1);
-
-  // Draw colored segments
-  pts.forEach((score, i) => {
-    if (i === 0) return;
-    const x0 = (i-1) * step, x1 = i * step;
-    const y0 = H - (pts[i-1]/100)*(H-4) - 2;
-    const y1 = H - (score/100)*(H-4) - 2;
-    const avg = (pts[i-1] + score) / 2;
-    ctx.beginPath();
-    ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
-    ctx.strokeStyle = avg >= 70 ? '#39d353' : avg >= 40 ? '#f6ad55' : '#f85149';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-  });
-
-  // Zone lines
-  [70, 40].forEach(threshold => {
-    const y = H - (threshold/100)*(H-4) - 2;
-    ctx.beginPath();
-    ctx.setLineDash([3,3]);
-    ctx.moveTo(0, y); ctx.lineTo(W, y);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-    ctx.setLineDash([]);
-  });
-}
-
-// ============================================================
-// REAL SENSORS (GPS + DeviceMotion) with SIM fallback
-// ============================================================
-let usingRealSensors = false;
-let realSensorData = { speed: 0, acc: 0, lat: 0, altitude: null };
-let lastGpsPos = null, lastGpsTime = 0;
-let gpsWatchId = null;
-
-function startRealSensors() {
-  // GPS
-  if ('geolocation' in navigator) {
-    gpsWatchId = navigator.geolocation.watchPosition(
-      pos => {
-        const now = Date.now();
-        const speedMs = pos.coords.speed || 0;
-        realSensorData.speed = speedMs * 3.6; // km/h
-        realSensorData.altitude = pos.coords.altitude; // meters or null
-
-        // Compute longitudinal acceleration from speed delta
-        if (lastGpsTime > 0) {
-          const dt = (now - lastGpsTime) / 1000;
-          const prevSpeed = realSensorData.speed;
-          const dV = realSensorData.speed - prevSpeed;
-          realSensorData.acc = dt > 0 ? dV / dt : 0;
-        }
-        lastGpsTime = now;
-
-        usingRealSensors = true;
-        const sm = document.getElementById('sensor-mode');
-        if (sm) { sm.textContent = 'GPS'; sm.classList.remove('sim'); }
-        const dot = document.getElementById('gps-dot');
-        if (dot) dot.classList.add('gps');
-        document.getElementById('gps-status').textContent = 'GPS reale';
-      },
-      err => {
-        console.warn('GPS error:', err.message);
-        usingRealSensors = false;
-      },
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
-    );
-  }
-
-  // DeviceMotion (lateral acceleration)
-  if (typeof DeviceMotionEvent !== 'undefined') {
-    // iOS 13+ requires permission
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-      DeviceMotionEvent.requestPermission().then(state => {
-        if (state === 'granted') bindMotion();
-      }).catch(() => {});
-    } else {
-      bindMotion();
-    }
-  }
-}
-
-function bindMotion() {
-  window.addEventListener('devicemotion', e => {
-    if (!e.accelerationIncludingGravity) return;
-    const ax = e.accelerationIncludingGravity.x || 0;
-    const ay = e.accelerationIncludingGravity.y || 0;
-    // ay = longitudinal (braking/accelerating), ax = lateral (cornering)
-    if (usingRealSensors) {
-      realSensorData.acc = -ay; // forward positive
-      realSensorData.lat = ax;
-    }
-  }, { passive: true });
-}
-
-function stopRealSensors() {
-  if (gpsWatchId !== null) {
-    navigator.geolocation.clearWatch(gpsWatchId);
-    gpsWatchId = null;
-  }
-  usingRealSensors = false;
-  const sm = document.getElementById('sensor-mode');
-  if (sm) { sm.textContent = 'SIM'; sm.classList.add('sim'); }
-}
-
-function getSensorData() {
-  if (usingRealSensors) return realSensorData;
-  return { speed: simState.speed, acc: simState.acc, lat: simState.lat };
-}
-
-// ============================================================
-// ROBUST WAKE LOCK
-// ============================================================
-let wakeLock = null;
-
-async function requestWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      wakeLock = await navigator.wakeLock.request('screen');
-      const ws2 = document.getElementById('wake-widget-status');
-      if (ws2) ws2.textContent = '🔆 attivo';
-      wakeLock.addEventListener('release', () => {
-        const ws3 = document.getElementById('wake-widget-status');
-        if (ws3) ws3.textContent = '🔒';
-      });
-    }
-  } catch(e) { console.warn('WakeLock:', e.message); }
-}
-
-// Re-acquire wake lock when page becomes visible again
-document.addEventListener('visibilitychange', async () => {
-  if (document.visibilityState === 'visible' && session) {
-    await requestWakeLock();
-  }
-});
-
-// ============================================================
-// RESET FUNCTIONS
-// ============================================================
-function resetHistory() {
-  if (confirm('Cancellare tutto lo storico sessioni? I dati veicolo restano invariati.')) {
-    localStorage.removeItem('ppCarSmile_history');
-    alert('Storico cancellato.');
-  }
-}
-
-function resetAll() {
-  if (confirm('Reset completo: veicoli, storico e impostazioni verranno eliminati. Sei sicuro?')) {
-    localStorage.clear();
-    location.reload();
-  }
-}
-
-// ============================================================
-// CLOCK + NIGHT MODE
-// ============================================================
-function updateClock() {
-  const now = new Date();
-  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  // Write to clock widget (primary) — status bar span removed
-  const wc = document.getElementById('w-clock-val');
-  if (wc) wc.textContent = timeStr;
-  // Wake lock indicator in clock widget
-  const ws = document.getElementById('wake-widget-status');
-  if (ws) ws.textContent = wakeLock ? '🔆 attivo' : '🔒';
-  if (appSettings.nightMode) {
-    const h = now.getHours();
-    document.documentElement.style.filter = (h >= 20 || h < 6) ? 'brightness(0.72)' : '';
-  } else {
-    document.documentElement.style.filter = '';
-  }
-}
-
-// ============================================================
-// DEBUG ACTIVATION
-// Triple tap top-left corner on mobile, or FAB button, or App settings
-// ============================================================
-let tapCount=0, tapTimer=null;
-document.addEventListener('touchend', e => {
-  const corner = e.changedTouches[0];
-  if (corner.clientX < 60 && corner.clientY < 80) {
-    tapCount++;
-    clearTimeout(tapTimer);
-    tapTimer = setTimeout(() => tapCount=0, 800);
-    if (tapCount >= 3) { tapCount=0; toggleDebug(); }
-  }
-});
-
-// ============================================================
-// WIDGET DRAG & DROP ENGINE
-// Grid: 80px cells. Positions stored as {col, row, w, h} in localStorage.
-// ============================================================
-const WCELL = 80;
-const WIDGET_LAYOUT_KEY = 'ppCarSmile_widgetLayout';
-let widgetEditMode = false;
-let layoutSnapshot = null; // for cancel
-
-const WIDGET_DEFAULTS = [
-  { id:'wg-speed',     col:0, row:0, w:1, h:1 },
-  { id:'wg-clock',     col:1, row:0, w:1, h:1 },
-  { id:'wg-cons',      col:2, row:0, w:1, h:1 },
-  { id:'wg-cost',      col:0, row:1, w:1, h:1 },
-  { id:'wg-score',     col:1, row:1, w:1, h:1 },
-  { id:'wg-cumcons',   col:2, row:1, w:1, h:1 },
-  { id:'wg-km',        col:0, row:2, w:1, h:1 },
-  { id:'wg-totalcost', col:1, row:2, w:1, h:1 },
-  { id:'wg-tank',      col:2, row:2, w:1, h:1 },
-  { id:'wg-gear',      col:0, row:3, w:1, h:1 },
-  { id:'wg-sparkline', col:1, row:3, w:1, h:1 },
-  { id:'wg-accel',     col:2, row:3, w:1, h:1 },
-  { id:'wg-lateral',   col:0, row:4, w:1, h:1 },
-  { id:'wg-gforce',    col:1, row:4, w:1, h:1 },
-  { id:'wg-altitude',  col:2, row:4, w:1, h:1 },
-];
-
-function loadWidgetLayout() {
-  try {
-    const saved = localStorage.getItem(WIDGET_LAYOUT_KEY);
-    if (saved) {
-      const layout = JSON.parse(saved);
-      // Migration: if any widget has w>1 or layout has fewer items than defaults, reset
-      const hasOversized = layout.some(l => l.w > 1);
-      if (hasOversized || layout.length < WIDGET_DEFAULTS.length) {
-        localStorage.removeItem(WIDGET_LAYOUT_KEY);
-        return WIDGET_DEFAULTS.map(d=>({...d}));
-      }
-      return layout;
-    }
-    return WIDGET_DEFAULTS.map(d=>({...d}));
-  } catch { return WIDGET_DEFAULTS.map(d=>({...d})); }
-}
-
-function saveWidgetLayout(layout) {
-  localStorage.setItem(WIDGET_LAYOUT_KEY, JSON.stringify(layout));
-}
-
-function applyWidgetLayout(layout) {
-  const grid = document.getElementById('widgets-grid');
-  if (!grid) return;
-
-  layout.forEach(item => {
-    const el = document.getElementById(item.id);
-    if (!el) return;
-    if (widgetEditMode) {
-      el.style.position = 'absolute';
-      el.style.left   = (item.col * WCELL) + 'px';
-      el.style.top    = (item.row * WCELL) + 'px';
-      el.style.width  = (item.w * WCELL - 6) + 'px';
-      el.style.height = (item.h * WCELL - 6) + 'px';
-      el.style.gridColumn = '';
-      el.style.gridRow    = '';
-    } else {
-      el.style.position = '';
-      el.style.left = ''; el.style.top = '';
-      el.style.width = ''; el.style.height = '';
-      el.style.gridColumn = item.w > 1 ? `span ${item.w}` : '';
-      el.style.gridRow    = item.h > 1 ? `span ${item.h}` : '';
-    }
-  });
-
-  if (widgetEditMode) {
-    const maxRow = Math.max(...layout.map(l => l.row + l.h));
-    grid.style.setProperty('--wgrid-height', (maxRow * WCELL + 8) + 'px');
-  } else {
-    grid.style.removeProperty('--wgrid-height');
-  }
-}
-
-function toggleWidgetEdit() {
-  // Entry point — takes a snapshot for cancel
-  if (!widgetEditMode) {
-    layoutSnapshot = JSON.parse(JSON.stringify(loadWidgetLayout()));
-  }
-  widgetEditMode = !widgetEditMode;
-  const grid = document.getElementById('widgets-grid');
-  const banner = document.getElementById('edit-mode-banner');
-  if (!grid || !banner) return;
-  grid.classList.toggle('edit-mode', widgetEditMode);
-  banner.classList.toggle('visible', widgetEditMode);
-  applyWidgetLayout(loadWidgetLayout());
-}
-
-function saveWidgetEdit() {
-  // Commit current positions to localStorage and exit edit mode
-  layoutSnapshot = null;
-  widgetEditMode = false;
-  const grid = document.getElementById('widgets-grid');
-  const banner = document.getElementById('edit-mode-banner');
-  if (grid) grid.classList.remove('edit-mode');
-  if (banner) banner.classList.remove('visible');
-  // Re-apply in normal grid flow mode
-  applyWidgetLayout(loadWidgetLayout());
-}
-
-function cancelWidgetEdit() {
-  // Restore snapshot and exit without saving
-  if (layoutSnapshot) {
-    saveWidgetLayout(layoutSnapshot);
-    layoutSnapshot = null;
-  }
-  widgetEditMode = false;
-  const grid = document.getElementById('widgets-grid');
-  const banner = document.getElementById('edit-mode-banner');
-  if (grid) grid.classList.remove('edit-mode');
-  if (banner) banner.classList.remove('visible');
-  applyWidgetLayout(loadWidgetLayout());
-}
-
-function resetWidgetLayout() {
-  localStorage.removeItem(WIDGET_LAYOUT_KEY);
-  const layout = WIDGET_DEFAULTS.map(d=>({...d}));
-  applyWidgetLayout(layout);
-  if (confirm('Layout widget ripristinato. Uscire dalla modalità modifica?')) {
-    if (widgetEditMode) toggleWidgetEdit();
-  }
-}
-
-// Drag engine
-(function initWidgetDrag() {
-  let dragging = null, resizing = null;
-  let startX, startY, startL, startT, startW, startH;
-  let layout = loadWidgetLayout();
-
-  function getItem(id) { return layout.find(l => l.id === id); }
-
-  function snapToGrid(px) { return Math.max(0, Math.round(px / WCELL)); }
-
-  function onPointerDown(e) {
-    if (!widgetEditMode) return;
-    const widget = e.target.closest('[data-wid]');
-    if (!widget) return;
-    const isResize = e.target.classList.contains('widget-resize-handle');
-    const rect = widget.getBoundingClientRect();
-    const gridRect = document.getElementById('widgets-grid').getBoundingClientRect();
-    startX = e.clientX; startY = e.clientY;
-    startL = rect.left - gridRect.left;
-    startT = rect.top  - gridRect.top;
-    startW = rect.width; startH = rect.height;
-    if (isResize) { resizing = widget; }
-    else          { dragging = widget; }
-    e.preventDefault();
-  }
-
-  function onPointerMove(e) {
-    if (!dragging && !resizing) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    if (dragging) {
-      dragging.style.left = Math.max(0, startL + dx) + 'px';
-      dragging.style.top  = Math.max(0, startT + dy) + 'px';
-    }
-    if (resizing) {
-      const newW = Math.max(WCELL, startW + dx);
-      const newH = Math.max(WCELL, startH + dy);
-      resizing.style.width  = newW + 'px';
-      resizing.style.height = newH + 'px';
-    }
-  }
-
-  function onPointerUp() {
-    if (dragging) {
-      const item = getItem(dragging.dataset.wid);
-      if (item) {
-        item.col = snapToGrid(parseFloat(dragging.style.left));
-        item.row = snapToGrid(parseFloat(dragging.style.top));
-        // Snap to grid visually
-        dragging.style.left = (item.col * WCELL) + 'px';
-        dragging.style.top  = (item.row * WCELL) + 'px';
-      }
-      dragging = null;
-    }
-    if (resizing) {
-      const item = getItem(resizing.dataset.wid);
-      if (item) {
-        item.w = Math.max(1, snapToGrid(parseFloat(resizing.style.width) + WCELL/2));
-        item.h = Math.max(1, snapToGrid(parseFloat(resizing.style.height) + WCELL/2));
-        resizing.style.width  = (item.w * WCELL - 6) + 'px';
-        resizing.style.height = (item.h * WCELL - 6) + 'px';
-      }
-      // Update grid height
-      const maxRow = Math.max(...layout.map(l => l.row + l.h));
-      document.getElementById('widgets-grid')
-        .style.setProperty('--wgrid-height', (maxRow * WCELL + 8) + 'px');
-      resizing = null;
-    }
-    saveWidgetLayout(layout);
-  }
-
-  document.addEventListener('mousedown',  onPointerDown);
-  document.addEventListener('mousemove',  onPointerMove);
-  document.addEventListener('mouseup',    onPointerUp);
-  document.addEventListener('touchstart', e => onPointerDown(e.touches[0]), { passive: false });
-  document.addEventListener('touchmove',  e => { onPointerMove(e.touches[0]); e.preventDefault(); }, { passive: false });
-  document.addEventListener('touchend',   onPointerUp);
-
-  // Re-apply saved layout on screen show
-  const origShowScreen = window.showScreen;
-  // Layout applied after showScreen in INIT
-})();
-
-// ============================================================
-// INIT
-// ============================================================
-loadVehicles();
-loadAppSettings();
-updateClock();
-clockLoop = setInterval(updateClock, 10000);
-setInterval(() => {
-  const el = document.getElementById('db-storage');
-  if (el) el.textContent = JSON.stringify(localStorage).length + ' B';
-}, 5000);
-// Apply saved widget layout after DOM is ready
-setTimeout(() => applyWidgetLayout(loadWidgetLayout()), 50);
-
-// ============================================================
-// COPYRIGHT / ABOUT POPUP
-// ============================================================
-document.getElementById('cp-span').addEventListener('click', () => {
-  document.getElementById('about-popup').classList.remove('hidden');
-});
-document.getElementById('about-close').addEventListener('click', () => {
-  document.getElementById('about-popup').classList.add('hidden');
-});
+loadVehicles();loadAppSettings();updateClock();setInterval(updateClock,10000);
+document.getElementById('cp-span').addEventListener('click',()=>document.getElementById('about-popup').classList.remove('hidden'));
+document.getElementById('about-close').addEventListener('click',()=>document.getElementById('about-popup').classList.add('hidden'));
 </script>
 </body>
 </html>
