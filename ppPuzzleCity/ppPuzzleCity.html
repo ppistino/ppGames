@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🏗️ ppPuzzleCity</title>
+<style>
+:root{
+  --bg:#0b0f14;--panel:#111820;--panel2:#18232e;
+  --border:rgba(90,180,120,.2);--border2:rgba(90,180,120,.09);
+  --accent:#5ab478;--accent2:#7dcf96;
+  --gold:#e8c84a;--gold2:#f5d96e;
+  --red:#e05a5a;--blue:#4a9fe0;--purple:#9a7fd4;
+  --road-dark:#3a3020;--road-light:#5a4a30;
+  --grass-dark:#1a3018;--grass-light:#224020;
+  --water-dark:#0e1e3a;--water-light:#162840;
+  --text:#ddeedd;--text2:rgba(221,238,221,.62);--text3:rgba(221,238,221,.34);--text4:rgba(221,238,221,.14);
+  --hud:rgba(11,15,20,.96);--overlay:rgba(0,0,0,.9);
+  --shadow:0 12px 48px rgba(0,0,0,.8);--radius:13px;
+}
+body.light{
+  --bg:#eaf2ea;--panel:#fff;--panel2:#f2f8f2;
+  --border:rgba(40,130,60,.2);--border2:rgba(40,130,60,.09);
+  --accent:#2d7a46;--accent2:#3a9458;
+  --gold:#b8940a;--gold2:#d4aa20;
+  --red:#c03030;--blue:#1a6eb0;--purple:#6040a0;
+  --road-dark:#5a4a2a;--road-light:#7a6a3a;
+  --grass-dark:#3a6a28;--grass-light:#4a8030;
+  --water-dark:#1a4a8a;--water-light:#2060a0;
+  --text:#0a1a0a;--text2:rgba(10,26,10,.62);--text3:rgba(10,26,10,.36);--text4:rgba(10,26,10,.14);
+  --hud:rgba(234,242,234,.97);--overlay:rgba(180,220,180,.88);
+  --shadow:0 8px 32px rgba(0,40,0,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Georgia',serif;overflow:hidden;touch-action:none;user-select:none}
+
+/* TOAST */
+#toast{position:fixed;top:clamp(48px,8vh,58px);left:50%;transform:translateX(-50%) translateY(-12px);
+  background:linear-gradient(135deg,#e8c84a,#c8940a);color:#1a0c00;
+  font-size:.74rem;padding:5px 16px;letter-spacing:1px;border-radius:50px;
+  z-index:900;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;padding:14px 10px 26px;overflow-y:auto}
+.screen.hidden,.hidden{display:none!important}
+
+/* LOGO */
+.logo{font-size:clamp(1.9rem,7vw,3rem);font-weight:700;letter-spacing:2px;line-height:1.05;
+  background:linear-gradient(135deg,#e8c84a 0%,#5ab478 40%,#4a9fe0 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(90,180,120,.4));
+  animation:logoPulse 3.5s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{filter:drop-shadow(0 0 12px rgba(90,180,120,.25))}
+  50%{filter:drop-shadow(0 0 32px rgba(90,180,120,.7))}}
+.tagline{font-size:.56rem;letter-spacing:4px;text-transform:uppercase;color:var(--text3);margin-top:3px;text-align:center}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px;width:100%;max-width:420px}
+.clbl{font-size:.52rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;display:block}
+.cinp{width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:8px;
+  padding:7px 10px;color:var(--text);font-family:Georgia,serif;font-size:.88rem;font-weight:600;
+  outline:none;margin-bottom:9px;transition:border-color .2s}
+body.light .cinp{background:rgba(0,0,0,.03)}
+.cinp:focus{border-color:var(--accent)}
+
+/* AVATAR */
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.avbtn{background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:9px;
+  padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  gap:2px;color:var(--text);font-family:Georgia,serif;transition:all .14s}
+.avbtn .ae{font-size:1.5rem;line-height:1}
+.avbtn .al{font-size:.46rem;color:var(--text3)}
+.avbtn:hover,.avbtn.active{border-color:var(--accent);background:rgba(90,180,120,.1)}
+.avbtn.active{box-shadow:0 0 10px rgba(90,180,120,.25)}
+
+/* DIFF */
+.diff-row{display:flex;gap:5px}
+.diffbtn{flex:1;padding:6px 3px;border-radius:7px;border:1.5px solid var(--border);
+  background:rgba(255,255,255,.03);color:var(--text2);font-family:Georgia,serif;
+  font-size:.58rem;letter-spacing:1px;cursor:pointer;transition:all .16s;text-align:center}
+.diffbtn:hover,.diffbtn.active{border-color:var(--gold2);color:var(--gold2);background:rgba(232,200,74,.08)}
+
+/* BTNS */
+.playbtn{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a0c00;border:none;
+  border-radius:50px;padding:11px 38px;font-family:Georgia,serif;font-size:.88rem;
+  letter-spacing:3px;cursor:pointer;box-shadow:0 4px 20px rgba(232,200,74,.4);
+  transition:all .2s;width:100%;max-width:260px;font-weight:700}
+.playbtn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,200,74,.6)}
+.secbtn{background:rgba(255,255,255,.04);color:var(--text2);border:1.5px solid var(--border);
+  border-radius:50px;padding:8px 28px;font-family:Georgia,serif;font-size:.74rem;
+  letter-spacing:2px;cursor:pointer;transition:all .2s;width:100%;max-width:260px}
+.secbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── GAME SCREEN ── */
+#gs{padding:0;justify-content:flex-start;gap:0;overflow:hidden}
+
+/* HUD */
+#hud{z-index:20;width:100%;background:var(--hud);border-bottom:2px solid var(--border);
+  padding:4px 7px;display:flex;align-items:center;gap:4px;flex-shrink:0;min-height:40px}
+.hs{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border2);border-radius:6px;padding:3px 6px}
+.hl{font-size:.42rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)}
+.hv{font-size:.84rem;font-weight:700;color:var(--accent)}
+.hud-btn{background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:7px;
+  padding:3px 6px;font-size:.84rem;cursor:pointer;color:var(--text);line-height:1;
+  transition:all .14s;font-family:Georgia,serif}
+.hud-btn:hover{border-color:var(--accent)}
+.hud-btn.danger:hover{background:rgba(224,90,90,.14);border-color:var(--red);color:var(--red)}
+.star-ico{font-size:.86rem;opacity:.2;transition:all .3s}
+.star-ico.lit{opacity:1;filter:drop-shadow(0 0 4px var(--gold2))}
+
+/* STATUS */
+#status-bar{width:100%;background:rgba(255,255,255,.025);border-bottom:1px solid var(--border2);
+  padding:2px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:6px}
+#status-lv-name{font-size:.52rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;flex:1}
+#status-weather-wrap{display:flex;align-items:center;gap:4px;font-size:.52rem;color:var(--text3)}
+#status-event{font-size:.52rem;color:var(--red);font-weight:700;letter-spacing:1px;
+  animation:blink .9s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* OBS OVERLAY */
+#obs-overlay{position:absolute;inset:0;z-index:50;background:rgba(0,0,0,.62);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+#obs-timer{font-size:clamp(3rem,13vw,5.5rem);font-weight:700;color:var(--gold2);
+  text-shadow:0 0 40px rgba(232,200,74,.8);line-height:1;font-family:Georgia,serif}
+#obs-subtitle{font-size:clamp(.72rem,2.5vw,.95rem);color:var(--accent2);
+  letter-spacing:4px;text-transform:uppercase}
+#obs-bar-wrap{width:clamp(150px,48vw,260px);height:5px;border-radius:3px;
+  background:rgba(255,255,255,.1);overflow:hidden}
+#obs-bar{height:100%;width:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--accent),var(--gold2));transition:width .25s linear}
+#obs-warning{font-size:.58rem;color:var(--text3);letter-spacing:3px;text-transform:uppercase;
+  animation:blink .6s ease-in-out infinite}
+
+/* ASTEROID FLASH */
+#asteroid-flash{position:absolute;inset:0;z-index:55;background:rgba(255,200,50,.0);
+  pointer-events:none;transition:background .1s}
+#asteroid-flash.bang{background:rgba(255,200,50,.7)}
+
+/* GAME AREA */
+#game-area{flex:1;width:100%;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;min-height:0}
+#game-canvas{display:block;touch-action:none;cursor:crosshair}
+
+/* TOOLBAR */
+#toolbar{flex-shrink:0;width:100%;background:var(--hud);border-top:2px solid var(--border);
+  padding:5px 7px 20px;display:flex;flex-direction:column;gap:3px;z-index:20}
+#toolbar-top{display:flex;align-items:center;gap:6px}
+#piece-queue{display:flex;gap:5px;align-items:center;flex:1;overflow-x:auto;
+  scrollbar-width:none;padding:2px 0}
+#piece-queue::-webkit-scrollbar{display:none}
+
+/* PIECE CARD */
+.piece-card{flex-shrink:0;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .18s;position:relative}
+.piece-card.active{border-color:var(--gold2);background:rgba(232,200,74,.1);
+  box-shadow:0 0 14px rgba(232,200,74,.35)}
+.piece-card.active::after{content:'▶ DRAG';position:absolute;bottom:-14px;left:50%;
+  transform:translateX(-50%);font-size:.38rem;color:var(--gold2);letter-spacing:1px;
+  white-space:nowrap}
+.piece-card:hover:not(.active){border-color:var(--accent);background:rgba(90,180,120,.07)}
+.piece-card.placed{opacity:.35;cursor:default;border-style:dashed}
+
+.recycle-btn{flex-shrink:0;background:rgba(255,255,255,.04);border:1.5px solid var(--border);
+  border-radius:8px;padding:5px 9px;font-size:.66rem;color:var(--text2);cursor:pointer;
+  transition:all .16s;display:flex;flex-direction:column;align-items:center;gap:1px;
+  font-family:Georgia,serif}
+.recycle-btn:hover{border-color:var(--gold);color:var(--gold)}
+.recycle-cost{font-size:.46rem;color:var(--text3)}
+
+#pu-row{display:flex;gap:4px;align-items:center;justify-content:center;
+  flex-wrap:wrap;min-height:14px}
+.pub{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.04);
+  border:1.5px solid var(--border);border-radius:14px;padding:2px 8px;cursor:pointer;
+  font-size:.56rem;color:var(--text2);transition:all .16s;font-family:Georgia,serif}
+.pub:hover{border-color:var(--gold);color:var(--gold);background:rgba(232,200,74,.08)}
+.pub:disabled{opacity:.28;cursor:not-allowed}
+
+#toolbar-hint{text-align:center;font-size:.46rem;color:var(--text3);letter-spacing:.5px}
+
+/* OVERLAYS */
+#ov{position:fixed;inset:0;z-index:400;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+#ov.hidden{display:none}
+.ovb{background:var(--panel);border:1px solid var(--border);border-radius:20px;
+  padding:24px 20px;text-align:center;max-width:320px;width:92%;
+  box-shadow:var(--shadow);animation:popIn .3s cubic-bezier(.34,1.56,.64,1)}
+.oe{font-size:2.5rem;margin-bottom:6px}.ot{font-size:1.3rem;font-weight:700;
+  color:var(--accent);letter-spacing:2px;margin-bottom:5px}
+.ox{color:var(--text2);margin-bottom:16px;font-size:.82rem;line-height:1.7;white-space:pre-line}
+.obtn{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a0c00;border:none;
+  border-radius:50px;padding:9px 26px;font-family:Georgia,serif;font-size:.8rem;
+  letter-spacing:2px;cursor:pointer;transition:all .14s;display:block;width:100%;font-weight:700}
+.obtn:hover{transform:translateY(-1px)}
+.obtn.sec{background:rgba(255,255,255,.05);color:var(--text2);border:1.5px solid var(--border);margin-top:6px}
+.obtn.sec:hover{border-color:var(--accent);color:var(--accent)}
+@keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* SCORE */
+#score-screen{position:fixed;inset:0;z-index:450;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.score-box{background:var(--panel);border:1px solid var(--border);border-radius:20px;
+  padding:26px 20px;max-width:340px;width:94%;text-align:center;box-shadow:var(--shadow);
+  animation:popIn .34s cubic-bezier(.34,1.56,.64,1)}
+.score-stars{display:flex;justify-content:center;gap:8px;margin:12px 0;font-size:2.1rem}
+.score-star{opacity:.16;filter:grayscale(1);transition:all .5s cubic-bezier(.34,1.56,.64,1)}
+.score-star.earned{opacity:1;filter:none;animation:starPop .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes starPop{from{transform:scale(0) rotate(-30deg)}to{transform:scale(1) rotate(0)}}
+.score-row{display:flex;justify-content:space-between;font-size:.76rem;padding:4px 0;
+  border-bottom:1px solid var(--border2);color:var(--text2)}
+.score-row .lbl{color:var(--text3)}.score-row .val{color:var(--text);font-weight:700}
+.score-total{font-size:1.3rem;font-weight:700;color:var(--gold2);margin-top:10px}
+
+/* SHOP */
+#shop-popup{position:fixed;inset:0;z-index:600;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.shop-box{background:var(--panel);border:1.5px solid var(--border);border-radius:20px;
+  padding:16px 14px;max-width:390px;width:96%;max-height:84vh;overflow-y:auto;
+  box-shadow:var(--shadow);animation:popIn .26s cubic-bezier(.34,1.56,.64,1)}
+.shop-title{font-size:1.05rem;font-weight:700;color:var(--gold2);letter-spacing:3px;
+  text-align:center;margin-bottom:3px}
+.shop-bal{text-align:center;font-size:.64rem;color:var(--text3);margin-bottom:9px}
+.shop-bal strong{color:var(--gold2);font-size:.86rem}
+.shop-item{display:grid;grid-template-columns:auto 1fr auto;gap:4px 9px;align-items:center;
+  background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:11px;
+  padding:8px 11px;margin-bottom:5px;transition:border-color .14s}
+.shop-item:hover{border-color:rgba(232,200,74,.3)}
+.si-ico{font-size:1.45rem}.si-name{font-size:.74rem;font-weight:700}
+.si-desc{font-size:.54rem;color:var(--text3);line-height:1.4;margin-top:1px}
+.si-buy{padding:4px 10px;border-radius:18px;border:none;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));color:#1a0c00;
+  font-family:Georgia,serif;font-size:.56rem;font-weight:700;cursor:pointer}
+.si-buy:disabled{opacity:.32;cursor:not-allowed}
+.shop-close-btn{width:100%;margin-top:9px;padding:8px;border-radius:50px;
+  border:1.5px solid var(--border);background:rgba(255,255,255,.04);color:var(--text2);
+  font-family:Georgia,serif;font-size:.76rem;letter-spacing:2px;cursor:pointer}
+.shop-close-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* CONFIRM */
+#conf{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.84);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.conf-box{background:var(--panel);border:1.5px solid var(--border);border-radius:13px;
+  padding:18px 16px;text-align:center;max-width:260px;width:90%;animation:popIn .18s ease}
+.conf-ico{font-size:1.9rem;margin-bottom:5px}.conf-t{font-size:.95rem;font-weight:700;
+  color:var(--accent);margin-bottom:5px}.conf-tx{color:var(--text2);font-size:.74rem;
+  margin-bottom:13px;line-height:1.5}
+.conf-btns{display:flex;gap:7px;justify-content:center}
+.conf-yes{padding:7px 16px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--red),#7a1010);color:#fff;
+  font-family:Georgia,serif;font-size:.72rem;cursor:pointer}
+.conf-no{padding:7px 16px;border-radius:50px;background:rgba(255,255,255,.05);
+  color:var(--text2);border:1.5px solid var(--border);font-family:Georgia,serif;
+  font-size:.72rem;cursor:pointer}
+
+/* POPUPS */
+.popup-bg{position:fixed;inset:0;z-index:500;background:var(--overlay);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.popup-box{background:var(--panel);border:1px solid var(--border);border-radius:17px;
+  padding:18px 16px;max-width:390px;width:94%;max-height:88vh;overflow-y:auto;
+  box-shadow:var(--shadow);animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
+.popup-title{font-size:1.05rem;font-weight:700;color:var(--accent);letter-spacing:2px;
+  text-align:center;margin-bottom:11px}
+.popup-row{font-size:.74rem;color:var(--text2);margin-bottom:7px;line-height:1.72}
+.popup-row strong{color:var(--text)}
+.popup-close{width:100%;margin-top:11px;padding:8px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,var(--accent),#1a5a2a);color:#fff;
+  font-family:Georgia,serif;font-size:.76rem;letter-spacing:2px;cursor:pointer}
+.lic{font-size:.52rem;color:var(--text3);border:1px solid var(--border2);border-radius:8px;
+  padding:9px;line-height:1.8;margin-top:9px}
+.lic .lt{color:var(--accent);font-weight:700;letter-spacing:2px;font-size:.54rem;
+  display:block;margin-bottom:3px}
+.lic p{margin-bottom:4px}
+
+/* HISTORY */
+#hs-screen{gap:8px;align-items:center;justify-content:flex-start;
+  padding-top:22px;overflow-y:auto}
+
+/* CONTROLS */
+#ss-controls{position:fixed;top:8px;right:8px;z-index:700;display:flex;gap:5px;align-items:center}
+#theme-btn,#hud-theme-btn{width:36px;height:20px;border-radius:10px;border:1.5px solid var(--border);
+  background:var(--panel2);cursor:pointer;display:flex;align-items:center;padding:2px;
+  transition:all .3s;flex-shrink:0}
+#theme-knob,#hud-theme-knob{width:13px;height:13px;border-radius:50%;
+  background:linear-gradient(135deg,#ffd700,#ff9500);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+  display:flex;align-items:center;justify-content:center;font-size:.44rem}
+body.light #theme-knob,body.light #hud-theme-knob{transform:translateX(15px);
+  background:linear-gradient(135deg,#88aaff,#4466dd)}
+#sound-btn,#hud-sound{width:24px;height:20px;border-radius:7px;border:1.5px solid var(--border);
+  background:var(--panel2);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;line-height:1;transition:all .18s;flex-shrink:0}
+#sound-btn:hover,#hud-sound:hover{border-color:var(--accent)}
+#sound-btn.muted,#hud-sound.muted{opacity:.36;filter:grayscale(1)}
+
+/* CPBAR */
+#cpbar{position:fixed;bottom:0;left:0;right:0;z-index:200;text-align:center;
+  font-family:Georgia,serif;font-size:7px;color:var(--text4);letter-spacing:1px;
+  pointer-events:none;padding:2px 0 3px;background:var(--panel);border-top:1px solid var(--border2)}
+#cpbar span{cursor:pointer;pointer-events:all;transition:color .14s;padding:2px 4px}
+#cpbar span:hover{color:var(--accent)}
+
+/* FLOAT SCORE */
+.fscore{position:absolute;pointer-events:none;font-size:.68rem;font-weight:700;
+  color:var(--gold2);text-shadow:0 1px 4px rgba(0,0,0,.8);z-index:35;
+  animation:floatUp .9s ease-out forwards;white-space:nowrap}
+@keyframes floatUp{from{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:0;transform:translateY(-30px) scale(.8)}}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div id="ss-controls">
+  <button id="sound-btn">🔊</button>
+  <button id="theme-btn"><div id="theme-knob"><span id="theme-icon">☀️</span></div></button>
+</div>
+
+<!-- START -->
+<div id="ss" class="screen">
+  <div style="text-align:center;margin-bottom:4px">
+    <div class="logo">🏗️ ppPuzzleCity</div>
+    <div class="tagline">Rebuild · Reconnect · Rescue the City ✦</div>
+  </div>
+  <div class="card">
+    <span class="clbl">Your Name</span>
+    <input id="pname" class="cinp" type="text" placeholder="e.g. Paolo…" maxlength="14" autocomplete="off">
+    <span class="clbl">Choose your Engineer</span>
+    <div class="avatar-grid" id="avatar-grid"></div>
+  </div>
+  <div class="card" style="max-width:420px">
+    <span class="clbl">Difficulty</span>
+    <div class="diff-row">
+      <button class="diffbtn active" data-diff="easy">🟢 Easy</button>
+      <button class="diffbtn" data-diff="medium">🟡 Medium</button>
+      <button class="diffbtn" data-diff="hard">🔴 Hard</button>
+    </div>
+  </div>
+  <button class="playbtn" id="pbtn">🏗️ PLAY!</button>
+  <button class="secbtn" id="hist-btn">🏆 History</button>
+  <button class="secbtn" id="help-ss-btn">❓ How to Play</button>
+</div>
+
+<!-- HISTORY -->
+<div id="hs-screen" class="screen hidden">
+  <div style="font-size:1.4rem;font-weight:700;color:var(--accent);letter-spacing:3px">🏆 History</div>
+  <div style="font-size:.58rem;color:var(--text3);letter-spacing:3px;text-transform:uppercase">Your ppPuzzleCity sessions</div>
+  <div id="hs-list" style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:5px"></div>
+  <div style="display:flex;gap:7px;width:100%;max-width:460px;margin-top:3px">
+    <button class="secbtn" id="hs-back" style="flex:1;padding:8px">← Back</button>
+    <button id="hs-del" style="flex:1;padding:8px;border-radius:50px;background:rgba(224,90,90,.08);color:var(--red);border:1.5px solid rgba(224,90,90,.2);font-family:Georgia,serif;font-size:.74rem;cursor:pointer">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="gs" class="screen hidden">
+  <div id="hud">
+    <div class="hs"><span class="hv" id="h-av" style="font-size:.95rem">🧔</span><span class="hv" id="h-nm" style="font-size:.68rem;color:var(--accent2)">—</span></div>
+    <div class="hs"><span class="hl">LV</span><span class="hv" id="h-lv" style="color:var(--purple)">1</span></div>
+    <div class="hs"><span class="hl">⭐</span><span class="star-ico" id="s1">⭐</span><span class="star-ico" id="s2">⭐</span><span class="star-ico" id="s3">⭐</span></div>
+    <div class="hs"><span class="hl">💰</span><span class="hv" id="h-coins" style="color:var(--gold2)">0</span></div>
+    <div class="hs"><span class="hl">🚗</span><span class="hv" id="h-veh">0/0</span></div>
+    <div class="hs"><span class="hl">🧩</span><span class="hv" id="h-pieces" style="color:var(--accent)">0/0</span></div>
+    <button class="hud-btn" id="hud-shop" style="margin-left:auto">🛍️</button>
+    <button class="hud-btn" id="hud-help">❓</button>
+    <button class="hud-btn danger" id="hud-quit">🚪</button>
+    <button class="hud-btn" id="hud-sound">🔊</button>
+    <button id="hud-theme-btn"><div id="hud-theme-knob"><span id="hud-theme-icon">☀️</span></div></button>
+  </div>
+  <div id="status-bar">
+    <div id="status-lv-name">Level 1</div>
+    <div id="status-weather-wrap"><span id="status-weather-ico">☀️</span><span id="status-weather-name" style="font-size:.48rem">Sunny</span></div>
+    <div id="status-event"></div>
+  </div>
+  <div id="game-area">
+    <canvas id="game-canvas"></canvas>
+    <div id="obs-overlay">
+      <div id="obs-subtitle">📖 MEMORIZE THE CITY</div>
+      <div id="obs-timer">10</div>
+      <div id="obs-bar-wrap"><div id="obs-bar"></div></div>
+      <div id="obs-warning">☄️ ASTEROID INCOMING…</div>
+    </div>
+    <div id="asteroid-flash"></div>
+  </div>
+  <div id="toolbar">
+    <div id="toolbar-top">
+      <div id="piece-queue"></div>
+      <button class="recycle-btn" id="recycle-btn">♻️<span class="recycle-cost">10💰</span></button>
+    </div>
+    <div id="pu-row"></div>
+    <div id="toolbar-hint">Select a piece · Drag to grid · Tap piece to rotate</div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="ov" class="hidden">
+  <div class="ovb">
+    <div class="oe" id="oe">🎉</div><div class="ot" id="ot">—</div>
+    <div class="ox" id="ox">—</div>
+    <button class="obtn" id="ob">OK</button>
+    <button class="obtn sec hidden" id="ob2">—</button>
+  </div>
+</div>
+
+<!-- SCORE -->
+<div id="score-screen" class="hidden">
+  <div class="score-box">
+    <div style="font-size:1.1rem;font-weight:700;color:var(--gold2);letter-spacing:3px">LEVEL COMPLETE!</div>
+    <div class="score-stars">
+      <span class="score-star" id="sc-s1">⭐</span>
+      <span class="score-star" id="sc-s2">⭐</span>
+      <span class="score-star" id="sc-s3">⭐</span>
+    </div>
+    <div id="score-rows"></div>
+    <div class="score-total" id="score-total"></div>
+    <button class="obtn" style="margin-top:14px" id="sc-next">⏩ Next Level</button>
+    <button class="obtn sec" id="sc-replay">🔄 Replay</button>
+  </div>
+</div>
+
+<!-- SHOP -->
+<div id="shop-popup" class="hidden">
+  <div class="shop-box">
+    <div class="shop-title">🛍️ SHOP</div>
+    <div class="shop-bal">Balance: <strong id="shop-bal-val">0</strong> 💰</div>
+    <div id="shop-grid"></div>
+    <button class="shop-close-btn" id="shop-close">✕ Close</button>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="conf" class="hidden">
+  <div class="conf-box">
+    <div class="conf-ico" id="conf-ico">⚠️</div><div class="conf-t" id="conf-t">Sure?</div>
+    <div class="conf-tx" id="conf-tx">—</div>
+    <div class="conf-btns"><button class="conf-no" id="conf-no">Cancel</button><button class="conf-yes" id="conf-yes">Confirm</button></div>
+  </div>
+</div>
+
+<!-- HELP -->
+<div id="help-popup" class="popup-bg hidden">
+  <div class="popup-box">
+    <div class="popup-title">🏗️ How to Play</div>
+    <div class="popup-row"><strong>👁️ Observation (10s):</strong> Study the intact city carefully — roads, buildings, houses. Memorize everything before the asteroid hits!</div>
+    <div class="popup-row"><strong>☄️ Asteroid Strike:</strong> The roads are destroyed. Your mission: put them back using the puzzle pieces in the toolbar.</div>
+    <div class="popup-row"><strong>🧩 Pieces:</strong> The toolbar holds all the pieces needed to reconstruct the roads exactly. Select a piece, drag it onto the grid. Tap a piece in the toolbar to rotate it 90°.</div>
+    <div class="popup-row"><strong>↩️ Pick up:</strong> Tap a piece already placed on the grid to return it to the toolbar.</div>
+    <div class="popup-row"><strong>🚗 Vehicles:</strong> As soon as a continuous road connects a building (🏥🏪…) to a house (🏠🏡…), a vehicle departs and earns you 💰 on arrival.</div>
+    <div class="popup-row"><strong>⭐ Stars:</strong> 1⭐ First vehicle arrives · 2⭐ All vehicles arrive · 3⭐ Every vehicle reaches its <em>correct</em> destination (each house has a specific vehicle assigned — check the badge above it!)</div>
+    <div class="popup-row"><strong>♻️ Recycle:</strong> Pay 10💰 to swap a piece you can't place. Use sparingly!</div>
+    <div class="popup-row"><strong>🗺️ Map Hint:</strong> Purchase in the Shop to see where each piece belongs on the city map.</div>
+    <div class="popup-row"><strong>🐛 Debug:</strong> CTRL+D → infinite coins.</div>
+    <button class="popup-close" id="help-close">✕ Close</button>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="about-popup" class="popup-bg hidden">
+  <div class="popup-box">
+    <div class="popup-title">🎮 ppPuzzleCity</div>
+    <div class="popup-row"><strong>Version:</strong> 0.2 — 2026</div>
+    <div class="popup-row"><strong>Genre:</strong> City Rescue Puzzle</div>
+    <div class="popup-row"><strong>Author:</strong> Paolo Pista. — ✉: <a style="color:var(--accent)" href="mailto:pistino@libero.it">pistino@libero.it</a></div>
+    <div class="popup-row"><strong>Platform:</strong> Single-file HTML5 — works on any modern browser and smartphone</div>
+    <div class="lic">
+      <span class="lt">⚖ SOFTWARE LICENSE</span>
+      <p>1. LICENSE GRANT: The author grants a limited, revocable, non-exclusive license to use the software for personal, non-commercial purposes only.</p>
+      <p>2. COMMERCIAL USE: Any commercial use, redistribution, sublicensing, or monetization requires prior written authorization from the author.</p>
+      <p>3. MODIFICATION: Modification, adaptation, or creation of derivative works is prohibited without explicit written consent.</p>
+      <p>4. OWNERSHIP: All rights, title, and interest in the software remain exclusively with the author.</p>
+      <p>5. DISCLAIMER: The software is provided "AS IS", without warranty of any kind. The author shall not be liable for any damages or claims.</p>
+      <p>By accessing or using this software, you agree to these terms.</p>
+      <p>Copyright (c) 2026 PISTINO DEVELOPMENT. All Rights Reserved.</p>
+    </div>
+    <button class="popup-close" id="about-close">✕ Close</button>
+  </div>
+</div>
+
+<div id="cpbar"><span id="cp-span">© 2026 PISTINO DEVELOPMENT — ppPuzzleCity v0.2</span></div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════ */
+const DEBUG_COINS = 99999;
+const START_COINS = 150;
+const OBS_SECS    = 10;
+// ms per cell traveled by vehicle (base speed)
+const VEH_MS_PER_CELL = 420;
+let isDebug = false;
+
+/* ══════════════════════════════════════════════════════
+   AUDIO
+══════════════════════════════════════════════════════ */
+const SK = 'ppPC2_snd';
+let soundOn = localStorage.getItem(SK) !== 'off';
+let _ac = null;
+function getAC(){if(!_ac){try{_ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(_ac&&_ac.state==='suspended')_ac.resume();return _ac;}
+function playSnd(type){
+  if(!soundOn)return; const ac=getAC(); if(!ac)return;
+  const now=ac.currentTime; const g=ac.createGain(); g.connect(ac.destination);
+  switch(type){
+    case'place':{const b=ac.createBuffer(1,ac.sampleRate*.055,ac.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2.2);const s=ac.createBufferSource();s.buffer=b;s.connect(g);g.gain.setValueAtTime(.22,now);g.gain.exponentialRampToValueAtTime(.001,now+.055);s.start(now);break;}
+    case'pickup':{const o=ac.createOscillator();o.connect(g);o.type='sine';o.frequency.setValueAtTime(900,now);o.frequency.exponentialRampToValueAtTime(600,now+.06);g.gain.setValueAtTime(.07,now);g.gain.exponentialRampToValueAtTime(.001,now+.07);o.start(now);o.stop(now+.07);break;}
+    case'rotate':{const o=ac.createOscillator();o.connect(g);o.type='sine';o.frequency.setValueAtTime(550,now);o.frequency.exponentialRampToValueAtTime(820,now+.055);g.gain.setValueAtTime(.07,now);g.gain.exponentialRampToValueAtTime(.001,now+.065);o.start(now);o.stop(now+.065);break;}
+    case'connect':{[523,659,784].forEach((f,i)=>{const o=ac.createOscillator();const gi=ac.createGain();o.connect(gi);gi.connect(ac.destination);o.type='triangle';o.frequency.value=f;const t=now+i*.085;gi.gain.setValueAtTime(0,t);gi.gain.linearRampToValueAtTime(.18,t+.02);gi.gain.exponentialRampToValueAtTime(.001,t+.17);o.start(t);o.stop(t+.17);});break;}
+    case'arrive':{[659,784,1047].forEach((f,i)=>{const o=ac.createOscillator();const gi=ac.createGain();o.connect(gi);gi.connect(ac.destination);o.type='triangle';o.frequency.value=f;const t=now+i*.07;gi.gain.setValueAtTime(0,t);gi.gain.linearRampToValueAtTime(.14,t+.015);gi.gain.exponentialRampToValueAtTime(.001,t+.15);o.start(t);o.stop(t+.15);});break;}
+    case'asteroid':{const b=ac.createBuffer(1,ac.sampleRate*.5,ac.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,.7);const s=ac.createBufferSource();s.buffer=b;s.connect(g);g.gain.setValueAtTime(.5,now);g.gain.exponentialRampToValueAtTime(.001,now+.5);s.start(now);break;}
+    case'coins':{[1047,1319].forEach((f,i)=>{const o=ac.createOscillator();const gi=ac.createGain();o.connect(gi);gi.connect(ac.destination);o.type='sine';o.frequency.value=f;const t=now+i*.065;gi.gain.setValueAtTime(.09,t);gi.gain.exponentialRampToValueAtTime(.001,t+.13);o.start(t);o.stop(t+.13);});break;}
+    case'click':{const o=ac.createOscillator();o.connect(g);o.type='sine';o.frequency.setValueAtTime(680,now);o.frequency.exponentialRampToValueAtTime(380,now+.05);g.gain.setValueAtTime(.07,now);g.gain.exponentialRampToValueAtTime(.001,now+.055);o.start(now);o.stop(now+.055);break;}
+    case'win':{const m=[523,659,784,659,784,1047];m.forEach((f,i)=>{const o=ac.createOscillator();const gi=ac.createGain();o.connect(gi);gi.connect(ac.destination);o.type='triangle';o.frequency.value=f;const t=now+i*.11;gi.gain.setValueAtTime(0,t);gi.gain.linearRampToValueAtTime(.16,t+.025);gi.gain.exponentialRampToValueAtTime(.001,t+.2);o.start(t);o.stop(t+.2);});break;}
+    case'lose':{[392,330,262,196].forEach((f,i)=>{const o=ac.createOscillator();const gi=ac.createGain();o.connect(gi);gi.connect(ac.destination);o.type='sawtooth';o.frequency.value=f;const t=now+i*.17;gi.gain.setValueAtTime(.14,t);gi.gain.exponentialRampToValueAtTime(.001,t+.22);o.start(t);o.stop(t+.22);});break;}
+  }
+}
+function updateSoundBtns(){['sound-btn','hud-sound'].forEach(id=>{const b=document.getElementById(id);if(!b)return;b.textContent=soundOn?'🔊':'🔇';b.classList.toggle('muted',!soundOn);});}
+updateSoundBtns();
+['sound-btn','hud-sound'].forEach(id=>{const b=document.getElementById(id);if(!b)return;b.addEventListener('click',()=>{soundOn=!soundOn;localStorage.setItem(SK,soundOn?'on':'off');updateSoundBtns();if(soundOn)playSnd('click');});});
+const TK='ppPC2_theme'; let isDark=localStorage.getItem(TK)!=='light';
+function applyTheme(d){isDark=d;document.body.classList.toggle('light',!d);['theme-icon','hud-theme-icon'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=d?'☀️':'🌙';});localStorage.setItem(TK,d?'dark':'light');}
+['theme-btn','hud-theme-btn'].forEach(id=>{const b=document.getElementById(id);if(!b)return;b.addEventListener('click',()=>applyTheme(!isDark));});
+applyTheme(isDark);
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='d'){e.preventDefault();isDebug=!isDebug;if(isDebug&&G.name){G.coins=DEBUG_COINS;updateHUD();}toast('🐛 DEBUG '+(isDebug?'ON':'OFF'));}});
+
+/* ══════════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════════ */
+const AVATARS={beard:{emoji:'🧔',label:'Beard'},woman:{emoji:'👩',label:'Lady'},cool:{emoji:'😎',label:'Cool'},lion:{emoji:'🦁',label:'Lion'},bear:{emoji:'🐻',label:'Bear'},wizard:{emoji:'🧙',label:'Wizard'},hero:{emoji:'🦸',label:'Hero'},zombie:{emoji:'🧟',label:'Zombie'},alien:{emoji:'👽',label:'Alien'},robot:{emoji:'🤖',label:'Robot'}};
+
+// Tile type constants
+const T = {GRASS:0, ROAD:1, BUILDING:2, HOUSE:3, DECO:4, WATER:5};
+
+// Shop items — note 'maphint' is the special map position hint
+const SHOP_ITEMS = [
+  {id:'maphint',  icon:'🗺️', name:'Map Hint',     desc:'See where each piece belongs on the city map',cost:80,  uses:1, type:'toggle'},
+  {id:'extinguisher',icon:'🧯',name:'Extinguisher',desc:'Put out volcano fire on 1 tile',           cost:50,  uses:1, type:'pu'},
+  {id:'bridge',   icon:'🌉', name:'Bridge',        desc:'Place a road tile over water (1 use)',      cost:90,  uses:1, type:'pu'},
+  {id:'turbo',    icon:'🏎️', name:'Turbo Engine',  desc:'All vehicles move 2× faster for 60s',      cost:140, uses:1, type:'pu'},
+  {id:'superclick',icon:'🔨',name:'Super-Click',   desc:'Clear all 🚧 roadworks instantly',          cost:90,  uses:1, type:'pu'},
+];
+
+const WEATHERS = [
+  {ico:'☀️', name:'Sunny',  coinMult:1.2, vehMult:1.0},
+  {ico:'🌧️', name:'Rainy',  coinMult:1.0, vehMult:0.6},
+  {ico:'🌫️', name:'Foggy',  coinMult:0.9, vehMult:0.8},
+  {ico:'⛅',  name:'Mild',   coinMult:1.0, vehMult:1.0},
+];
+
+/* ══════════════════════════════════════════════════════
+   HAND-CRAFTED LEVELS
+   Map legend: G=grass  W=water  R=road
+               B:icon=building  H:icon=house  D:icon=deco
+   routes: [{from:'bld-icon', to:'house-icon', vehicle:'🚗'}]
+   Each route defines ONE vehicle that must travel from
+   that building to that specific house.
+══════════════════════════════════════════════════════ */
+const LEVELS = [
+  // ── LEVEL 1 ──────────────────────────────────────
+  {
+    name:'City Center', cols:10, rows:9,
+    map:[
+      'G  G  G  G  G  G  G  G  G  G',
+      'G  B:🏥 R  R  R  R  H:🏠 G  G  G',
+      'G  G  G  G  R  G  G  G  G  G',
+      'G  G  G  G  R  G  G  G  G  G',
+      'G  G  G  G  R  R  R  H:🏡 G  G',
+      'G  G  G  G  G  G  R  G  G  G',
+      'G  G  B:🏪 R  R  R  R  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G',
+    ],
+    routes:[
+      {from:'🏥', to:'🏠', vehicle:'🚑'},
+      {from:'🏪', to:'🏡', vehicle:'🚚'},
+    ],
+    decos:[{r:0,c:8,icon:'🌳'},{r:7,c:1,icon:'⛲'},{r:2,c:9,icon:'🌲'}],
+  },
+  // ── LEVEL 2 ──────────────────────────────────────
+  {
+    name:'Industrial Zone', cols:11, rows:10,
+    map:[
+      'G  G  G  G  G  G  G  G  G  G  G',
+      'G  B:🏥 R  R  R  G  G  G  G  G  G',
+      'G  G  G  G  R  G  W  W  G  G  G',
+      'G  G  G  G  R  G  W  W  G  G  G',
+      'G  G  G  G  R  R  R  R  R  H:🏠 G',
+      'G  G  G  G  G  G  G  G  R  G  G',
+      'G  B:🏦 R  R  R  R  R  R  R  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G',
+      'G  H:🏡 G  G  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G',
+    ],
+    routes:[
+      {from:'🏥', to:'🏠', vehicle:'🚑'},
+      {from:'🏦', to:'🏡', vehicle:'🚗'},
+      {from:'🏥', to:'🏡', vehicle:'🚌'},
+    ],
+    decos:[{r:0,c:9,icon:'🌳'},{r:9,c:5,icon:'🌴'},{r:0,c:2,icon:'🌲'}],
+  },
+  // ── LEVEL 3 ──────────────────────────────────────
+  {
+    name:'Historic Quarter', cols:12, rows:10,
+    map:[
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  B:🏛️ R  R  R  R  R  G  G  G  G  G',
+      'G  G  G  G  G  G  R  G  W  W  G  G',
+      'G  G  G  G  G  G  R  G  W  W  G  G',
+      'G  B:🏥 R  R  R  R  R  R  R  H:🏡 G  G',
+      'G  G  G  G  R  G  G  G  G  G  G  G',
+      'G  G  G  G  R  G  G  G  G  G  G  G',
+      'G  H:🏠 R  R  R  G  G  H:🏘️ G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+    ],
+    routes:[
+      {from:'🏛️', to:'🏘️', vehicle:'🚌'},
+      {from:'🏥', to:'🏡', vehicle:'🚑'},
+      {from:'🏥', to:'🏠', vehicle:'🚗'},
+      {from:'🏛️', to:'🏠', vehicle:'🚕'},
+    ],
+    decos:[{r:0,c:10,icon:'⛲'},{r:9,c:2,icon:'🌳'},{r:0,c:5,icon:'🌲'},{r:9,c:9,icon:'🌵'}],
+  },
+  // ── LEVEL 4 ──────────────────────────────────────
+  {
+    name:'Shopping District', cols:12, rows:11,
+    map:[
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  B:🏪 R  R  R  R  R  G  B:🏨 R  H:🏠 G',
+      'G  G  G  G  G  G  R  G  G  G  G  G',
+      'G  G  W  W  G  G  R  G  G  G  G  G',
+      'G  G  W  W  G  G  R  R  R  R  H:🏡 G',
+      'G  G  G  G  G  G  G  G  R  G  G  G',
+      'G  B:🏬 R  R  G  G  G  G  R  G  G  G',
+      'G  G  G  R  G  G  G  G  R  G  G  G',
+      'G  H:🏚️ R  R  G  G  G  H:🛖 R  R  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G',
+    ],
+    routes:[
+      {from:'🏪', to:'🏠', vehicle:'🚚'},
+      {from:'🏨', to:'🏡', vehicle:'🚗'},
+      {from:'🏬', to:'🏚️', vehicle:'🚙'},
+      {from:'🏬', to:'🛖', vehicle:'🚕'},
+      {from:'🏪', to:'🛖', vehicle:'🚌'},
+    ],
+    decos:[{r:0,c:5,icon:'🌳'},{r:10,c:3,icon:'⛲'},{r:0,c:11,icon:'🌴'},{r:10,c:10,icon:'🌲'}],
+  },
+  // ── LEVEL 5 ──────────────────────────────────────
+  {
+    name:'Grand Arena', cols:14, rows:12,
+    map:[
+      'G  G  G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  B:🏟️ R  R  R  R  R  R  G  G  B:🏰 R  H:🏠 G',
+      'G  G  G  G  G  G  G  R  G  G  G  G  G  G',
+      'G  G  W  W  G  G  G  R  G  W  W  G  G  G',
+      'G  G  W  W  G  G  G  R  G  W  W  G  G  G',
+      'G  G  G  G  G  G  G  R  R  R  R  R  H:🏡 G',
+      'G  B:🏦 R  R  R  R  R  R  G  G  G  G  G  G',
+      'G  G  G  G  G  G  R  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  R  G  G  G  G  G  G  G',
+      'G  H:🏘️ R  R  R  R  R  G  H:🏡 G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G  G  G',
+      'G  G  G  G  G  G  G  G  G  G  G  G  G  G',
+    ],
+    routes:[
+      {from:'🏟️', to:'🏠', vehicle:'🚌'},
+      {from:'🏰', to:'🏡', vehicle:'🚗'},
+      {from:'🏦', to:'🏘️', vehicle:'🚕'},
+      {from:'🏟️', to:'🏘️', vehicle:'🚙'},
+      {from:'🏦', to:'🏡', vehicle:'🚑'},
+    ],
+    decos:[{r:0,c:12,icon:'🌳'},{r:11,c:1,icon:'⛲'},{r:0,c:6,icon:'🌲'},{r:11,c:8,icon:'🌴'},{r:5,c:0,icon:'🌵'}],
+  },
+];
+
+/* ══════════════════════════════════════════════════════
+   MAP PARSER
+   Converts a LEVELS[i].map string array → grid[][]
+══════════════════════════════════════════════════════ */
+function parseMap(lvDef){
+  const grid = [];
+  const buildingCoords = {}; // icon → {r,c}
+  const houseCoords    = {}; // icon → {r,c}
+
+  lvDef.map.forEach((rowStr, r) => {
+    const cells = rowStr.trim().split(/\s+/);
+    grid.push([]);
+    cells.forEach((token, c) => {
+      if(token === 'G')       grid[r].push({type:T.GRASS,    icon:null});
+      else if(token === 'R')  grid[r].push({type:T.ROAD,     icon:null});
+      else if(token === 'W')  grid[r].push({type:T.WATER,    icon:'🟦'});
+      else if(token.startsWith('B:')){
+        const icon=token.slice(2);
+        grid[r].push({type:T.BUILDING, icon});
+        buildingCoords[icon]={r,c};
+      }
+      else if(token.startsWith('H:')){
+        const icon=token.slice(2);
+        grid[r].push({type:T.HOUSE, icon});
+        houseCoords[icon]={r,c};
+      }
+      else if(token.startsWith('D:')){
+        grid[r].push({type:T.DECO, icon:token.slice(2)});
+      }
+      else grid[r].push({type:T.GRASS, icon:null});
+    });
+  });
+  // Place decos
+  if(lvDef.decos) lvDef.decos.forEach(d=>{
+    if(d.r<grid.length&&d.c<grid[0].length)
+      grid[d.r][d.c]={type:T.DECO,icon:d.icon};
+  });
+  return {grid, buildingCoords, houseCoords};
+}
+
+// Build route objects with actual grid coordinates resolved
+function buildRoutes(lvDef, buildingCoords, houseCoords){
+  return (lvDef.routes||[]).map((rt,i)=>{
+    const bldPos = buildingCoords[rt.from];
+    const hsePos = houseCoords[rt.to];
+    return {
+      id:       i,
+      from:     rt.from,   // building icon
+      to:       rt.to,     // house icon
+      vehicle:  rt.vehicle,
+      bldPos,              // {r,c} or undefined if not found
+      hsePos,              // {r,c} or undefined
+      dispatched: false,   // vehicle sent
+      arrived:    false,   // vehicle reached correct house
+      arrivedWrong: false, // reached wrong house
+    };
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   ROAD DECOMPOSER
+   Splits the road cells into N random polyomino pieces
+   such that they cover exactly the full road network.
+   Returns: Array of pieces, each = {cells:[{r,c}], color, id}
+══════════════════════════════════════════════════════ */
+const PIECE_COLORS = [
+  '#8b7355','#7a6245','#6b5a3e','#5d4e35','#9a8060',
+  '#a0896a','#4e3f2c','#c4a46a','#b8924e','#d4b87a',
+];
+
+function decomposeRoads(grid, rows, cols){
+  // Collect all road cell coords
+  const roadSet = new Set();
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++)
+    if(grid[r][c].type === T.ROAD) roadSet.add(r+','+c);
+
+  const remaining = new Set(roadSet);
+  const pieces = [];
+  let colorIdx = 0;
+
+  // Piece size range per difficulty (can be tuned later)
+  const minSz = 2, maxSz = 5;
+
+  // Greedy BFS partitioning with randomization
+  while(remaining.size > 0){
+    // Pick a random starting cell
+    const keys = [...remaining];
+    const startKey = keys[Math.floor(Math.random() * keys.length)];
+    const [sr, sc] = startKey.split(',').map(Number);
+
+    // Determine random target size
+    const targetSz = minSz + Math.floor(Math.random() * (maxSz - minSz + 1));
+    const pieceCells = [];
+    const frontier = [{r:sr, c:sc}];
+    const visited = new Set([startKey]);
+
+    while(pieceCells.length < targetSz && frontier.length > 0){
+      // Weighted random from frontier (bias toward continuation)
+      const fi = Math.floor(Math.random() * frontier.length);
+      const {r, c} = frontier.splice(fi, 1)[0];
+      pieceCells.push({r, c});
+      remaining.delete(r+','+c);
+      // Add connected road neighbors to frontier
+      [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
+        const nr=r+dr, nc=c+dc, nk=nr+','+nc;
+        if(remaining.has(nk) && !visited.has(nk)){visited.add(nk);frontier.push({r:nr,c:nc});}
+      });
+    }
+
+    pieces.push({
+      id: pieces.length,
+      cells: pieceCells,      // absolute grid coords (solution position)
+      color: PIECE_COLORS[colorIdx % PIECE_COLORS.length],
+    });
+    colorIdx++;
+  }
+
+  // Convert each piece to relative shape + store solution offset
+  pieces.forEach(p => {
+    const minR = Math.min(...p.cells.map(c=>c.r));
+    const minC = Math.min(...p.cells.map(c=>c.c));
+    p.originR = minR;  // top-left of bounding box in grid
+    p.originC = minC;
+    p.shape   = p.cells.map(c=>({r:c.r-minR, c:c.c-minC}));
+    p.rotation = 0;    // current rotation (0,1,2,3 = 0°,90°,180°,270°)
+    p.placed  = false; // on grid or in toolbar
+    p.gridR   = null;  // placed at this grid origin
+    p.gridC   = null;
+  });
+
+  return pieces;
+}
+
+/* ══════════════════════════════════════════════════════
+   PIECE ROTATION
+   Rotates shape cells by 90° clockwise (times) times.
+   Returns new {r,c}[] relative cells.
+══════════════════════════════════════════════════════ */
+function rotateCells(cells, times){
+  let s = cells;
+  for(let t=0; t<(times%4); t++){
+    // 90° CW: (r,c) → (c, -r) then normalize
+    const rotated = s.map(({r,c}) => ({r:c, c:-r}));
+    const minR = Math.min(...rotated.map(x=>x.r));
+    const minC = Math.min(...rotated.map(x=>x.c));
+    s = rotated.map(x=>({r:x.r-minR, c:x.c-minC}));
+  }
+  return s;
+}
+
+function pieceBounds(cells){
+  return {
+    rows: Math.max(...cells.map(c=>c.r))+1,
+    cols: Math.max(...cells.map(c=>c.c))+1,
+  };
+}
+
+/* ══════════════════════════════════════════════════════
+   CANVAS + LAYOUT
+══════════════════════════════════════════════════════ */
+const canvas = document.getElementById('game-canvas');
+const ctx    = canvas.getContext('2d');
+let CELL = 40;
+
+function computeLayout(){
+  const area = document.getElementById('game-area');
+  const W = area.clientWidth||320, H = area.clientHeight||240;
+  const cols = G.lvDef?.cols || 10;
+  const rows = G.lvDef?.rows || 9;
+  CELL = Math.max(18, Math.floor(Math.min(W/cols, H/rows)));
+  canvas.width  = cols * CELL;
+  canvas.height = rows * CELL;
+  canvas.style.width  = canvas.width  + 'px';
+  canvas.style.height = canvas.height + 'px';
+}
+
+/* ══════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════ */
+let _tt = null;
+function toast(msg, dur=2400){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('on');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('on'),dur);}
+function hideAll(){['ss','gs','hs-screen'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('ss-controls').style.display='';}
+function showOverlay(em,t,tx,b1,cb1,b2,cb2){
+  ['oe','ot','ox'].forEach((id,i)=>document.getElementById(id).textContent=[em,t,tx][i]);
+  document.getElementById('ob').textContent=b1;document.getElementById('ov').classList.remove('hidden');
+  const b2el=document.getElementById('ob2');
+  if(b2){b2el.textContent=b2;b2el.classList.remove('hidden');}else b2el.classList.add('hidden');
+  document.getElementById('ob').onclick=()=>{document.getElementById('ov').classList.add('hidden');if(cb1)cb1();};
+  b2el.onclick=b2?()=>{document.getElementById('ov').classList.add('hidden');if(cb2)cb2();}:null;
+}
+function confirm2(ico,t,tx,yTxt,cb){
+  ['conf-ico','conf-t','conf-tx'].forEach((id,i)=>document.getElementById(id).textContent=[ico,t,tx][i]);
+  document.getElementById('conf-yes').textContent=yTxt;
+  document.getElementById('conf').classList.remove('hidden');
+  const cl=()=>document.getElementById('conf').classList.add('hidden');
+  document.getElementById('conf-yes').onclick=()=>{cl();cb();};
+  document.getElementById('conf-no').onclick=cl;
+}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function floatTxt(x,y,txt){
+  const area=document.getElementById('game-area');
+  const cv=canvas.getBoundingClientRect();
+  const ar=area.getBoundingClientRect();
+  const d=document.createElement('div');d.className='fscore';
+  d.style.left=(cv.left-ar.left+x-16)+'px';d.style.top=(cv.top-ar.top+y-6)+'px';
+  d.textContent=txt;area.appendChild(d);setTimeout(()=>d.remove(),950);
+}
+
+/* ══════════════════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════════════════ */
+let G = {};
+let rafId = null, lastTs = 0;
+
+/* ══════════════════════════════════════════════════════
+   HUD
+══════════════════════════════════════════════════════ */
+function updateHUD(){
+  if(!G.name) return;
+  document.getElementById('h-av').textContent     = G.avatar?.emoji||'🧔';
+  document.getElementById('h-nm').textContent     = G.name;
+  document.getElementById('h-lv').textContent     = G.lv||1;
+  document.getElementById('h-coins').textContent  = isDebug?'∞':(G.coins||0);
+  document.getElementById('h-veh').textContent    = (G.vehArrived||0)+'/'+(G.vehTotal||0);
+  const placed = (G.pieces||[]).filter(p=>p.placed).length;
+  const total  = (G.pieces||[]).length;
+  document.getElementById('h-pieces').textContent = placed+'/'+total;
+  updateStars();
+}
+function updateStars(){
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('lit', i<(G.stars||0));
+  });
+}
+function recalcStars(){
+  const totalRoutes = (G.routes||[]).length;
+  const arrived     = G.vehArrived||0;
+  const correct     = G.vehArrivedCorrect||0;
+  let s=0;
+  if(arrived>0) s=1;                          // 1⭐ first vehicle arrives
+  if(arrived>0&&arrived>=totalRoutes) s=2;    // 2⭐ all vehicles arrive
+  if(s===2&&correct>=totalRoutes) s=3;        // 3⭐ all to correct destination
+  G.stars=s; updateStars();
+}
+
+/* ══════════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════════ */
+function render(){
+  if(!G.grid) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawTerrain();
+  drawPlacedPieces();
+  drawEntities();
+  drawGhost();
+  drawVehicles();
+  if(G.mapHintActive) drawMapHint();
+}
+
+// Terrain colors
+function terrainColor(type){
+  if(isDark) switch(type){
+    case T.GRASS:    return '#1a3018';
+    case T.WATER:    return '#0e1e3a';
+    case T.ROAD:     return '#3a3020';
+    case T.BUILDING: return '#1a2a3a';
+    case T.HOUSE:    return '#1e1a30';
+    case T.DECO:     return '#1a3018';
+    default:         return '#1a3018';
+  }
+  switch(type){
+    case T.GRASS:    return '#3a6a28';
+    case T.WATER:    return '#1a4a8a';
+    case T.ROAD:     return '#5a4a2a';
+    case T.BUILDING: return '#2a4060';
+    case T.HOUSE:    return '#3a2a5a';
+    case T.DECO:     return '#3a6a28';
+    default:         return '#3a6a28';
+  }
+}
+
+function drawTerrain(){
+  const rows=G.grid.length, cols=G.grid[0].length;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const tile=G.grid[r][c];
+    const x=c*CELL, y=r*CELL;
+    ctx.fillStyle = terrainColor(tile.type);
+    ctx.fillRect(x,y,CELL,CELL);
+    // subtle grid lines
+    ctx.strokeStyle = isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.06)';
+    ctx.lineWidth=.5; ctx.strokeRect(x,y,CELL,CELL);
+    // water shimmer
+    if(tile.type===T.WATER){
+      const t=Date.now()*.0012;
+      ctx.fillStyle=`rgba(80,160,255,${.08+.04*Math.sin(t+c*.5+r*.3)})`;
+      ctx.fillRect(x,y,CELL,CELL);
+    }
+    // Original road (solution) shown faintly during obs, hidden after
+    if(tile.type===T.ROAD && G.obs){
+      ctx.fillStyle=isDark?'rgba(180,140,60,.55)':'rgba(120,90,30,.55)';
+      ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+      // dashed center
+      ctx.strokeStyle=isDark?'rgba(255,220,80,.4)':'rgba(180,140,40,.5)';
+      ctx.setLineDash([4,3]); ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(x+CELL/2,y+2);ctx.lineTo(x+CELL/2,y+CELL-2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(x+2,y+CELL/2);ctx.lineTo(x+CELL-2,y+CELL/2);ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // connection glow on road tile
+    if(tile.type===T.ROAD && tile.connected && !G.obs){
+      ctx.strokeStyle=isDark?'rgba(90,180,120,.5)':'rgba(40,130,60,.5)';
+      ctx.lineWidth=2; ctx.strokeRect(x+1.5,y+1.5,CELL-3,CELL-3);
+    }
+  }
+}
+
+function drawPlacedPieces(){
+  (G.pieces||[]).forEach(p=>{
+    if(!p.placed) return;
+    const rotCells = rotateCells(p.shape, p.rotation);
+    rotCells.forEach(({r,c})=>{
+      const gx=(p.gridC+c)*CELL, gy=(p.gridR+r)*CELL;
+      // Road texture
+      ctx.fillStyle = isDark ? '#4a3d2c' : '#7a6440';
+      ctx.fillRect(gx+1,gy+1,CELL-2,CELL-2);
+      // Road cross lines
+      ctx.fillStyle = isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.07)';
+      ctx.fillRect(gx+CELL*.18,gy,CELL*.64,CELL);
+      ctx.fillRect(gx,gy+CELL*.18,CELL,CELL*.64);
+      // Center dashes
+      ctx.strokeStyle=isDark?'rgba(255,210,60,.28)':'rgba(180,140,30,.38)';
+      ctx.setLineDash([4,3]); ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.moveTo(gx+CELL/2,gy+2);ctx.lineTo(gx+CELL/2,gy+CELL-2);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(gx+2,gy+CELL/2);ctx.lineTo(gx+CELL-2,gy+CELL/2);ctx.stroke();
+      ctx.setLineDash([]);
+      // Piece color tint border
+      ctx.strokeStyle=p.color+'88'; ctx.lineWidth=1.5;
+      ctx.strokeRect(gx+2,gy+2,CELL-4,CELL-4);
+    });
+  });
+}
+
+function drawEntities(){
+  const rows=G.grid.length, cols=G.grid[0].length;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const tile=G.grid[r][c]; if(!tile.icon) continue;
+    const x=c*CELL, y=r*CELL;
+    if(tile.type===T.BUILDING||tile.type===T.HOUSE){
+      ctx.fillStyle=isDark?'rgba(0,0,0,.4)':'rgba(0,0,0,.15)';
+      ctx.beginPath();ctx.roundRect(x+3,y+3,CELL-6,CELL-6,5);ctx.fill();
+      ctx.strokeStyle=isDark?'rgba(255,255,255,.12)':'rgba(0,0,0,.18)';
+      ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.roundRect(x+3,y+3,CELL-6,CELL-6,5);ctx.stroke();
+    }
+    ctx.font=(CELL*.58)+'px serif';
+    ctx.fillText(tile.icon, x+CELL/2, y+CELL/2);
+    if(tile.roadwork){
+      ctx.font=(CELL*.38)+'px serif';
+      ctx.fillText('🚧',x+CELL*.72,y+CELL*.28);
+    }
+  }
+  // Vehicle badges on destination houses (shows which vehicle is expected here)
+  if(!G.obs && G.routes){
+    G.routes.forEach(rt=>{
+      if(!rt.hsePos||rt.arrived) return;
+      const x=rt.hsePos.c*CELL, y=rt.hsePos.r*CELL;
+      // Small pill background
+      ctx.fillStyle=isDark?'rgba(0,0,0,.72)':'rgba(255,255,255,.82)';
+      ctx.beginPath();ctx.roundRect(x+CELL*.42,y-CELL*.22,CELL*.52,CELL*.28,4);ctx.fill();
+      ctx.strokeStyle=rt.dispatched?'rgba(90,180,120,.7)':'rgba(232,200,74,.7)';
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.roundRect(x+CELL*.42,y-CELL*.22,CELL*.52,CELL*.28,4);ctx.stroke();
+      // Vehicle icon
+      ctx.font=(CELL*.26)+'px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(rt.vehicle, x+CELL*.68, y-CELL*.08);
+    });
+  }
+}
+
+function drawGhost(){
+  if(!G.ghostPos || G.dragPiece===null || G.dragPiece===undefined) return;
+  const p = G.pieces[G.dragPiece];
+  if(!p || p.placed) return;
+  const rotCells = rotateCells(p.shape, p.rotation);
+  const {r:gr, c:gc} = G.ghostPos;
+  const valid = canPlacePiece(p, gr, gc);
+  rotCells.forEach(({r,c})=>{
+    const x=(gc+c)*CELL, y=(gr+r)*CELL;
+    ctx.fillStyle = valid?'rgba(90,180,120,.32)':'rgba(224,90,90,.32)';
+    ctx.fillRect(x+1,y+1,CELL-2,CELL-2);
+    ctx.strokeStyle = valid?'rgba(90,180,120,.7)':'rgba(224,90,90,.7)';
+    ctx.lineWidth=1.5; ctx.strokeRect(x+2,y+2,CELL-4,CELL-4);
+  });
+}
+
+function drawVehicles(){
+  if(!G.vehicles) return;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  G.vehicles.forEach(v=>{
+    if(!v.active) return;
+    ctx.font=(CELL*.54)+'px serif';
+    ctx.fillText(v.icon, v.px, v.py);
+  });
+}
+
+// Map hint: overlay tinted cells showing where each piece belongs
+function drawMapHint(){
+  (G.pieces||[]).forEach(p=>{
+    if(p.placed) return;
+    // Show ghost at solution position
+    p.shape.forEach(({r,c})=>{
+      const x=(p.originC+c)*CELL, y=(p.originR+r)*CELL;
+      ctx.fillStyle=p.color+'44';
+      ctx.fillRect(x+2,y+2,CELL-4,CELL-4);
+      ctx.strokeStyle=p.color+'99'; ctx.lineWidth=1.5;
+      ctx.setLineDash([3,3]);
+      ctx.strokeRect(x+2,y+2,CELL-4,CELL-4);
+      ctx.setLineDash([]);
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   PIECE TOOLBAR
+══════════════════════════════════════════════════════ */
+function buildPieceQueue(){
+  const container = document.getElementById('piece-queue');
+  container.innerHTML = '';
+  (G.pieces||[]).forEach((p, idx)=>{
+    const rotCells = rotateCells(p.shape, p.rotation);
+    const bounds   = pieceBounds(rotCells);
+    const cardSize = 56;
+    const cellSz   = Math.floor(cardSize / Math.max(bounds.rows, bounds.cols, 1));
+
+    const card = document.createElement('div');
+    card.className = 'piece-card' + (p.placed?' placed':'') + (G.dragPiece===idx?' active':'');
+    card.style.width  = cardSize + 'px';
+    card.style.height = cardSize + 'px';
+
+    // Mini canvas
+    const mc = document.createElement('canvas');
+    mc.width  = bounds.cols * cellSz;
+    mc.height = bounds.rows * cellSz;
+    const mc2 = mc.getContext('2d');
+    rotCells.forEach(({r,c})=>{
+      mc2.fillStyle = p.color;
+      mc2.fillRect(c*cellSz+1, r*cellSz+1, cellSz-2, cellSz-2);
+      mc2.strokeStyle='rgba(255,255,255,.28)'; mc2.lineWidth=1;
+      mc2.strokeRect(c*cellSz+1.5, r*cellSz+1.5, cellSz-3, cellSz-3);
+    });
+    card.appendChild(mc);
+
+    if(!p.placed){
+      card.addEventListener('click', ()=>{
+        if(G.dragPiece === idx){
+          // Tap to rotate
+          p.rotation = (p.rotation+1)%4;
+          playSnd('rotate');
+        } else {
+          G.dragPiece = idx;
+          playSnd('click');
+        }
+        buildPieceQueue(); render();
+      });
+    }
+    container.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   PLACEMENT LOGIC
+══════════════════════════════════════════════════════ */
+function canPlacePiece(p, originR, originC){
+  const rows = G.grid.length, cols = G.grid[0].length;
+  const rotCells = rotateCells(p.shape, p.rotation);
+  for(const {r,c} of rotCells){
+    const nr=originR+r, nc=originC+c;
+    if(nr<0||nr>=rows||nc<0||nc>=cols) return false;
+    const tile = G.grid[nr][nc];
+    // Can only place on GRASS or (with bridge) WATER
+    if(tile.type === T.WATER && !G.bridgeActive) return false;
+    if(tile.type === T.BUILDING || tile.type === T.HOUSE || tile.type === T.DECO) return false;
+    // Can't stack on another placed piece
+    if(tile.type === T.ROAD) return false;
+  }
+  return true;
+}
+
+function placePiece(p, originR, originC){
+  if(!canPlacePiece(p, originR, originC)){toast('❌ Cannot place here!'); return false;}
+  const rotCells = rotateCells(p.shape, p.rotation);
+  rotCells.forEach(({r,c})=>{
+    const tile = G.grid[originR+r][originC+c];
+    tile.type = T.ROAD;
+  });
+  p.placed = true;
+  p.gridR  = originR;
+  p.gridC  = originC;
+  playSnd('place');
+  G.dragPiece = null;
+  checkConnections();
+  recalcStars();
+  buildPieceQueue();
+  updateHUD();
+  render();
+  // Check if all pieces placed
+  if((G.pieces||[]).every(pp=>pp.placed)) checkLevelComplete();
+  return true;
+}
+
+function pickUpPiece(r, c){
+  // Find which placed piece covers this cell
+  const pieceIdx = (G.pieces||[]).findIndex(p=>{
+    if(!p.placed) return false;
+    const rotCells = rotateCells(p.shape, p.rotation);
+    return rotCells.some(({r:dr,c:dc})=>(p.gridR+dr)===r&&(p.gridC+dc)===c);
+  });
+  if(pieceIdx < 0) return false;
+  const p = G.pieces[pieceIdx];
+  // Remove road tiles
+  const rotCells = rotateCells(p.shape, p.rotation);
+  rotCells.forEach(({r:dr,c:dc})=>{
+    G.grid[p.gridR+dr][p.gridC+dc].type = T.GRASS;
+  });
+  p.placed = false; p.gridR = null; p.gridC = null;
+  G.dragPiece = pieceIdx;
+  playSnd('pickup');
+  // Recheck connections (roads removed may break paths)
+  checkConnections();
+  recalcStars();
+  buildPieceQueue(); updateHUD(); render();
+  return true;
+}
+
+/* ══════════════════════════════════════════════════════
+   BFS CONNECTION CHECK + VEHICLE DISPATCH
+══════════════════════════════════════════════════════ */
+function checkConnections(){
+  if(!G.grid||!G.routes) return;
+  const rows=G.grid.length, cols=G.grid[0].length;
+  // Clear connection markers
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) G.grid[r][c].connected=false;
+
+  // For each undispatched route, BFS from building → look for its specific house
+  G.routes.forEach(rt=>{
+    if(rt.dispatched) return;
+    if(!rt.bldPos||!rt.hsePos) return;
+    const {r:br, c:bc} = rt.bldPos;
+    if(G.grid[br][bc].type !== T.BUILDING) return;
+
+    // BFS from building cell through roads
+    const visited = new Set([br+','+bc]);
+    const queue   = [{r:br, c:bc, path:[{r:br,c:bc}]}];
+
+    while(queue.length){
+      const cur = queue.shift();
+      G.grid[cur.r][cur.c].connected = true;
+
+      [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
+        const nr=cur.r+dr, nc=cur.c+dc, nk=nr+','+nc;
+        if(nr<0||nr>=rows||nc<0||nc>=cols||visited.has(nk)) return;
+        const tile = G.grid[nr][nc];
+        const t    = tile.type;
+
+        if(t===T.ROAD){
+          visited.add(nk);
+          tile.connected=true;
+          queue.push({r:nr,c:nc,path:[...cur.path,{r:nr,c:nc}]});
+        } else if(t===T.HOUSE){
+          // Only trigger if this is the CORRECT destination house
+          if(nr===rt.hsePos.r && nc===rt.hsePos.c){
+            visited.add(nk);
+            tile.connected=true;
+            const fullPath=[...cur.path,{r:nr,c:nc}];
+            dispatchVehicle(rt, fullPath);
+          }
+        }
+      });
+    }
+  });
+}
+
+function dispatchVehicle(rt, pathCells){
+  if(rt.dispatched) return;
+  rt.dispatched = true;
+
+  if(!G.vehicles) G.vehicles=[];
+  const waypoints = pathCells.map(({r,c})=>({
+    r, c,
+    px: c*CELL + CELL/2,
+    py: r*CELL + CELL/2,
+  }));
+
+  G.vehicles.push({
+    icon:     rt.vehicle,
+    routeId:  rt.id,
+    targetR:  rt.hsePos.r,
+    targetC:  rt.hsePos.c,
+    active:   true,
+    waypoints,
+    wpIdx:    0,
+    px:       waypoints[0].px,
+    py:       waypoints[0].py,
+  });
+  G.vehTotal = (G.vehTotal||0)+1;
+  playSnd('connect');
+  toast(`${rt.vehicle} dispatched to ${rt.to}!`);
+  updateHUD();
+}
+
+/* ══════════════════════════════════════════════════════
+   VEHICLE UPDATE — follows road waypoints cell by cell
+══════════════════════════════════════════════════════ */
+function updateVehicles(dt){
+  if(!G.vehicles) return;
+  const weather  = G.weather || WEATHERS[0];
+  const turboMul = G.turboActive ? 2 : 1;
+  const wMul     = weather.vehMult || 1;
+  const spd      = (CELL / VEH_MS_PER_CELL) * dt * turboMul * wMul;
+
+  G.vehicles.forEach(v=>{
+    if(!v.active || !v.waypoints || v.wpIdx >= v.waypoints.length-1) return;
+    const target = v.waypoints[v.wpIdx+1];
+    const dx = target.px - v.px;
+    const dy = target.py - v.py;
+    const dist = Math.hypot(dx, dy);
+    if(dist <= spd+0.5){
+      v.px = target.px;
+      v.py = target.py;
+      v.wpIdx++;
+      if(v.wpIdx >= v.waypoints.length-1){
+        // Arrived at correct house (route already validated at dispatch)
+        v.active = false;
+        G.vehArrived = (G.vehArrived||0)+1;
+        G.vehArrivedCorrect = (G.vehArrivedCorrect||0)+1;
+        // Mark the route as arrived
+        const rt = (G.routes||[]).find(r=>r.id===v.routeId);
+        if(rt) rt.arrived=true;
+        const bonus = Math.round(30 * (weather.coinMult||1));
+        G.coins = (G.coins||0)+bonus;
+        playSnd('arrive');
+        floatTxt(v.px, v.py-10, v.icon+' +'+bonus+'💰');
+        updateHUD(); recalcStars(); checkLevelComplete();
+      }
+    } else {
+      v.px += dx/dist * spd;
+      v.py += dy/dist * spd;
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   LEVEL COMPLETE CHECK
+══════════════════════════════════════════════════════ */
+function checkLevelComplete(){
+  if(G.over) return;
+  const totalRoutes = (G.routes||[]).length;
+  if(totalRoutes===0) return;
+  const allArrived = (G.vehArrived||0) >= totalRoutes;
+  if(allArrived) setTimeout(showScoreScreen, 900);
+}
+
+/* ══════════════════════════════════════════════════════
+   SCORE SCREEN
+══════════════════════════════════════════════════════ */
+function showScoreScreen(){
+  if(G.over) return;
+  G.over=true; G.playing=false;
+  playSnd('win');
+  const base    = 60;
+  const veh     = (G.vehArrived||0)*25;
+  const correct = (G.vehArrivedCorrect||0)*15;
+  const star    = (G.stars||0)*40;
+  const total   = base+veh+correct+star;
+  G.coins=(G.coins||0)+total;
+  saveHistory('win');
+  document.getElementById('score-screen').classList.remove('hidden');
+  const totalRoutes=(G.routes||[]).length;
+  document.getElementById('score-rows').innerHTML=`
+    <div class="score-row"><span class="lbl">Vehicles arrived</span><span class="val">${G.vehArrived||0}/${totalRoutes} 🚗</span></div>
+    <div class="score-row"><span class="lbl">Correct destinations</span><span class="val">${G.vehArrivedCorrect||0}/${totalRoutes} ✅</span></div>
+    <div class="score-row"><span class="lbl">Pieces placed</span><span class="val">${(G.pieces||[]).filter(p=>p.placed).length}/${(G.pieces||[]).length} 🧩</span></div>
+    <div class="score-row"><span class="lbl">Base reward</span><span class="val">+${base}💰</span></div>
+    <div class="score-row"><span class="lbl">Vehicle bonus</span><span class="val">+${veh}💰</span></div>
+    <div class="score-row"><span class="lbl">Correct route bonus</span><span class="val">+${correct}💰</span></div>
+    <div class="score-row"><span class="lbl">Star bonus</span><span class="val">+${star}💰</span></div>`;
+  document.getElementById('score-total').textContent=`💰 +${total} earned this level!`;
+  updateHUD();
+  ['sc-s1','sc-s2','sc-s3'].forEach((id,i)=>{
+    const el=document.getElementById(id); el.classList.remove('earned');
+    if(i<(G.stars||0)) setTimeout(()=>el.classList.add('earned'),400+i*360);
+  });
+  document.getElementById('sc-next').onclick=()=>{document.getElementById('score-screen').classList.add('hidden');startLevel((G.lv||1)+1);};
+  document.getElementById('sc-replay').onclick=()=>{document.getElementById('score-screen').classList.add('hidden');startLevel(G.lv||1);};
+}
+
+/* ══════════════════════════════════════════════════════
+   OBSERVATION PHASE
+══════════════════════════════════════════════════════ */
+let _obsTimer=null;
+function startObservation(){
+  G.obs=true; G.paused=false;
+  const overlay=document.getElementById('obs-overlay');
+  const timerEl=document.getElementById('obs-timer');
+  const barEl  =document.getElementById('obs-bar');
+  overlay.classList.remove('hidden');
+  render();
+  const startT=performance.now();
+  function tick(){
+    const elapsed=performance.now()-startT;
+    const rem=Math.max(0,OBS_SECS*1000-elapsed);
+    timerEl.textContent=Math.ceil(rem/1000);
+    barEl.style.width=(rem/(OBS_SECS*1000)*100)+'%';
+    if(rem<=0) endObservation();
+    else _obsTimer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endObservation(){
+  clearTimeout(_obsTimer);
+  G.obs=false;
+  document.getElementById('obs-overlay').classList.add('hidden');
+  // Flash effect
+  const flash=document.getElementById('asteroid-flash');
+  flash.classList.add('bang');
+  playSnd('asteroid');
+  setTimeout(()=>{
+    flash.classList.remove('bang');
+    // Wipe road tiles from grid (they become grass; player will reconstruct)
+    const rows=G.grid.length, cols=G.grid[0].length;
+    for(let r=0;r<rows;r++) for(let c=0;c<cols;c++)
+      if(G.grid[r][c].type===T.ROAD) G.grid[r][c]={type:T.GRASS,icon:null};
+    G.playing=true;
+    render();
+    toast('☄️ Asteroid hit! Rebuild the roads!',3200);
+  }, 180);
+}
+
+/* ══════════════════════════════════════════════════════
+   GAME LOOP
+══════════════════════════════════════════════════════ */
+function gameLoop(ts){
+  const dt=Math.min(ts-lastTs,50); lastTs=ts;
+  if(!G.over && !G.paused && G.playing){
+    updateVehicles(dt);
+    render();
+  }
+  rafId=requestAnimationFrame(gameLoop);
+}
+
+/* ══════════════════════════════════════════════════════
+   CANVAS INPUT
+══════════════════════════════════════════════════════ */
+function cellFromEvent(e){
+  const r=canvas.getBoundingClientRect();
+  return{
+    r:Math.floor((e.clientY-r.top)*(canvas.height/r.height)/CELL),
+    c:Math.floor((e.clientX-r.left)*(canvas.width/r.width)/CELL),
+  };
+}
+
+let _pointerDown=false;
+canvas.addEventListener('pointerdown',e=>{
+  if(G.obs||G.over||G.paused) return;
+  _pointerDown=true;
+  const {r,c}=cellFromEvent(e);
+  G.ghostPos={r,c}; render();
+});
+canvas.addEventListener('pointermove',e=>{
+  if(!_pointerDown||G.obs||G.over||G.paused) return;
+  const {r,c}=cellFromEvent(e);
+  G.ghostPos={r,c}; render();
+});
+canvas.addEventListener('pointerup',e=>{
+  if(G.obs||G.over||G.paused){_pointerDown=false;return;}
+  _pointerDown=false;
+  const {r,c}=cellFromEvent(e);
+  G.ghostPos=null;
+
+  if(G.dragPiece!==null && G.dragPiece!==undefined){
+    const p=G.pieces[G.dragPiece];
+    if(p && !p.placed){
+      placePiece(p,r,c);
+    }
+  } else {
+    // Try to pick up piece at clicked cell
+    pickUpPiece(r,c);
+  }
+  render();
+});
+canvas.addEventListener('pointerleave',()=>{_pointerDown=false;G.ghostPos=null;if(!G.obs)render();});
+
+/* recycle */
+document.getElementById('recycle-btn').addEventListener('click',()=>{
+  if(G.dragPiece===null||G.dragPiece===undefined){toast('👆 Select a piece first!');return;}
+  if(!isDebug&&(G.coins||0)<10){toast('💰 Need 10 coins to recycle!');return;}
+  if(!isDebug) G.coins-=10;
+  // Randomize the piece's shape by picking a different random partition
+  // Simple approach: rotate it by a random amount
+  const p=G.pieces[G.dragPiece];
+  if(!p||p.placed) return;
+  p.rotation=Math.floor(Math.random()*4);
+  toast('♻️ Piece rotated!');
+  buildPieceQueue(); updateHUD(); render();
+});
+
+/* ══════════════════════════════════════════════════════
+   POWER-UPS
+══════════════════════════════════════════════════════ */
+function buildPuRow(){
+  const row=document.getElementById('pu-row'); row.innerHTML='';
+  if(!G.powerups) return;
+  // Map hint toggle
+  if(G.mapHintActive){
+    const b=document.createElement('span');
+    b.style.cssText='font-size:.5rem;color:var(--accent);border:1px solid var(--accent);border-radius:10px;padding:2px 7px;';
+    b.textContent='🗺️ Map Hint ON';
+    row.appendChild(b);
+  }
+  if(G.turboActive){
+    const b=document.createElement('span');
+    b.style.cssText='font-size:.5rem;color:var(--gold);border:1px solid var(--gold);border-radius:10px;padding:2px 7px;';
+    b.textContent='🏎️ Turbo ON';
+    row.appendChild(b);
+  }
+  Object.entries(G.powerups).forEach(([id,uses])=>{
+    if(!uses) return;
+    const item=SHOP_ITEMS.find(s=>s.id===id); if(!item) return;
+    const btn=document.createElement('button'); btn.className='pub'; btn.disabled=!!G.over;
+    btn.innerHTML=`${item.icon} ${item.name} <span style="font-size:.46rem;color:var(--gold)">(${uses})</span>`;
+    btn.addEventListener('click',()=>activatePU(id));
+    row.appendChild(btn);
+  });
+}
+function activatePU(id){
+  if(!G.powerups?.[id]) return;
+  G.powerups[id]--;
+  playSnd('click');
+  if(id==='maphint'){
+    G.mapHintActive=!G.mapHintActive;
+    toast(G.mapHintActive?'🗺️ Map Hint ON — piece positions shown!':'🗺️ Map Hint OFF');
+    if(G.mapHintActive && G.powerups.maphint===0) G.powerups.maphint=0;
+    else if(!G.mapHintActive) G.powerups.maphint=(G.powerups.maphint||0)+1; // refund if toggled off
+  } else if(id==='extinguisher'){
+    let n=0; G.grid.forEach(row=>row.forEach(t=>{if(t.fire){t.fire=false;n++;}}));
+    toast(`🧯 ${n} fire${n!==1?'s':''} out!`);
+  } else if(id==='turbo'){
+    G.turboActive=true;
+    toast('🏎️ Turbo active — vehicles 2× faster for 60s!');
+    setTimeout(()=>{G.turboActive=false;buildPuRow();},60000);
+  } else if(id==='bridge'){
+    G.bridgeActive=true;
+    toast('🌉 Bridge ready — place one piece over water!');
+  } else if(id==='superclick'){
+    G.grid.forEach(row=>row.forEach(t=>t.roadwork=false));
+    toast('🔨 All roadworks cleared!');
+  }
+  render(); buildPuRow(); updateHUD();
+}
+
+/* ══════════════════════════════════════════════════════
+   SHOP
+══════════════════════════════════════════════════════ */
+function openShop(){G.paused=true; buildShopUI(); document.getElementById('shop-popup').classList.remove('hidden');}
+function closeShop(){G.paused=false; document.getElementById('shop-popup').classList.add('hidden');}
+function buildShopUI(){
+  document.getElementById('shop-bal-val').textContent=isDebug?'∞':(G.coins||0);
+  const grid=document.getElementById('shop-grid'); grid.innerHTML='';
+  SHOP_ITEMS.forEach(item=>{
+    const owned=(G.powerups?.[item.id]||0);
+    const canAfford=isDebug||(G.coins||0)>=item.cost;
+    const div=document.createElement('div'); div.className='shop-item';
+    div.innerHTML=`<div class="si-ico">${item.icon}</div>
+      <div><div class="si-name">${item.name}${owned?` <span style="color:var(--accent);font-size:.54rem">(${owned})</span>`:''}</div>
+      <div class="si-desc">${item.desc}</div></div>
+      <div><button class="si-buy" data-id="${item.id}" ${canAfford?'':'disabled'}>${item.cost}💰</button></div>`;
+    grid.appendChild(div);
+  });
+  grid.querySelectorAll('.si-buy').forEach(btn=>btn.addEventListener('click',()=>{
+    const item=SHOP_ITEMS.find(s=>s.id===btn.dataset.id); if(!item) return;
+    if(!isDebug&&(G.coins||0)<item.cost){toast('💰 Not enough coins!');return;}
+    if(!isDebug) G.coins-=item.cost;
+    if(!G.powerups) G.powerups={};
+    G.powerups[item.id]=(G.powerups[item.id]||0)+item.uses;
+    playSnd('coins'); toast(`${item.icon} ${item.name} purchased!`);
+    updateHUD(); buildShopUI(); buildPuRow();
+  }));
+}
+document.getElementById('shop-close').addEventListener('click',closeShop);
+document.getElementById('hud-shop').addEventListener('click',()=>{if(G.name&&!G.over)openShop();});
+
+/* ══════════════════════════════════════════════════════
+   START LEVEL
+══════════════════════════════════════════════════════ */
+function startLevel(lv){
+  cancelAnimationFrame(rafId);
+  clearTimeout(_obsTimer);
+
+  // Wrap levels (cycle after last)
+  const lvIdx = ((lv-1) % LEVELS.length);
+  const lvDef = LEVELS[lvIdx];
+  const weather = WEATHERS[Math.floor(Math.random()*WEATHERS.length)];
+
+  // Parse map — now returns {grid, buildingCoords, houseCoords}
+  const parsed  = parseMap(lvDef);
+  const grid    = parsed.grid;
+  const routes  = buildRoutes(lvDef, parsed.buildingCoords, parsed.houseCoords);
+
+  // Decompose roads into puzzle pieces
+  const pieces = decomposeRoads(grid, lvDef.rows, lvDef.cols);
+
+  G = {...G,
+    lv, lvDef, grid, pieces, routes, weather,
+    playing:false, obs:false, over:false, paused:false,
+    dragPiece:null, ghostPos:null,
+    vehicles:[], vehArrived:0, vehArrivedCorrect:0, vehTotal:0,
+    activeConnections:new Set(),
+    stars:0, bridgeActive:false, mapHintActive:false, turboActive:false,
+    startTime:Date.now(),
+  };
+
+  computeLayout();
+  updateHUD();
+  buildPieceQueue();
+  buildPuRow();
+
+  // Status bar
+  document.getElementById('status-lv-name').textContent=`Level ${lv} — ${lvDef.name}`;
+  document.getElementById('status-weather-ico').textContent=weather.ico;
+  document.getElementById('status-weather-name').textContent=weather.name;
+  document.getElementById('status-event').textContent='';
+
+  render();
+  startObservation();
+
+  lastTs=performance.now();
+  rafId=requestAnimationFrame(gameLoop);
+}
+
+/* ══════════════════════════════════════════════════════
+   AVATAR GRID + DIFFICULTY
+══════════════════════════════════════════════════════ */
+let pAvatarKey=null;
+(()=>{
+  const g=document.getElementById('avatar-grid');
+  Object.entries(AVATARS).forEach(([k,av])=>{
+    const b=document.createElement('button'); b.className='avbtn'; b.dataset.key=k;
+    b.innerHTML=`<span class="ae">${av.emoji}</span><span class="al">${av.label}</span>`;
+    b.addEventListener('click',()=>{document.querySelectorAll('.avbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');pAvatarKey=k;});
+    g.appendChild(b);
+  });
+})();
+let selDiff='easy';
+document.querySelectorAll('.diffbtn').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.diffbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); selDiff=b.dataset.diff;
+}));
+
+/* ══════════════════════════════════════════════════════
+   HISTORY
+══════════════════════════════════════════════════════ */
+const HK='ppPC2_hist';
+function loadH(){try{return JSON.parse(localStorage.getItem(HK)||'[]');}catch{return[];}}
+function saveH(h){try{localStorage.setItem(HK,JSON.stringify(h));}catch{}}
+function saveHistory(result){
+  const h=loadH();
+  h.unshift({name:G.name,avatar:G.avatar?.emoji||'🧔',lv:G.lv,stars:G.stars,
+    coins:G.coins,diff:selDiff,result,
+    date:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})});
+  if(h.length>50)h.length=50; saveH(h);
+}
+function showHist(ret='ss'){
+  hideAll(); document.getElementById('hs-screen').classList.remove('hidden');
+  const h=loadH(),el=document.getElementById('hs-list');
+  if(!h.length) el.innerHTML='<div style="color:var(--text3);font-size:.82rem;text-align:center;padding:24px;font-style:italic">✦ No games yet — play your first!</div>';
+  else{
+    const med=['🥇','🥈','🥉'];
+    el.innerHTML=h.map((e,i)=>`<div style="background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 9px;align-items:center;border-left:3px solid ${e.result==='win'?'var(--accent)':'var(--red)'}">
+      <div style="font-size:1.1rem;color:var(--accent2)">${med[i]||i+1}</div>
+      <div><div style="font-weight:700;font-size:.8rem">${e.avatar} ${e.name} — Lv${e.lv||1} ${'⭐'.repeat(e.stars||0)}</div>
+      <div style="font-size:.58rem;color:var(--text3)">${e.date} · ${e.diff||''}</div></div>
+      <div style="text-align:right;font-size:.68rem;color:var(--gold2)">💰${e.coins||0}</div></div>`).join('');
+  }
+  document.getElementById('hs-back').onclick=()=>{hideAll();document.getElementById(ret).classList.remove('hidden');};
+}
+document.getElementById('hist-btn').addEventListener('click',()=>showHist('ss'));
+document.getElementById('hs-del').addEventListener('click',()=>{confirm2('🗑','Clear History','Delete all records?','Delete',()=>{saveH([]);showHist();toast('🗑 Cleared!');});});
+
+/* ══════════════════════════════════════════════════════
+   HUD BUTTONS
+══════════════════════════════════════════════════════ */
+document.getElementById('hud-quit').addEventListener('click',()=>{
+  if(!G.name||G.over)return; G.paused=true;
+  confirm2('🚪','Quit Level','Abandon this level?','Quit',()=>{
+    cancelAnimationFrame(rafId); clearTimeout(_obsTimer);
+    saveHistory('fail'); G={}; hideAll(); document.getElementById('ss').classList.remove('hidden');
+  });
+  document.getElementById('conf-no').addEventListener('click',()=>{G.paused=false;},{once:true});
+});
+document.getElementById('hud-help').addEventListener('click',()=>{G.paused=true;document.getElementById('help-popup').classList.remove('hidden');});
+document.getElementById('help-close').addEventListener('click',()=>{document.getElementById('help-popup').classList.add('hidden');if(G.name&&!G.over)G.paused=false;});
+document.getElementById('help-ss-btn').addEventListener('click',()=>document.getElementById('help-popup').classList.remove('hidden'));
+document.getElementById('cp-span').addEventListener('click',()=>document.getElementById('about-popup').classList.remove('hidden'));
+document.getElementById('about-close').addEventListener('click',()=>document.getElementById('about-popup').classList.add('hidden'));
+
+/* ══════════════════════════════════════════════════════
+   START GAME
+══════════════════════════════════════════════════════ */
+function startGame(name, avatarKey){
+  cancelAnimationFrame(rafId); clearTimeout(_obsTimer);
+  hideAll(); document.getElementById('gs').classList.remove('hidden');
+  document.getElementById('ss-controls').style.display='none';
+  G={name, avatar:AVATARS[avatarKey], avatarKey, diff:selDiff,
+     coins:isDebug?DEBUG_COINS:START_COINS, powerups:{}};
+  startLevel(1);
+  toast(`Welcome, ${name}! 📖 Study the city — asteroid incoming!`,3200);
+}
+document.getElementById('pbtn').addEventListener('click',()=>{
+  const name=document.getElementById('pname').value.trim();
+  if(!name){toast('✏️ Enter your name!');return;}
+  if(!pAvatarKey){toast('👆 Choose your engineer!');return;}
+  playSnd('click'); startGame(name,pAvatarKey);
+});
+
+/* RESIZE — only geometry, no path regeneration */
+let _rt=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(_rt); _rt=setTimeout(()=>{
+    if(!G.name||G.over)return;
+    const area=document.getElementById('game-area');
+    const W=area.clientWidth||320,H=area.clientHeight||240;
+    const nc=Math.max(18,Math.floor(Math.min(W/(G.lvDef?.cols||10),H/(G.lvDef?.rows||9))));
+    if(nc===CELL)return;
+    computeLayout();
+    // Reposition vehicle pixel coords to match new CELL
+    (G.vehicles||[]).forEach(v=>{
+      if(v.waypoints){
+        v.waypoints=v.waypoints.map(({r,c})=>({r,c,px:c*CELL+CELL/2,py:r*CELL+CELL/2}));
+      }
+    });
+    render();
+  },300);
+});
+</script>
+</body>
+</html>
